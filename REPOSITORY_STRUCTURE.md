@@ -84,7 +84,9 @@ Contains:
 
 - ARCHITECTURE.md
 - ARCHITECTURE_V2.md
+- API_DESIGN.md
 - BLUEPRINT.md
+- TECH_STACK.md
 
 ---
 
