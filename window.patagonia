@@ -617,4 +617,878 @@ It must never expose how the browser is implemented.
 
 Changing Electron, SQLite or internal services should never require changing the public API.
 
+
+
 This separation is one of the most important long-term architectural goals of Patagonia Browser.
+
+# 19. Detailed Process Architecture
+
+Patagonia Browser follows a strict layered architecture to ensure security,
+maintainability and long-term evolution.
+
+Each layer has a clearly defined responsibility and communicates only with its
+adjacent layers.
+
+```text
+┌───────────────────────────────────────────────┐
+│                 React UI                      │
+└───────────────────────────────────────────────┘
+                     │
+                     ▼
+┌───────────────────────────────────────────────┐
+│            window.patagonia API               │
+└───────────────────────────────────────────────┘
+                     │
+                     ▼
+┌───────────────────────────────────────────────┐
+│               Preload Bridge                  │
+└───────────────────────────────────────────────┘
+                     │
+                     ▼
+┌───────────────────────────────────────────────┐
+│            Runtime Validation (Zod)           │
+└───────────────────────────────────────────────┘
+                     │
+                     ▼
+┌───────────────────────────────────────────────┐
+│              Electron IPC Layer               │
+└───────────────────────────────────────────────┘
+                     │
+                     ▼
+┌───────────────────────────────────────────────┐
+│             Sender Validation                 │
+└───────────────────────────────────────────────┘
+                     │
+                     ▼
+┌───────────────────────────────────────────────┐
+│            Application Services               │
+└───────────────────────────────────────────────┘
+                     │
+                     ▼
+┌───────────────────────────────────────────────┐
+│            Core Browser Engine                │
+└───────────────────────────────────────────────┘
+                     │
+                     ▼
+┌───────────────────────────────────────────────┐
+│      Storage / Native OS / Electron API       │
+└───────────────────────────────────────────────┘
+```
+
+Every layer depends only on the layer immediately below it.
+
+No layer may skip another layer.
+
+---
+
+# 20. Renderer Process
+
+The Renderer Process is responsible exclusively for presentation logic.
+
+Responsibilities:
+
+- Render React components.
+- Manage local UI state.
+- Receive user interaction.
+- Display browser information.
+- Call the public API.
+
+Forbidden responsibilities:
+
+- File system access.
+- SQLite access.
+- Node.js modules.
+- Electron APIs.
+- Browser process management.
+
+The Renderer must remain completely sandboxed.
+
+---
+
+# 21. Preload Process
+
+The preload script is the only trusted bridge between the Renderer and the Main
+Process.
+
+Responsibilities:
+
+- Expose `window.patagonia`.
+- Marshal requests.
+- Marshal responses.
+- Hide Electron IPC.
+- Enforce the public API surface.
+
+The preload layer contains no business rules.
+
+It must remain thin and deterministic.
+
+---
+
+# 22. Main Process
+
+The Main Process owns all privileged capabilities.
+
+Responsibilities include:
+
+- Window lifecycle.
+- Tab lifecycle.
+- Download manager.
+- Permission manager.
+- Native dialogs.
+- File system access.
+- Session management.
+- Browser services.
+- OS integration.
+
+The Main Process must never expose internal Electron objects directly to the
+Renderer.
+
+---
+
+# 23. Application Services
+
+Business logic resides inside Application Services.
+
+Examples:
+
+- NavigationService
+- TabService
+- WindowService
+- DownloadService
+- SettingsService
+- HistoryService
+- BookmarkService
+- SessionService
+
+Application Services should never know that IPC exists.
+
+They operate only on domain models and DTOs.
+
+---
+
+# 24. Trust Boundary Model
+
+Every communication crossing a trust boundary must be validated.
+
+Trust hierarchy:
+
+```text
+Main Process
+      │
+      ▼
+Preload
+      │
+      ▼
+Renderer
+      │
+      ▼
+Web Content
+```
+
+Validation is mandatory at every transition.
+
+---
+
+# 25. IPC Request Flow
+
+Every public API call follows the same execution path.
+
+```text
+React Component
+      │
+      ▼
+window.patagonia.tabs.create()
+      │
+      ▼
+Preload
+      │
+      ▼
+Zod Validation
+      │
+      ▼
+ipcRenderer.invoke()
+      │
+      ▼
+ipcMain.handle()
+      │
+      ▼
+Sender Validation
+      │
+      ▼
+TabService.create()
+      │
+      ▼
+DTO Mapper
+      │
+      ▼
+ApiResult<TabDTO>
+      │
+      ▼
+Renderer
+```
+
+No step may be bypassed.
+
+---
+
+# 26. IPC Channel Registry
+
+IPC channel names follow a strict convention.
+
+Pattern:
+
+```text
+<namespace>:<action>
+```
+
+Examples:
+
+```text
+tabs:create
+tabs:close
+tabs:activate
+
+downloads:pause
+
+downloads:resume
+
+history:search
+
+settings:get
+
+settings:update
+```
+
+Channels are private implementation details.
+
+Application code must never reference channel names directly.
+
+---
+
+# 27. Runtime Validation
+
+Compile-time validation is insufficient.
+
+Every IPC request must be validated using Zod before execution.
+
+Example:
+
+```ts
+const schema = z.object({
+
+    url: z.string().url(),
+
+    active: z.boolean().optional()
+
+});
+```
+
+Invalid requests are rejected before reaching the service layer.
+
+---
+
+# 28. Sender Validation
+
+Every IPC handler validates the caller.
+
+Validation includes:
+
+- Frame origin.
+- Process identity.
+- Browser context.
+- Internal page permissions.
+
+Unauthorized callers receive an access denied error.
+
+No privileged operation executes before sender validation succeeds.
+
+---
+
+# 29. IPC Handler Rules
+
+Handlers must remain extremely small.
+
+Responsibilities:
+
+- Validate sender.
+- Validate payload.
+- Call one service.
+- Map response DTO.
+- Return ApiResult.
+
+Handlers must never:
+
+- Access SQLite directly.
+- Execute business logic.
+- Perform complex calculations.
+- Modify unrelated state.
+
+---
+
+# 30. DTO Mapping
+
+Internal domain models are never exposed outside the Main Process.
+
+Instead, every response is mapped to immutable DTOs.
+
+Example:
+
+```text
+Internal Model
+        │
+        ▼
+DTO Mapper
+        │
+        ▼
+TabDTO
+```
+
+Benefits:
+
+- Stable contracts.
+- Better security.
+- Easier versioning.
+- Reduced coupling.
+- Simpler testing.
+
+Every DTO should represent only the information required by the caller.
+
+No internal implementation details should ever appear in a DTO.
+
+# 31. Public API Structure
+
+The Renderer process interacts with Patagonia Browser exclusively through the
+global `window.patagonia` object.
+
+This object represents the complete public API surface exposed by the browser.
+
+It is intentionally:
+
+- Small
+- Stable
+- Typed
+- Discoverable
+- Versionable
+- Secure
+
+No Electron APIs, Node.js APIs or IPC primitives are exposed directly.
+
+---
+
+# 32. Global API Contract
+
+The preload script injects the following object:
+
+```ts
+declare global {
+    interface Window {
+        readonly patagonia: PatagoniaAPI;
+    }
+}
+```
+
+The object is immutable after initialization.
+
+Replacing or mutating `window.patagonia` is forbidden.
+
+---
+
+# 33. PatagoniaAPI Interface
+
+The root interface is intentionally organized into namespaces.
+
+Example:
+
+```ts
+export interface PatagoniaAPI {
+
+    readonly app: AppAPI;
+
+    readonly windows: WindowsAPI;
+
+    readonly tabs: TabsAPI;
+
+    readonly navigation: NavigationAPI;
+
+    readonly downloads: DownloadsAPI;
+
+    readonly history: HistoryAPI;
+
+    readonly bookmarks: BookmarksAPI;
+
+    readonly settings: SettingsAPI;
+
+    readonly permissions: PermissionsAPI;
+
+    readonly sessions: SessionsAPI;
+
+    readonly ai: AIAPI;
+}
+```
+
+Each namespace owns exactly one functional domain.
+
+---
+
+# 34. Namespace Design Principles
+
+Namespaces should follow these rules:
+
+- One responsibility
+- No overlap
+- Easy discovery
+- Stable naming
+- Independent evolution
+
+Namespaces must never expose implementation details.
+
+Good:
+
+```ts
+tabs.create()
+```
+
+Bad:
+
+```ts
+ipc.invokeCreateTab()
+```
+
+---
+
+# 35. Namespace Responsibilities
+
+## app
+
+Application lifecycle.
+
+Examples:
+
+- version
+- quit
+- restart
+- checkUpdates
+
+---
+
+## windows
+
+Browser windows.
+
+Examples:
+
+- create
+- close
+- minimize
+- maximize
+- focus
+
+---
+
+## tabs
+
+Browser tabs.
+
+Examples:
+
+- create
+- close
+- duplicate
+- activate
+- move
+- pin
+
+---
+
+## navigation
+
+Navigation.
+
+Examples:
+
+- back
+- forward
+- reload
+- stop
+- navigate
+
+---
+
+## downloads
+
+Download management.
+
+Examples:
+
+- pause
+- resume
+- cancel
+- remove
+
+---
+
+## history
+
+Browsing history.
+
+Examples:
+
+- search
+- clear
+- deleteEntry
+
+---
+
+## bookmarks
+
+Bookmark management.
+
+Examples:
+
+- create
+- update
+- delete
+- move
+
+---
+
+## settings
+
+Persistent configuration.
+
+Examples:
+
+- get
+- update
+- reset
+
+---
+
+## permissions
+
+Permission management.
+
+Examples:
+
+- request
+- revoke
+- list
+
+---
+
+## sessions
+
+Profiles and sessions.
+
+Examples:
+
+- create
+- switch
+- delete
+
+---
+
+## ai
+
+Artificial Intelligence integrations.
+
+Examples:
+
+- summarize
+- translate
+- explain
+- chat
+
+---
+
+# 36. Naming Convention
+
+Methods always begin with verbs.
+
+Examples:
+
+```ts
+create()
+
+update()
+
+delete()
+
+move()
+
+reload()
+
+activate()
+
+pause()
+
+resume()
+
+search()
+```
+
+Avoid nouns as actions.
+
+Bad:
+
+```ts
+tabCreation()
+
+windowClose()
+
+historyCleaner()
+```
+
+---
+
+# 37. Method Signature Rules
+
+Every method must:
+
+- Receive typed parameters.
+- Return typed results.
+- Never return `any`.
+- Never throw expected business errors.
+- Be deterministic.
+
+Example:
+
+```ts
+create(input: CreateTabRequest): Promise<ApiResult<TabDTO>>
+```
+
+---
+
+# 38. Request Objects
+
+Methods receiving more than one parameter should use request objects.
+
+Bad:
+
+```ts
+create(url, active, pinned)
+```
+
+Good:
+
+```ts
+create({
+
+    url,
+
+    active,
+
+    pinned
+
+})
+```
+
+Advantages:
+
+- Easier evolution
+- Better readability
+- Optional fields
+- Backward compatibility
+
+---
+
+# 39. Response Objects
+
+Responses must never expose internal classes.
+
+Only DTOs.
+
+Good:
+
+```ts
+TabDTO
+```
+
+Bad:
+
+```ts
+Electron.WebContents
+```
+
+---
+
+# 40. Immutability
+
+Returned DTOs should be treated as immutable.
+
+Consumers should never modify received objects.
+
+Updates are performed using dedicated API methods.
+
+---
+
+# 41. Async Rules
+
+Every operation crossing an IPC boundary is asynchronous.
+
+Examples:
+
+```ts
+await tabs.create()
+
+await settings.get()
+
+await downloads.pause()
+```
+
+Avoid synchronous IPC entirely.
+
+---
+
+# 42. Error Handling
+
+Methods return an ApiResult.
+
+Expected failures are represented as values.
+
+Unexpected failures are converted into ApiError.
+
+The Renderer should never receive uncaught exceptions from the Main Process.
+
+---
+
+# 43. Discoverability
+
+The API should be intuitive.
+
+Developers should discover capabilities using IDE autocomplete.
+
+Example:
+
+```ts
+window.patagonia.
+```
+
+Immediately reveals:
+
+- app
+- tabs
+- navigation
+- downloads
+- settings
+- history
+
+No documentation should be required for common operations.
+
+---
+
+# 44. Stability Rules
+
+Public methods are considered contracts.
+
+Changing:
+
+- names
+- meanings
+- parameter order
+- return types
+
+is considered a breaking change.
+
+Breaking changes require version evolution.
+
+---
+
+# 45. Deprecation Policy
+
+Deprecated APIs remain available during at least one major release.
+
+Example:
+
+```ts
+/**
+ * @deprecated
+ * Use tabs.activate()
+ */
+focusTab()
+```
+
+Deprecated methods should emit development warnings.
+
+---
+
+# 46. Namespace Evolution
+
+New namespaces may be added without breaking compatibility.
+
+Existing namespaces should not change responsibility.
+
+Example:
+
+Future additions:
+
+```text
+sync
+
+extensions
+
+workspaces
+
+profiles
+
+passwordManager
+
+devtools
+```
+
+---
+
+# 47. Forbidden Public APIs
+
+The following must never appear in the Renderer API:
+
+- ipcRenderer
+- ipcMain
+- BrowserWindow
+- WebContents
+- shell
+- dialog
+- fs
+- path
+- process
+- child_process
+- sqlite
+- Electron classes
+
+The Renderer interacts only with browser capabilities.
+
+---
+
+# 48. Public API Invariants
+
+The following rules are always true:
+
+- The Renderer never talks directly to Electron.
+- Every call passes through the preload bridge.
+- Every payload is validated.
+- Every privileged operation validates the sender.
+- DTOs are immutable.
+- Business logic never exists inside preload.
+- IPC channels are private.
+- Contracts are versioned.
+- Secrets never leave the Main Process.
+
+These invariants are part of Patagonia Browser's security model.
+
+---
+
+# End of Part 1C
+
+The next section of this document begins with:
+
+# 49. API Contracts
+
+which introduces:
+
+- ApiResult
+- ApiError
+- DTO Specifications
+- Request Contracts
+- Response Contracts
+- Event Contracts
+- Validation Rules
