@@ -2,23 +2,34 @@
 
 # TECH_STACK.md
 
-**Document Version:** 1.0  
+**Document Version:** 1.1  
 **Status:** Official Technical Stack  
-**Owner:** Patagonia Labs
+**Owner:** Patagonia Labs  
+**Last Updated:** July 2026
 
 ---
 
-# Purpose
+## 1. Purpose
 
 This document defines the official technology stack of Patagonia Browser.
 
-It explains the technologies used throughout the project, the reasons behind each decision, and the criteria for introducing new dependencies.
+It explains:
 
-Technology choices are considered architectural decisions.
+- Which technologies are approved
+- Why each technology was selected
+- How each technology fits the architecture
+- Which responsibilities belong to each layer
+- How dependencies are evaluated
+- Which practices are forbidden
+- Which technologies may be considered in the future
+
+Technology choices are architectural decisions.
+
+No new framework, runtime, database, validation library, build tool or infrastructure dependency may be introduced without technical review.
 
 ---
 
-# Design Principles
+## 2. Design Principles
 
 The technology stack must prioritize:
 
@@ -28,17 +39,21 @@ The technology stack must prioritize:
 - Cross-platform compatibility
 - Developer experience
 - Performance
-- Open-source ecosystem
+- Open-source availability
+- Strong documentation
 - Large community support
+- Predictable upgrade paths
 
-No technology should be adopted solely because it is new or popular.
+No technology should be adopted solely because it is new, popular or fashionable.
+
+The stack must remain as small as practical.
 
 ---
 
-# Technology Overview
+## 3. Technology Overview
 
 | Layer | Technology |
-|--------|------------|
+|---|---|
 | Desktop Runtime | Electron |
 | Rendering Engine | Chromium |
 | UI Framework | React |
@@ -48,121 +63,217 @@ No technology should be adopted solely because it is new or popular.
 | Styling | CSS Modules + CSS Variables |
 | Local Storage | SQLite |
 | State Management | React Context + Custom Services |
+| Runtime Validation | Zod |
 | Linting | ESLint |
 | Formatting | Prettier |
-| Testing | Vitest + Playwright |
+| Unit Testing | Vitest |
+| End-to-End Testing | Playwright |
 | Packaging | electron-builder |
 | CI/CD | GitHub Actions |
 
 ---
 
-# Electron
+## 4. Electron
 
-## Purpose
+### Purpose
 
-Electron provides the desktop runtime.
+Electron provides the desktop application runtime.
 
-Responsibilities include:
+It is responsible for:
 
 - Window management
 - Native operating system integration
 - IPC
 - File system access
 - Native dialogs
-- Auto-updates
-- System tray
+- Application lifecycle
+- Menus
 - Notifications
+- Auto-updates
+- Download integration
+- Permission handling
+- Session management
 
-Electron is used only for desktop functionality.
+Electron must be used only where desktop-level capabilities are required.
 
-Business logic remains independent whenever possible.
+Business logic should remain independent from Electron whenever practical.
+
+### Security Requirements
+
+Electron must be configured with secure defaults.
+
+Required principles include:
+
+- Context isolation enabled
+- Node integration disabled in Renderer processes
+- Sandboxing enabled where supported
+- Narrow preload APIs
+- No raw IPC exposure
+- No arbitrary shell execution
+- No direct Node.js access from React
+- Explicit navigation controls
+- Sender validation for privileged IPC calls
+
+Electron configuration must remain consistent with:
+
+- `SECURITY_MODEL.md`
+- `API_DESIGN.md`
+- `ARCHITECTURE_V2.md`
 
 ---
 
-# Chromium
+## 5. Chromium
 
-Chromium is responsible for:
+Chromium provides the web rendering engine.
+
+It is responsible for:
 
 - HTML rendering
 - CSS rendering
 - JavaScript execution
-- Browser engine
-- Modern web standards
+- Web platform support
+- Browser engine behavior
+- Network requests
+- Page lifecycle
+- Web security primitives
+- Site isolation capabilities
 
-Patagonia Browser relies on Chromium's rendering capabilities while implementing its own user experience.
+Patagonia Browser relies on Chromium's rendering capabilities while implementing its own:
+
+- User interface
+- Navigation model
+- Tabs
+- Privacy controls
+- Permissions interface
+- Settings
+- Sessions
+- Spaces
+- Security policies
+
+Chromium must not be treated as the product interface.
+
+The Patagonia Browser UI remains separate from normal web content.
 
 ---
 
-# React
+## 6. React
 
-React is used exclusively for the user interface.
+React is used exclusively for the trusted application interface.
 
-Responsibilities:
+Responsibilities include:
 
-- Component rendering
-- State synchronization
+- Rendering browser controls
+- Rendering tab interfaces
+- Rendering internal pages
 - UI composition
-- Internal pages
-- Browser controls
+- State synchronization
+- User interaction
+- Accessibility behavior
+- Theme integration
 
-React must never communicate directly with Node.js APIs.
+React must never communicate directly with:
 
-All communication passes through secure IPC.
+- Node.js APIs
+- Electron internals
+- SQLite
+- File system APIs
+- Environment variables
+- Native shell APIs
+- Secrets
+
+All privileged communication must pass through the approved preload API and secure IPC contracts defined in `API_DESIGN.md`.
 
 ---
 
-# TypeScript
+## 7. TypeScript
 
-TypeScript is mandatory.
+TypeScript is mandatory for application code.
 
-Strict mode is always enabled.
+Strict mode must remain enabled.
 
 Goals:
 
 - Static typing
 - Refactoring safety
-- Better tooling
-- Fewer runtime errors
+- Better editor tooling
+- Explicit contracts
+- Reduced runtime defects
+- Safer API evolution
+- Improved testability
 
-The use of `any` should be avoided.
+### Rules
+
+- Avoid `any`
+- Prefer `unknown` when a value is not yet validated
+- Define explicit request and response types
+- Define explicit event contracts
+- Use discriminated unions for state and errors
+- Separate domain types from Renderer-safe DTOs
+- Do not duplicate shared API contracts
+
+TypeScript provides compile-time safety.
+
+It does not replace runtime validation.
 
 ---
 
-# Vite
+## 8. Vite
 
-Vite provides:
+Vite is the official build tool for the Renderer and supporting front-end assets.
 
-- Fast development server
-- Efficient builds
-- Modern bundling
+It provides:
+
+- Fast development startup
 - Hot Module Replacement
+- Modern bundling
+- TypeScript support
+- Efficient development builds
+- Optimized production builds
+- Simple React integration
 
-Development speed is one of the reasons for choosing Vite.
+Vite configuration must remain predictable and minimal.
+
+Build customizations must be documented when they affect:
+
+- Security
+- Asset loading
+- Preload scripts
+- Worker behavior
+- Internal browser pages
+- Production packaging
 
 ---
 
-# SQLite
+## 9. npm
 
-SQLite stores:
-
-- History
-- Bookmarks
-- Preferences
-- Sessions
-- Downloads
-- Browser metadata
+npm is the official package manager.
 
 Reasons:
 
-- Lightweight
-- Reliable
-- No external server
-- Cross-platform
-- Excellent TypeScript support
+- Included with Node.js
+- Broad ecosystem support
+- Stable lockfile behavior
+- Native compatibility with Electron tooling
+- Familiar contributor workflow
+- Strong CI support
+
+Requirements:
+
+- Commit `package-lock.json`
+- Use reproducible installation commands in CI
+- Review dependency changes
+- Avoid unnecessary package manager migration
+- Do not mix multiple lockfiles
+
+Recommended CI installation:
+
+```bash
+npm ci
+```
 
 ---
 
-# CSS Strategy
+## 10. CSS Strategy
 
 Patagonia Browser uses:
 
@@ -172,189 +283,511 @@ Patagonia Browser uses:
 
 Goals:
 
+- Style isolation
 - Theme support
-- Isolation
-- Predictability
-- Performance
+- Predictable component styling
+- Minimal global CSS
+- Reusable visual tokens
+- Good performance
+- Reduced naming collisions
 
-Global CSS should remain minimal.
+### Rules
+
+- Global CSS must remain minimal
+- Colors, spacing, typography and elevation should use design tokens
+- Components should not hardcode duplicated visual values
+- Theme behavior must follow `DESIGN_SYSTEM.md`
+- UI implementation must follow `UI_GUIDE.md`
+- Accessibility states must remain visible
+
+Tailwind CSS is not currently part of the approved stack.
 
 ---
 
-# State Management
+## 11. SQLite
 
-Global application state is intentionally simple.
+SQLite is the official local database.
+
+It stores data such as:
+
+- History
+- Bookmarks
+- Preferences
+- Sessions
+- Downloads
+- Browser metadata
+- Spaces
+- Permission decisions
+- Migration state
+
+Reasons:
+
+- Lightweight
+- Reliable
+- No external database server
+- Cross-platform
+- Transaction support
+- Mature ecosystem
+- Good local application fit
+- Strong Node.js and TypeScript support
+
+### Access Rules
+
+- Renderer processes must never access SQLite directly
+- Database operations must pass through storage services
+- SQL must not cross IPC boundaries
+- Migrations must be versioned
+- Sensitive values must be protected according to `SECURITY_MODEL.md`
+- Private browsing data must not be written to normal persistent history
+
+A dedicated `DATABASE_SCHEMA.md` should define tables, indexes, relationships and migrations.
+
+---
+
+## 12. State Management
+
+The initial state management strategy is intentionally simple.
 
 Primary tools:
 
 - React Context
-- Custom Services
+- Custom hooks
+- Application services
+- Typed event subscriptions
+- Local component state
 
-Additional state libraries should only be introduced if justified by measurable complexity.
+Additional state libraries may only be introduced when justified by measurable complexity.
+
+A new state library must not be added merely to avoid designing clear data ownership.
+
+### State Ownership
+
+- UI presentation state belongs in the Renderer
+- Privileged browser state belongs in the Main Process
+- Persistent state belongs in storage services
+- Shared contracts belong in `src/shared`
+- Browser domain logic belongs in services or core modules
+
+The Renderer must not be treated as the authoritative source for privileged browser state.
 
 ---
 
-# Testing Stack
+## 13. Runtime Validation
 
-## Unit Tests
+Zod is the official runtime validation library.
 
-Vitest
+Zod is used to validate data crossing trust boundaries.
+
+This includes:
+
+- IPC requests
+- IPC responses where appropriate
+- Configuration files
+- Imported data
+- External service responses
+- AI provider responses
+- Extension manifests
+- Update metadata
+- User-controlled structured input
+- Data read from storage after migrations
+
+TypeScript provides compile-time safety.
+
+Zod provides runtime safety.
+
+### Validation Rules
+
+- Validate all IPC payloads in the trusted process
+- Reject unknown or unsupported values where practical
+- Enforce input length limits
+- Validate identifiers
+- Validate URLs and protocols
+- Validate enum-like values
+- Validate imported files before persistence
+- Never trust external JSON
+- Never rely only on TypeScript types
+
+### Example
+
+```ts
+import { z } from "zod";
+
+export const NavigateRequestSchema = z
+  .object({
+    tabId: z.string().min(1),
+    input: z.string().min(1).max(8192),
+    disposition: z
+      .enum(["current-tab", "new-tab"])
+      .optional(),
+  })
+  .strict();
+
+export type NavigateRequest = z.infer<
+  typeof NavigateRequestSchema
+>;
+```
+
+Shared schemas should be placed near their shared contracts.
+
+Validation errors must be mapped to safe API errors.
+
+Raw Zod errors must not be exposed directly to untrusted web content.
+
+---
+
+## 14. ESLint
+
+ESLint enforces code quality and project conventions.
+
+It should cover:
+
+- TypeScript rules
+- React rules
+- Hooks rules
+- Import organization
+- Unsafe type usage
+- Promise handling
+- Unused code
+- Security-related restrictions where practical
+
+No production code should bypass linting without documented justification.
+
+Disabling an ESLint rule locally requires an explanatory comment when the reason is not obvious.
+
+---
+
+## 15. Prettier
+
+Prettier is the official formatter.
+
+Responsibilities:
+
+- Consistent formatting
+- Reduced style debates
+- Predictable diffs
+- Automated code layout
+
+Formatting decisions should be automated.
+
+Manual alignment and formatting should be avoided when Prettier will rewrite it.
+
+Prettier should run in:
+
+- Local development
+- Pre-commit workflows where practical
+- CI validation
+
+---
+
+## 16. Vitest
+
+Vitest is the official unit and integration test runner for TypeScript modules.
 
 Used for:
 
 - Utilities
 - Services
-- Core logic
-- Components
+- Domain logic
+- Validation schemas
+- API contracts
+- Mappers
+- React components
+- Hooks
+- Storage abstractions
+- Security helpers
+
+Tests should be fast, deterministic and isolated.
+
+Vitest is not a substitute for Electron or browser end-to-end testing.
 
 ---
 
-## End-to-End Tests
+## 17. Playwright
 
-Playwright
+Playwright is the official end-to-end testing framework.
 
 Used for:
 
+- Browser startup
 - Navigation
 - Tabs
+- Window behavior
 - Downloads
-- Browser workflows
 - Settings
+- History
+- Internal pages
+- Browser workflows
+- Regression testing
+- Security boundary verification where practical
+
+Important flows should be tested across supported platforms when CI capacity allows.
+
+End-to-end tests must not rely on unstable public websites when a local test fixture can be used.
 
 ---
 
-# Linting
+## 18. electron-builder
 
-ESLint enforces:
+`electron-builder` is the official packaging tool.
 
-- Code quality
-- Best practices
-- TypeScript rules
-- React rules
-
-No production code should bypass linting.
-
----
-
-# Formatting
-
-Prettier formats the entire codebase.
-
-Formatting decisions are automated.
-
-Manual formatting should be avoided.
-
----
-
-# Packaging
-
-electron-builder is responsible for:
+Responsibilities include:
 
 - Windows installers
 - Portable builds
+- Linux packages
+- macOS packages when supported
 - Release artifacts
-- Version metadata
+- Application metadata
+- Code-signing integration
+- Update metadata where applicable
+
+Packaging configuration must not weaken Electron security settings.
+
+Release artifacts must be reproducible where practical.
 
 ---
 
-# Continuous Integration
+## 19. GitHub Actions
 
-GitHub Actions automates:
+GitHub Actions is the official CI/CD platform.
 
-- Build validation
+It automates:
+
+- Dependency installation
+- Type checking
 - Linting
-- Testing
+- Formatting validation
+- Unit tests
+- Integration tests
+- End-to-end tests
+- Build validation
+- Packaging checks
 - Release workflows
+- Security scanning where configured
 
-Every Pull Request should pass CI before merging.
+Every Pull Request should pass required CI checks before merge.
 
----
-
-# Dependency Policy
-
-New dependencies must satisfy all of the following:
-
-- Actively maintained
-- Open source
-- Compatible license
-- Stable releases
-- Good documentation
-- Security track record
-- Strong community adoption
+Secrets must use protected GitHub Actions secrets and must not be printed in logs.
 
 ---
 
-# Dependency Evaluation Checklist
+## 20. Dependency Policy
 
-Before adding a library, answer:
+New dependencies must satisfy all relevant criteria:
 
-- Does it solve a real problem?
-- Can it be implemented internally with reasonable effort?
-- Is the maintenance burden acceptable?
-- Is it actively maintained?
-- Does it increase bundle size significantly?
-- Does it introduce unnecessary security risks?
+- Solve a real project need
+- Be actively maintained
+- Use a compatible license
+- Have stable releases
+- Have adequate documentation
+- Have a reasonable security history
+- Support the project platforms
+- Avoid unnecessary bundle growth
+- Avoid duplicating existing functionality
+- Have an acceptable maintenance burden
 
-If any answer raises concern, the dependency should be reconsidered.
+The smallest suitable dependency should be preferred.
+
+Native dependencies require additional review because they may affect:
+
+- Cross-platform builds
+- Electron compatibility
+- Packaging
+- Security
+- Installation complexity
 
 ---
 
-# Forbidden Practices
+## 21. Dependency Evaluation Checklist
 
-Avoid libraries that:
+Before adding a dependency, answer:
+
+1. Does it solve a real and current problem?
+2. Can existing approved tools already solve it?
+3. Can it be implemented internally with reasonable effort?
+4. Is the project actively maintained?
+5. Is the license compatible?
+6. Is the package widely trusted?
+7. Does it have unresolved critical vulnerabilities?
+8. Does it significantly increase bundle size?
+9. Does it add native build requirements?
+10. Does it weaken security boundaries?
+11. Is its API stable?
+12. Is removal or replacement realistic later?
+
+If the answers raise meaningful concern, the dependency should be reconsidered.
+
+---
+
+## 22. Forbidden Practices
+
+Avoid libraries or tools that:
 
 - Are abandoned
 - Have unclear licensing
 - Require disabling security features
-- Duplicate existing functionality
+- Duplicate approved functionality
 - Introduce unnecessary complexity
 - Depend on unstable APIs
+- Expose raw native capabilities to the Renderer
+- Require unrestricted shell execution
+- Hide important behavior behind opaque magic
+- Make reproducible builds difficult
+- Collect telemetry without explicit project approval
+
+Forbidden implementation patterns include:
+
+- Direct Node.js access from React
+- Raw `ipcRenderer` exposure
+- Arbitrary IPC channel invocation
+- Arbitrary file path APIs
+- Raw SQL from the Renderer
+- Unvalidated external JSON
+- Secrets returned to the Renderer
+- Synchronous IPC for normal application features
 
 ---
 
-# Versioning Policy
+## 23. Versioning Policy
 
 General rules:
 
 - Prefer stable releases
-- Avoid pre-release versions in production
-- Update dependencies regularly
-- Review changelogs before upgrading
-- Test all major upgrades thoroughly
+- Avoid pre-release dependencies in production
+- Review changelogs before upgrades
+- Test major upgrades thoroughly
+- Update security-sensitive dependencies promptly
+- Keep Electron and Chromium security updates current
+- Avoid uncontrolled automatic major upgrades
+- Document breaking stack changes
+
+Dependency update Pull Requests should include:
+
+- Reason for the update
+- Important breaking changes
+- Security impact
+- Test results
+- Migration notes when needed
 
 ---
 
-# Security Considerations
+## 24. Security Considerations
 
-Technology choices must support:
+Every technology must support:
 
-- Context Isolation
-- Secure IPC
-- CSP
+- Context isolation
 - Sandboxing
+- Secure IPC
+- Content Security Policy
 - Principle of Least Privilege
+- Runtime input validation
+- Safe secret handling
+- Process separation
+- Controlled navigation
+- Controlled file access
+- Secure update workflows
 
-No dependency should weaken the browser's security architecture.
+No dependency may weaken the browser's security architecture.
+
+Security requirements take priority over developer convenience.
 
 ---
 
-# Future Technologies
+## 25. Performance Considerations
+
+Technology decisions must account for:
+
+- Startup time
+- Memory usage
+- CPU usage
+- Renderer responsiveness
+- Database performance
+- IPC frequency
+- Serialization cost
+- Build size
+- Package size
+- Background activity
+
+Avoid:
+
+- Large dependency trees
+- Unnecessary background processes
+- Frequent full-state IPC transfers
+- Blocking synchronous operations
+- Unbounded database queries
+- Large client-side state duplication
+
+Performance problems should be measured before introducing complex optimization tools.
+
+---
+
+## 26. Accessibility Compatibility
+
+The stack must support:
+
+- Keyboard navigation
+- Screen readers
+- Semantic HTML
+- Visible focus states
+- Reduced motion
+- Scalable text
+- High contrast
+- Accessible dialogs
+- Accessible internal pages
+
+React components must use native platform semantics whenever possible.
+
+Accessibility must not depend on a future rewrite.
+
+---
+
+## 27. Cross-Platform Requirements
+
+The stack should support:
+
+- Windows
+- Linux
+- macOS when project capacity allows
+
+Platform-specific code must be isolated behind adapters.
+
+Avoid spreading operating system checks throughout business logic.
+
+Example:
+
+```text
+Application Service
+        ↓
+Platform Adapter
+        ↓
+Windows / Linux / macOS Implementation
+```
+
+---
+
+## 28. Future Technologies
 
 Potential future additions include:
 
 - Rust modules for performance-critical components
 - WebAssembly for isolated workloads
 - Native operating system integrations
-- AI inference engines
+- Local AI inference engines
+- Remote AI provider adapters
 - Plugin SDK
+- Extension sandbox infrastructure
+- Crash reporting infrastructure
+- Automated update services
 
-These technologies require architectural review before adoption.
+These technologies require architectural and security review before adoption.
+
+They are not part of Alpha 0.1 unless explicitly approved.
 
 ---
 
-# Technologies Not Currently Planned
+## 29. Technologies Not Currently Planned
 
-The following technologies are intentionally excluded from the initial roadmap:
+The following technologies are not currently planned for the initial architecture:
 
 - Angular
 - Vue
@@ -365,26 +798,112 @@ The following technologies are intentionally excluded from the initial roadmap:
 - Flutter
 - .NET
 - Java
+- Multiple package managers
+- Alternative desktop runtimes
 
-This decision may be revisited if future project requirements change.
+This is not a permanent ban.
+
+A technology may be reconsidered if future requirements provide a strong, documented justification.
 
 ---
 
-# Architecture Compatibility
+## 30. Alpha 0.1 Stack
+
+The Alpha 0.1 implementation should initially require:
+
+- Electron
+- Chromium
+- React
+- TypeScript
+- Vite
+- npm
+- CSS Modules
+- CSS Variables
+- Zod
+- ESLint
+- Prettier
+- Vitest
+- Playwright
+- electron-builder
+- GitHub Actions
+
+SQLite may be introduced when persistent features begin requiring it.
+
+The initial browser shell should not add future-facing dependencies for:
+
+- AI
+- Extensions
+- Cloud synchronization
+- Telemetry
+- Plugin systems
+- Complex state management
+
+---
+
+## 31. Architecture Compatibility
 
 Every technology introduced into Patagonia Browser must be compatible with:
 
-- ARCHITECTURE.md
-- ARCHITECTURE_V2.md
-- SECURITY_MODEL.md
-- CODING_STANDARDS.md
-- IMPLEMENTATION_PLAN.md
+- `ARCHITECTURE.md`
+- `ARCHITECTURE_V2.md`
+- `API_DESIGN.md`
+- `SECURITY_MODEL.md`
+- `CODING_STANDARDS.md`
+- `IMPLEMENTATION_PLAN.md`
+- `REPOSITORY_STRUCTURE.md`
+- `DESIGN_SYSTEM.md`
 
-No implementation may contradict the project's architectural principles.
+No implementation may contradict the project's approved architectural principles.
+
+When documents conflict, the conflict must be resolved through an explicit architectural decision.
 
 ---
 
-# Final Principle
+## 32. Technology Decision Records
+
+Major technology decisions should be recorded as Architecture Decision Records.
+
+Examples:
+
+```text
+ADR-001-WEB-CONTENT-CONTAINER.md
+ADR-002-RUNTIME-VALIDATION-ZOD.md
+ADR-003-SQLITE-DRIVER.md
+ADR-004-ELECTRON-PACKAGING.md
+```
+
+An ADR should include:
+
+- Context
+- Decision
+- Alternatives considered
+- Security impact
+- Consequences
+- Migration implications
+- Decision status
+
+---
+
+## 33. Review Checklist
+
+Before approving a technology change:
+
+- Does it solve a documented requirement?
+- Is it compatible with the architecture?
+- Is it compatible with the security model?
+- Is it actively maintained?
+- Is its license acceptable?
+- Does it work across target platforms?
+- Does it add native build complexity?
+- Does it increase startup or memory cost?
+- Does it duplicate an approved tool?
+- Can it be tested reliably?
+- Can it be removed later?
+- Has the decision been documented?
+
+---
+
+## 34. Final Principle
 
 Technology serves the architecture.
 
@@ -396,6 +915,6 @@ Technology decisions should always follow that order.
 
 ---
 
-> "Choose technologies that will still make sense five years from now—not just five weeks."
-
-— Patagonia Labs
+> “Choose technologies that will still make sense five years from now—not just five weeks.”
+>
+> — Patagonia Labs
