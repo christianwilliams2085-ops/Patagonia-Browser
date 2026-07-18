@@ -1,0 +1,620 @@
+# 🏔 Patagonia Browser
+
+# API_DESIGN.md
+
+**Document Version:** 1.1
+
+**Status:** Official Internal API Specification
+
+**Owner:** Patagonia Labs
+
+**Applies To:** All Browser Components
+
+**Current Target:** Alpha 0.1
+
+**Last Updated:** July 2026
+
+---
+
+# Table of Contents
+
+1. Purpose
+2. Scope
+3. Design Philosophy
+4. Architectural Principles
+5. Security Principles
+6. API Design Principles
+7. Process Architecture
+8. Trust Boundaries
+9. IPC Architecture
+10. Public API Surface
+11. window.patagonia
+12. Namespace Design
+13. Naming Conventions
+14. Future Evolution
+
+---
+
+# 1. Purpose
+
+This document defines the official internal API architecture of Patagonia Browser.
+
+It specifies:
+
+- How browser components communicate.
+- How IPC is exposed.
+- How privileged operations are protected.
+- Which contracts are stable.
+- How APIs evolve.
+- Which responsibilities belong to each layer.
+- Which security guarantees must always remain true.
+
+This specification is considered part of the browser security model.
+
+Any modification requires architectural review.
+
+---
+
+# 2. Scope
+
+This document applies to every internal API exposed by Patagonia Browser.
+
+Including:
+
+- Renderer APIs
+- Preload APIs
+- IPC Contracts
+- Main Process Services
+- Browser Modules
+- Native Integrations
+- Internal Pages
+- Settings
+- Downloads
+- History
+- Bookmarks
+- AI Providers
+- Extensions
+- Future SDKs
+
+External web pages are explicitly outside this scope.
+
+---
+
+# 3. Design Philosophy
+
+The API is designed around one fundamental idea:
+
+> Capabilities are exposed.
+>
+> Infrastructure is hidden.
+
+Application code should never need to understand:
+
+- Electron
+- IPC channels
+- Native APIs
+- SQLite
+- File System
+- Process Management
+
+Instead, it interacts with high-level browser capabilities.
+
+Example:
+
+Bad:
+
+```ts
+ipcRenderer.invoke("tabs:create")
+```
+
+Good:
+
+```ts
+window.patagonia.tabs.create(...)
+```
+
+The API should read like browser functionality instead of operating system functionality.
+
+---
+
+# 4. Primary Goals
+
+The internal API exists to provide:
+
+- Safety
+- Simplicity
+- Stability
+- Predictability
+- Versionability
+- Testability
+- Security
+- Maintainability
+
+Every exposed method must justify its existence.
+
+If a capability can remain internal, it should remain internal.
+
+---
+
+# 5. Architectural Principles
+
+The following principles govern every API.
+
+## Explicit
+
+No hidden behavior.
+
+Every action is represented by a documented method.
+
+---
+
+## Small Surface
+
+Expose the smallest possible API.
+
+Large APIs become impossible to secure.
+
+---
+
+## Strong Contracts
+
+Every request and response has an explicit TypeScript contract.
+
+Implicit objects are forbidden.
+
+---
+
+## Runtime Validation
+
+Compile-time validation is insufficient.
+
+Every trust boundary performs runtime validation using Zod.
+
+---
+
+## Stable Evolution
+
+Minor releases should not break existing integrations.
+
+Breaking changes require version evolution.
+
+---
+
+## Secure by Default
+
+Unsafe operations require deliberate opt-in.
+
+Security is never optional.
+
+---
+
+# 6. Security Principles
+
+The API is one of the primary security boundaries of Patagonia Browser.
+
+The following guarantees are mandatory.
+
+## Renderer Isolation
+
+Renderer processes never receive Node.js access.
+
+---
+
+## Capability Isolation
+
+Only approved capabilities are exposed.
+
+Everything else remains private.
+
+---
+
+## Sender Validation
+
+Every privileged IPC call validates the sender.
+
+---
+
+## Runtime Validation
+
+All incoming data is validated.
+
+---
+
+## DTO Isolation
+
+Internal objects never cross process boundaries.
+
+Only DTOs travel through IPC.
+
+---
+
+## Secret Isolation
+
+Secrets never leave the Main Process.
+
+---
+
+## Raw IPC Isolation
+
+Raw Electron IPC objects are never visible to React code.
+
+---
+
+# 7. Architecture Overview
+
+Patagonia Browser follows a layered architecture.
+
+```text
+React UI
+    │
+    ▼
+window.patagonia
+    │
+    ▼
+Preload Bridge
+    │
+    ▼
+Runtime Validation
+    │
+    ▼
+Secure IPC
+    │
+    ▼
+Sender Validation
+    │
+    ▼
+Application Services
+    │
+    ▼
+Core
+    │
+    ▼
+Storage / Native APIs
+```
+
+Each layer has exactly one responsibility.
+
+---
+
+# 8. Layer Responsibilities
+
+## Renderer
+
+Responsible for:
+
+- User Interface
+- Interaction
+- Rendering
+- Local UI State
+
+Forbidden:
+
+- Node.js
+- File System
+- SQLite
+- Native APIs
+- Electron Internals
+
+---
+
+## Preload
+
+Responsible for:
+
+- Safe bridge
+- API exposure
+- DTO conversion
+- IPC abstraction
+
+Preload contains no business logic.
+
+---
+
+## Main Process
+
+Responsible for:
+
+- Privileged execution
+- Window management
+- Downloads
+- Updates
+- File system
+- Native dialogs
+- Permissions
+
+---
+
+## Services
+
+Responsible for business rules.
+
+Examples:
+
+NavigationService
+
+HistoryService
+
+DownloadService
+
+BookmarkService
+
+PermissionService
+
+No Electron-specific code should leak beyond this layer.
+
+---
+
+## Core
+
+Responsible for browser orchestration.
+
+Examples:
+
+Tab Manager
+
+Window Manager
+
+Session Manager
+
+Browser Controller
+
+---
+
+## Storage
+
+Responsible only for persistence.
+
+Examples:
+
+SQLite
+
+Cache
+
+Cookies
+
+Preferences
+
+No UI logic belongs here.
+
+---
+
+# 9. Trust Boundaries
+
+Trust decreases as data approaches the user.
+
+```text
+Main Process
+
+↓
+
+Preload
+
+↓
+
+Renderer
+
+↓
+
+Website
+```
+
+Every transition requires validation.
+
+---
+
+# 10. IPC Philosophy
+
+IPC is an implementation detail.
+
+Applications should never depend directly on IPC channels.
+
+Instead of:
+
+ipcRenderer.invoke(...)
+
+Applications use:
+
+window.patagonia.*
+
+This allows:
+
+- Channel renaming
+- Internal refactoring
+- Improved security
+- Better testing
+- Stable contracts
+
+---
+
+# 11. IPC Rules
+
+IPC handlers:
+
+- Validate sender
+- Validate payload
+- Call services
+- Return DTOs
+
+Nothing else.
+
+Business logic belongs inside services.
+
+---
+
+# 12. Public API Surface
+
+The official public interface is:
+
+```ts
+window.patagonia
+```
+
+Everything available to the Renderer begins here.
+
+No other global object is permitted.
+
+---
+
+# 13. Global Object
+
+```ts
+interface Window {
+    patagonia: PatagoniaAPI;
+}
+```
+
+This object is injected exclusively by the preload script.
+
+Web content must never access it.
+
+---
+
+# 14. Namespace Philosophy
+
+Capabilities are grouped by domain.
+
+Examples:
+
+app
+
+windows
+
+tabs
+
+navigation
+
+history
+
+bookmarks
+
+downloads
+
+settings
+
+permissions
+
+sessions
+
+Each namespace owns a single responsibility.
+
+---
+
+# 15. Namespace Rules
+
+Namespaces should:
+
+- Be cohesive
+- Be discoverable
+- Remain small
+- Avoid overlapping responsibilities
+- Hide infrastructure
+
+Example:
+
+Good
+
+tabs.create()
+
+tabs.close()
+
+tabs.activate()
+
+Bad
+
+browser.createNewTab()
+
+system.openBrowserTab()
+
+window.createNavigationTab()
+
+---
+
+# 16. Initial Namespaces
+
+Alpha 0.1 exposes:
+
+app
+
+windows
+
+tabs
+
+navigation
+
+Later releases introduce:
+
+history
+
+downloads
+
+settings
+
+bookmarks
+
+permissions
+
+sessions
+
+extensions
+
+ai
+
+spaces
+
+---
+
+# 17. API Naming
+
+Methods always use verbs.
+
+Examples:
+
+create()
+
+update()
+
+remove()
+
+close()
+
+reload()
+
+activate()
+
+navigate()
+
+search()
+
+clear()
+
+Never expose implementation names.
+
+Example:
+
+Bad
+
+invokeChannel()
+
+sendIPC()
+
+executeElectron()
+
+Good
+
+tabs.create()
+
+downloads.pause()
+
+settings.update()
+
+---
+
+# 18. Final Principle
+
+The API represents the browser itself.
+
+It must never expose how the browser is implemented.
+
+Changing Electron, SQLite or internal services should never require changing the public API.
+
+This separation is one of the most important long-term architectural goals of Patagonia Browser.
