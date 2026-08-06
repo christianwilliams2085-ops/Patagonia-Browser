@@ -5,6 +5,12 @@ const {
     ipcMain
 } = require("electron");
 
+const {
+    ALTURA_BARRA,
+    ANCHO_BARRA_LATERAL,
+    PAGINA_INICIO
+} = require("./src/shared/constants");
+
 const path = require("path");
 const {
     Readability
@@ -27,10 +33,6 @@ let pestanas = [];
 let idPestanaActiva = null;
 let siguienteId = 1;
 let barraLateralAbierta = false;
-
-const ALTURA_BARRA = 108;
-const ANCHO_BARRA_LATERAL = 320;
-const PAGINA_INICIO = "https://www.google.com";
 
 function obtenerPestanaActiva() {
     return pestanas.find(
