@@ -1,0 +1,20 @@
+{
+  "name": "patagonia-browser-main",
+  "version": "1.0.0",
+  "description": "Patagonia Browser",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "electron": "^43.1.1"
+  },
+  "dependencies": {
+    "@mozilla/readability": "^0.6.0",
+    "jsdom": "^29.1.1"
+  }
+}

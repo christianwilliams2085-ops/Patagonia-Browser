@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Patagonia Browser</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:"Segoe UI",Arial,sans-serif;
+}
+
+body{
+    height:100vh;
+    overflow:hidden;
+    background:#1b1f27;
+    color:white;
+}
+
+/* ==========================
+   PESTAÑAS
+========================== */
+
+.tabs{
+    height:38px;
+
+    display:flex;
+    align-items:flex-end;
+    gap:5px;
+
+    padding:5px 8px 0;
+
+    overflow-x:auto;
+
+    background:#20242c;
+    border-bottom:1px solid #303846;
+}
+
+.tabs::-webkit-scrollbar{
+    height:4px;
+}
+
+.tab{
+    width:220px;
+    min-width:120px;
+    max-width:220px;
+    height:33px;
+
+    display:flex;
+    align-items:center;
+    gap:8px;
+
+    padding:0 10px;
+
+    border-radius:8px 8px 0 0;
+    background:#2f3643;
+
+    cursor:pointer;
+    overflow:hidden;
+
+    transition:background .2s;
+}
+
+.tab:hover{
+    background:#3b4657;
+}
+
+.tab.activa{
+    background:#4d79ff;
+}
+
+.favicon-pestana{
+    width:16px;
+    height:16px;
+
+    flex-shrink:0;
+
+    object-fit:contain;
+}
+
+.cargando-pestana{
+    width:16px;
+    height:16px;
+
+    flex-shrink:0;
+
+    border:2px solid rgba(255,255,255,.35);
+    border-top-color:white;
+    border-radius:50%;
+
+    animation:girar-carga .8s linear infinite;
+}
+
+@keyframes girar-carga{
+    from{
+        transform:rotate(0deg);
+    }
+
+    to{
+        transform:rotate(360deg);
+    }
+}
+
+.titulo-pestana{
+    flex:1;
+
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+
+    font-size:13px;
+}
+
+.cerrar-pestana{
+    width:22px;
+    height:22px;
+
+    padding:0;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:transparent;
+
+    font-size:17px;
+
+    border-radius:5px;
+}
+
+.cerrar-pestana:hover{
+    background:rgba(255,255,255,.15);
+}
+
+#nuevaPestana{
+    width:30px;
+    height:30px;
+
+    padding:0;
+
+    flex-shrink:0;
+
+    background:#2a313d;
+
+    font-size:20px;
+
+    border-radius:50%;
+}
+
+#nuevaPestana:hover{
+    background:#3a4453;
+}
+
+/* ==========================
+   BARRA DE DIRECCIÓN
+========================== */
+
+.barra{
+    height:70px;
+
+    display:flex;
+    align-items:center;
+    gap:8px;
+
+    padding:10px;
+
+    background:#11151c;
+    border-bottom:1px solid #2c3440;
+}
+
+button{
+    color:white;
+    border:none;
+    cursor:pointer;
+}
+
+.boton-navegacion{
+    width:40px;
+    height:40px;
+
+    padding:0;
+
+    background:#2a313d;
+
+    border-radius:7px;
+
+    font-size:17px;
+
+    transition:background .2s, transform .15s;
+}
+
+.boton-navegacion:hover{
+    background:#3a4453;
+}
+
+.boton-navegacion:active{
+    transform:scale(.94);
+}
+
+#direccion{
+    flex:1;
+    height:40px;
+
+    padding:0 14px;
+
+    background:#202631;
+    color:white;
+
+    border:1px solid #3a4453;
+    border-radius:8px;
+
+    outline:none;
+
+    font-size:14px;
+}
+
+#direccion:focus{
+    border-color:#4d79ff;
+    box-shadow:0 0 0 2px rgba(77,121,255,.15);
+}
+
+#ir{
+    height:40px;
+
+    padding:0 18px;
+
+    background:#2a313d;
+
+    border-radius:7px;
+}
+
+#ir:hover{
+    background:#3a4453;
+}
+
+/* ==========================
+   SIDEBAR
+========================== */
+
+.sidebar{
+    position:absolute;
+
+    top:108px;
+    right:0;
+    bottom:0;
+
+    width:320px;
+
+    display:none;
+    flex-direction:column;
+
+    background:#191e27;
+
+    border-left:1px solid #323a48;
+
+    box-shadow:-12px 0 30px rgba(0,0,0,.28);
+
+    z-index:10;
+}
+
+.sidebar.abierta{
+    display:flex;
+}
+
+.sidebar-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    padding:16px 18px;
+
+    border-bottom:1px solid #303846;
+}
+
+.sidebar-identidad{
+    display:flex;
+    align-items:center;
+    gap:11px;
+}
+
+.sidebar-logo{
+    width:34px;
+    height:34px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:linear-gradient(135deg,#4d79ff,#805ad5);
+
+    border-radius:10px;
+
+    font-size:16px;
+    font-weight:700;
+}
+
+.sidebar-titulos{
+    display:flex;
+    flex-direction:column;
+}
+
+.sidebar-titulo{
+    font-size:15px;
+    font-weight:600;
+}
+
+.sidebar-subtitulo{
+    margin-top:2px;
+
+    color:#98a2b3;
+
+    font-size:11px;
+}
+
+.sidebar-contenido{
+    flex:1;
+
+    overflow-y:auto;
+
+    padding:14px;
+}
+
+.sidebar-contenido::-webkit-scrollbar{
+    width:6px;
+}
+
+.sidebar-contenido::-webkit-scrollbar-thumb{
+    background:#384253;
+    border-radius:10px;
+}
+
+/* ==========================
+   TARJETA DE IA
+========================== */
+
+.tarjeta-ia{
+    padding:16px;
+
+    margin-bottom:18px;
+
+    background:linear-gradient(
+        145deg,
+        rgba(77,121,255,.22),
+        rgba(128,90,213,.16)
+    );
+
+    border:1px solid rgba(115,143,255,.3);
+    border-radius:13px;
+}
+
+.tarjeta-ia.oculta{
+    display:none;
+}
+
+.tarjeta-ia-titulo{
+    font-size:16px;
+    font-weight:600;
+}
+
+.tarjeta-ia-texto{
+    margin-top:7px;
+
+    color:#c4cad4;
+
+    font-size:13px;
+    line-height:1.45;
+}
+
+.tarjeta-ia-boton{
+    width:100%;
+    height:36px;
+
+    margin-top:14px;
+
+    background:#4d79ff;
+
+    border-radius:8px;
+
+    font-size:13px;
+    font-weight:600;
+}
+
+.tarjeta-ia-boton:hover{
+    background:#638aff;
+}
+
+/* ==========================
+   PANEL DEL ASISTENTE
+========================== */
+
+.panel-asistente{
+    display:none;
+    flex-direction:column;
+
+    height:430px;
+
+    margin-bottom:18px;
+
+    background:#11161f;
+
+    border:1px solid #30394a;
+    border-radius:13px;
+
+    overflow:hidden;
+}
+
+.panel-asistente.abierto{
+    display:flex;
+}
+
+.panel-asistente-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    padding:13px 14px;
+
+    background:#1d2430;
+
+    border-bottom:1px solid #30394a;
+}
+
+.panel-asistente-titulo{
+    font-size:14px;
+    font-weight:600;
+}
+
+.panel-asistente-estado{
+    margin-top:2px;
+
+    color:#8f9bad;
+
+    font-size:11px;
+}
+
+.cerrar-asistente{
+    width:28px;
+    height:28px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:transparent;
+
+    border-radius:7px;
+
+    font-size:18px;
+}
+
+.cerrar-asistente:hover{
+    background:#303846;
+}
+
+.mensajes-asistente{
+    flex:1;
+
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+
+    padding:14px;
+
+    overflow-y:auto;
+}
+
+.mensajes-asistente::-webkit-scrollbar{
+    width:6px;
+}
+
+.mensajes-asistente::-webkit-scrollbar-thumb{
+    background:#384253;
+    border-radius:10px;
+}
+
+.mensaje{
+    max-width:88%;
+
+    padding:10px 12px;
+
+    border-radius:11px;
+
+    font-size:13px;
+    line-height:1.4;
+
+    word-break:break-word;
+}
+
+.mensaje-ia{
+    align-self:flex-start;
+
+    background:#252d3a;
+    color:#e9edf4;
+
+    border-bottom-left-radius:4px;
+}
+
+.mensaje-usuario{
+    align-self:flex-end;
+
+    background:#4d79ff;
+    color:white;
+
+    border-bottom-right-radius:4px;
+}
+
+.formulario-asistente{
+    display:flex;
+    align-items:flex-end;
+    gap:8px;
+
+    padding:10px;
+
+    background:#181e28;
+
+    border-top:1px solid #30394a;
+}
+
+#entradaAsistente{
+    flex:1;
+
+    min-height:38px;
+    max-height:100px;
+
+    resize:none;
+
+    padding:9px 11px;
+
+    background:#252d3a;
+    color:white;
+
+    border:1px solid #3a4454;
+    border-radius:9px;
+
+    outline:none;
+
+    font-family:inherit;
+    font-size:13px;
+    line-height:1.35;
+}
+
+#entradaAsistente::placeholder{
+    color:#8f9bad;
+}
+
+#entradaAsistente:focus{
+    border-color:#4d79ff;
+}
+
+.enviar-asistente{
+    width:38px;
+    height:38px;
+
+    flex-shrink:0;
+
+    background:#4d79ff;
+
+    border-radius:9px;
+
+    font-size:16px;
+}
+
+.enviar-asistente:hover{
+    background:#638aff;
+}
+
+/* ==========================
+   HERRAMIENTAS
+========================== */
+
+.sidebar-seccion-titulo{
+    margin:0 8px 8px;
+
+    color:#8994a5;
+
+    font-size:11px;
+    font-weight:600;
+
+    text-transform:uppercase;
+    letter-spacing:.8px;
+}
+
+.sidebar-item{
+    width:100%;
+    height:44px;
+
+    display:flex;
+    align-items:center;
+    gap:12px;
+
+    padding:0 12px;
+    margin-bottom:4px;
+
+    background:transparent;
+
+    border-radius:9px;
+
+    color:#e8ebf0;
+
+    text-align:left;
+
+    font-size:14px;
+
+    transition:background .18s, transform .15s;
+}
+
+.sidebar-item:hover{
+    background:#292f3b;
+}
+
+.sidebar-item:active{
+    transform:scale(.98);
+}
+
+.sidebar-icono{
+    width:24px;
+
+    display:flex;
+    justify-content:center;
+
+    font-size:16px;
+}
+
+.sidebar-footer{
+    padding:12px 14px;
+
+    border-top:1px solid #303846;
+}
+
+#contenido{
+    display:none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="tabs">
+
+    <button
+        id="nuevaPestana"
+        title="Nueva pestaña"
+    >
+        +
+    </button>
+
+</div>
+
+<div class="barra">
+
+    <button
+        id="atras"
+        class="boton-navegacion"
+        title="Atrás"
+    >
+        ←
+    </button>
+
+    <button
+        id="adelante"
+        class="boton-navegacion"
+        title="Adelante"
+    >
+        →
+    </button>
+
+    <button
+        id="recargar"
+        class="boton-navegacion"
+        title="Recargar"
+    >
+        ↻
+    </button>
+
+    <button
+        id="inicio"
+        class="boton-navegacion"
+        title="Inicio"
+    >
+        ⌂
+    </button>
+
+    <input
+        id="direccion"
+        type="text"
+        autocomplete="off"
+        spellcheck="false"
+        placeholder="Buscar o escribir una dirección"
+    >
+
+    <button id="ir">
+        Ir
+    </button>
+
+    <button
+        id="alternarSidebar"
+        class="boton-navegacion"
+        title="Abrir barra lateral"
+    >
+        ☰
+    </button>
+
+</div>
+
+<aside id="sidebar" class="sidebar">
+
+    <header class="sidebar-header">
+
+        <div class="sidebar-identidad">
+
+            <div class="sidebar-logo">
+                P
+            </div>
+
+            <div class="sidebar-titulos">
+
+                <span class="sidebar-titulo">
+                    Patagonia
+                </span>
+
+                <span class="sidebar-subtitulo">
+                    Browser Workspace
+                </span>
+
+            </div>
+
+        </div>
+
+    </header>
+
+    <div class="sidebar-contenido">
+
+        <section id="tarjetaIA" class="tarjeta-ia">
+
+            <div class="tarjeta-ia-titulo">
+                Patagonia AI
+            </div>
+
+            <p class="tarjeta-ia-texto">
+                Resumí páginas, explicá contenido y hacé preguntas
+                sobre lo que estás viendo.
+            </p>
+
+            <button
+                id="abrirAsistente"
+                class="tarjeta-ia-boton"
+            >
+                Abrir asistente
+            </button>
+
+        </section>
+
+        <section
+            id="panelAsistente"
+            class="panel-asistente"
+        >
+
+            <div class="panel-asistente-header">
+
+                <div>
+
+                    <div class="panel-asistente-titulo">
+                        Patagonia AI
+                    </div>
+
+                    <div class="panel-asistente-estado">
+                        Asistente local
+                    </div>
+
+                </div>
+
+                <button
+                    id="cerrarAsistente"
+                    class="cerrar-asistente"
+                    title="Cerrar asistente"
+                >
+                    ×
+                </button>
+
+            </div>
+
+            <div
+                id="mensajesAsistente"
+                class="mensajes-asistente"
+            >
+
+                <div class="mensaje mensaje-ia">
+                    Hola. ¿En qué puedo ayudarte con esta página?
+                </div>
+
+            </div>
+
+            <form
+                id="formularioAsistente"
+                class="formulario-asistente"
+            >
+
+                <textarea
+                    id="entradaAsistente"
+                    placeholder="Escribí un mensaje..."
+                    rows="1"
+                ></textarea>
+
+                <button
+                    type="submit"
+                    class="enviar-asistente"
+                    title="Enviar mensaje"
+                >
+                    ➤
+                </button>
+
+            </form>
+
+        </section>
+
+        <div class="sidebar-seccion-titulo">
+            Herramientas
+        </div>
+
+        <button class="sidebar-item">
+
+            <span class="sidebar-icono">
+                ⭐
+            </span>
+
+            <span>
+                Favoritos
+            </span>
+
+        </button>
+
+        <button class="sidebar-item">
+
+            <span class="sidebar-icono">
+                🕘
+            </span>
+
+            <span>
+                Historial
+            </span>
+
+        </button>
+
+        <button class="sidebar-item">
+
+            <span class="sidebar-icono">
+                📥
+            </span>
+
+            <span>
+                Descargas
+            </span>
+
+        </button>
+
+        <button class="sidebar-item">
+
+            <span class="sidebar-icono">
+                📑
+            </span>
+
+            <span>
+                Sesiones
+            </span>
+
+        </button>
+
+    </div>
+
+    <footer class="sidebar-footer">
+
+        <button class="sidebar-item">
+
+            <span class="sidebar-icono">
+                ⚙
+            </span>
+
+            <span>
+                Configuración
+            </span>
+
+        </button>
+
+    </footer>
+
+</aside>
+
+<div id="contenido"></div>
+
+<script src="ui/modules/assistant.js"></script>
+<script src="renderer.js"></script>
+
+</body>
+</html>
