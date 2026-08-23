@@ -5,6 +5,20 @@ const {
     ipcMain
 } = require("electron");
 
+const {
+    ALTURA_BARRA,
+    ANCHO_BARRA_LATERAL,
+    PAGINA_INICIO
+} = require("./src/shared/constants");
+
+const {
+    navegar,
+    atras,
+    adelante,
+    recargar,
+    irAInicio
+} = require("./src/main/navigation");
+
 const path = require("path");
 const {
     Readability
@@ -27,10 +41,6 @@ let pestanas = [];
 let idPestanaActiva = null;
 let siguienteId = 1;
 let barraLateralAbierta = false;
-
-const ALTURA_BARRA = 108;
-const ANCHO_BARRA_LATERAL = 320;
-const PAGINA_INICIO = "https://www.google.com";
 
 function obtenerPestanaActiva() {
     return pestanas.find(
@@ -115,39 +125,12 @@ function enviarURLActual() {
         ventanaPrincipal &&
         !ventanaPrincipal.isDestroyed()
     ) {
-        ventanaPrincipal.webContents.send(
+        ventanaPrincipal.webContents.send( 
             "url-actualizada",
             pestanaActiva.url
         );
-    }
 }
-
-function prepararDireccion(direccion) {
-    const texto = String(
-        direccion || ""
-    ).trim();
-
-    if (!texto) {
-        return PAGINA_INICIO;
-    }
-
-    if (/^https?:\/\//i.test(texto)) {
-        return texto;
-    }
-
-    if (
-        texto.includes(" ") ||
-        !texto.includes(".")
-    ) {
-        return (
-            "https://www.google.com/search?q=" +
-            encodeURIComponent(texto)
-        );
-    }
-
-    return `https://${texto}`;
-}
-
+}        
 async function obtenerContextoPestanaActiva() {
     const pestanaActiva =
         obtenerPestanaActiva();
@@ -565,74 +548,46 @@ ipcMain.on(
 ipcMain.on(
     "navegar",
     (_evento, direccion) => {
-        const pestanaActiva =
-            obtenerPestanaActiva();
-
-        if (pestanaActiva) {
-            pestanaActiva.vista
-                .webContents
-                .loadURL(
-                    prepararDireccion(
-                        direccion
-                    )
-                );
-        }
+        navegar(
+            obtenerPestanaActiva(),
+            direccion
+        );
     }
 );
 
 ipcMain.on(
     "atras",
     () => {
-        const pestanaActiva =
-            obtenerPestanaActiva();
-
-        if (
-            pestanaActiva?.vista
-                .webContents
-                .canGoBack()
-        ) {
-            pestanaActiva.vista
-                .webContents
-                .goBack();
-        }
+        atras(
+            obtenerPestanaActiva()
+        );
     }
 );
 
 ipcMain.on(
     "adelante",
     () => {
-        const pestanaActiva =
-            obtenerPestanaActiva();
-
-        if (
-            pestanaActiva?.vista
-                .webContents
-                .canGoForward()
-        ) {
-            pestanaActiva.vista
-                .webContents
-                .goForward();
-        }
+        adelante(
+            obtenerPestanaActiva()
+        );
     }
 );
 
 ipcMain.on(
     "recargar",
     () => {
-        obtenerPestanaActiva()
-            ?.vista.webContents
-            .reload();
+        recargar(
+            obtenerPestanaActiva()
+        );
     }
 );
 
 ipcMain.on(
     "inicio",
     () => {
-        obtenerPestanaActiva()
-            ?.vista.webContents
-            .loadURL(
-                PAGINA_INICIO
-            );
+        irAlInicio(
+            obtenerPestanaActiva()
+        );
     }
 );
 
