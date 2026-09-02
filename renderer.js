@@ -34,6 +34,11 @@ function actualizarBarraDireccion() {
         : obtenerDominio(urlActual));
 }
 
+window.addEventListener("favorito-abierto", () => {
+    direccionPendiente = null;
+    actualizarBarraDireccion();
+});
+
 function navegar() {
     const direccion = barraDireccion.value.trim();
 
@@ -113,6 +118,7 @@ function crearElementoPestana(pestana) {
 }
 
 function mostrarPestanas(pestanas) {
+    window.PatagoniaFavorites.actualizarPagina(pestanas.find(pestana => pestana.activa));
     const error = pestanas.find((pestana) => pestana.activa)?.errorCarga;
     avisoCarga.hidden = !error;
     mensajeCarga.textContent = error?.mensaje || "";

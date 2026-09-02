@@ -692,6 +692,10 @@ button{
         placeholder="Buscar o escribir una dirección"
     >
 
+    <button id="guardarFavorito" class="boton-navegacion" type="button"
+        title="Guardar en favoritos" aria-label="Guardar en favoritos" aria-pressed="false" disabled>☆</button>
+    <span id="avisoFavoritos" role="status"></span>
+
     <button id="ir">
         Ir
     </button>
@@ -821,7 +825,7 @@ button{
             Herramientas
         </div>
 
-        <button class="sidebar-item">
+        <button id="abrirFavoritos" class="sidebar-item" aria-expanded="false" aria-controls="panelFavoritos">
 
             <span class="sidebar-icono">
                 ⭐
@@ -832,6 +836,12 @@ button{
             </span>
 
         </button>
+
+        <section id="panelFavoritos" hidden aria-label="Favoritos guardados">
+            <p id="estadoFavoritos" role="status"></p>
+            <p id="favoritosVacios">Todavía no guardaste favoritos. Usá la estrella junto a la dirección.</p>
+            <ul id="listaFavoritos"></ul>
+        </section>
 
         <button class="sidebar-item">
 
@@ -915,6 +925,28 @@ button{
     #reintentarCarga:focus-visible { outline:3px solid #c4d1ff; outline-offset:4px; }
 </style>
 
+<style>
+    #guardarFavorito { font-size:24px; }
+    #guardarFavorito[aria-pressed="true"] { color:#ffd36e; }
+    #guardarFavorito:disabled { opacity:.45; cursor:default; }
+    #avisoFavoritos { font-size:12px; max-width:150px; color:#c4cbd8; }
+    #avisoFavoritos:empty { display:none; }
+    #panelFavoritos { padding:4px 8px 16px; }
+    #panelFavoritos p { color:#c4cbd8; font-size:13px; line-height:1.5; }
+    #listaFavoritos { list-style:none; padding:0; margin:0; }
+    #listaFavoritos li { display:flex; align-items:center; gap:6px; margin:6px 0; }
+    .favorito-abrir { flex:1; min-width:0; text-align:left; padding:10px; border:0;
+        border-radius:8px; background:#2a313d; color:#eef2f8; cursor:pointer; }
+    .favorito-abrir span, .favorito-abrir small { display:block; overflow:hidden;
+        text-overflow:ellipsis; white-space:nowrap; }
+    .favorito-abrir small { color:#aab4c6; margin-top:4px; }
+    .favorito-eliminar { background:transparent; color:#c4cbd8; border:0;
+        padding:8px; font-size:22px; cursor:pointer; }
+    .favorito-abrir:hover, .favorito-eliminar:hover { background:#3a4453; }
+    #guardarFavorito:focus-visible, .favorito-abrir:focus-visible, .favorito-eliminar:focus-visible {
+        outline:2px solid #8faaff; outline-offset:2px; }
+</style>
+<script src="ui/modules/bookmarks.js"></script>
 <script src="ui/modules/assistant.js"></script>
 <script src="renderer.js"></script>
 

@@ -20,6 +20,7 @@ const {
 } = require("./src/main/navigation");
 
 const path = require("path");
+const { registrarFavoritos } = require("./src/main/bookmarks");
 const { registrarErroresCarga } = require("./src/main/loadErrors");
 const {
     Readability
@@ -699,6 +700,13 @@ process.on(
 app.whenReady()
     .then(() => {
         console.log("Electron listo.");
+        registrarFavoritos({
+            ipcMain,
+            archivo: path.join(app.getPath("userData"), "favoritos.json"),
+            obtenerVentana: () => ventanaPrincipal,
+            obtenerPestana: obtenerPestanaActiva,
+            navegar
+        });
         crearVentana();
     })
     .catch((error) => {
