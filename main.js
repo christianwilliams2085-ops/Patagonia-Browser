@@ -2,7 +2,9 @@ const {
     app,
     BrowserWindow,
     WebContentsView,
-    ipcMain
+    ipcMain,
+    session,
+    shell
 } = require("electron");
 
 const {
@@ -20,6 +22,7 @@ const {
 } = require("./src/main/navigation");
 
 const path = require("path");
+const { registrarDescargas } = require("./src/main/downloads");
 const { registrarHistorial } = require("./src/main/history");
 const { registrarFavoritos } = require("./src/main/bookmarks");
 const { registrarErroresCarga } = require("./src/main/loadErrors");
@@ -703,6 +706,13 @@ process.on(
 app.whenReady()
     .then(() => {
         console.log("Electron listo.");
+        registrarDescargas({
+            ipcMain,
+            sesion: session.defaultSession,
+            shell,
+            obtenerVentana: () => ventanaPrincipal,
+            esPestanaPropia: contenido => pestanas.some(pestana => pestana.vista.webContents === contenido)
+        });
         observarVisitas = registrarHistorial({
             ipcMain,
             archivo: path.join(app.getPath("userData"), "historial.json"),

@@ -871,17 +871,25 @@ button{
             </div>
         </section>
 
-        <button class="sidebar-item">
+        <button id="abrirDescargas" class="sidebar-item" aria-expanded="false" aria-controls="panelDescargas">
 
             <span class="sidebar-icono">
                 📥
             </span>
 
             <span>
-                Descargas
+                Descargas<span id="contadorDescargas"></span>
             </span>
 
         </button>
+
+        <section id="panelDescargas" hidden aria-label="Descargas de esta sesión">
+            <p>Descargas de esta sesión (hasta 100 terminadas). Los archivos guardados se conservan al salir.</p>
+            <p>Mantené Patagonia abierto hasta que terminen.</p>
+            <p id="estadoDescargas" role="status"></p>
+            <p id="descargasVacias">Todavía no hay descargas.</p>
+            <ul id="listaDescargas"></ul>
+        </section>
 
         <button class="sidebar-item">
 
@@ -974,6 +982,17 @@ button{
     .historial-accion:focus-visible, #buscarHistorial:focus-visible { outline:2px solid #8faaff; outline-offset:2px; }
     #confirmarBorradoHistorial { padding:8px; border:1px solid #46516a; border-radius:8px; }
 </style>
+<style>
+    #panelDescargas { padding:4px 8px 16px; }
+    #panelDescargas p { color:#c4cbd8; font-size:13px; line-height:1.5; margin:8px 0; }
+    #listaDescargas { list-style:none; margin:8px 0; padding:0; }
+    #listaDescargas li { background:#2a313d; border-radius:8px; padding:12px; margin:8px 0; }
+    #listaDescargas strong { display:block; overflow-wrap:anywhere; font-size:13px; }
+    #listaDescargas progress { width:100%; accent-color:#7393ff; }
+    #listaDescargas button { color:#eef2f8; border:0; cursor:pointer; }
+    #listaDescargas button:disabled { opacity:.5; cursor:wait; }
+</style>
+<script src="ui/modules/downloads.js"></script>
 <script src="ui/modules/history.js"></script>
 <script src="ui/modules/bookmarks.js"></script>
 <script src="ui/modules/assistant.js"></script>

@@ -1,6 +1,10 @@
 const { contextBridge, ipcRenderer } = require("electron");
 
 contextBridge.exposeInMainWorld("patagonia", {
+    listarDescargas: () => ipcRenderer.invoke("listar-descargas"),
+    cancelarDescarga: (id) => ipcRenderer.invoke("cancelar-descarga", id),
+    mostrarDescarga: (id) => ipcRenderer.invoke("mostrar-descarga", id),
+    recibirDescargas: (callback) => ipcRenderer.on("descargas-actualizadas", (_, datos) => callback(datos)),
     listarHistorial: () => ipcRenderer.invoke("listar-historial"),
     abrirVisita: (id) => ipcRenderer.invoke("abrir-visita", id),
     eliminarVisita: (id) => ipcRenderer.invoke("eliminar-visita", id),
