@@ -585,7 +585,7 @@ ipcMain.on(
 ipcMain.on(
     "inicio",
     () => {
-        irAlInicio(
+        irAInicio(
             obtenerPestanaActiva()
         );
     }
