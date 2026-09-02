@@ -895,7 +895,7 @@ button{
             <ul id="listaDescargas"></ul>
         </section>
 
-        <button class="sidebar-item">
+        <button id="abrirSesiones" class="sidebar-item" aria-expanded="false" aria-controls="panelSesiones">
 
             <span class="sidebar-icono">
                 📑
@@ -906,6 +906,13 @@ button{
             </span>
 
         </button>
+
+        <section id="panelSesiones" hidden aria-label="Recuperación de pestañas">
+            <p>Al abrir Patagonia recuperamos tus pestañas web en el mismo orden y seleccionamos la que estabas usando.</p>
+            <p>Se guardan las direcciones en este dispositivo. Los formularios sin enviar y el historial de Atrás de cada pestaña no se recuperan.</p>
+            <p id="estadoSesion" role="status"></p>
+            <button id="guardarSesion" class="historial-accion">Guardar ahora</button>
+        </section>
 
     </div>
 
@@ -1000,6 +1007,11 @@ button{
     #listaDescargas button { color:#eef2f8; border:0; cursor:pointer; }
     #listaDescargas button:disabled { opacity:.5; cursor:wait; }
 </style>
+<style>
+    #panelSesiones { padding:4px 8px 16px; }
+    #panelSesiones p { color:#c4cbd8; font-size:13px; line-height:1.5; margin:8px 0; }
+</style>
+<script src="ui/modules/sessions.js"></script>
 <script src="ui/modules/downloads.js"></script>
 <script src="ui/modules/history.js"></script>
 <script src="ui/modules/bookmarks.js"></script>

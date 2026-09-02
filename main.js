@@ -22,6 +22,7 @@ const {
 } = require("./src/main/navigation");
 
 const path = require("path");
+const { registrarSesiones } = require("./src/main/sessions");
 const { registrarDescargas } = require("./src/main/downloads");
 const { registrarHistorial } = require("./src/main/history");
 const { registrarFavoritos } = require("./src/main/bookmarks");
@@ -48,6 +49,14 @@ let idPestanaActiva = null;
 let siguienteId = 1;
 let barraLateralAbierta = false;
 let observarVisitas;
+let gestorSesion;
+let sesionInicial;
+let restaurandoSesion = true;
+let cerrandoVentana = false;
+
+function recordarSesion() {
+    if (!restaurandoSesion && !cerrandoVentana) gestorSesion?.actualizar(pestanas, idPestanaActiva);
+}
 
 function obtenerPestanaActiva() {
     return pestanas.find(
@@ -98,6 +107,7 @@ function enviarEstadoBarraLateral() {
 }
 
 function enviarPestanas() {
+    recordarSesion();
     if (
         !ventanaPrincipal ||
         ventanaPrincipal.isDestroyed()
@@ -313,7 +323,8 @@ function crearPestana(
 
     vista.webContents.on(
         "did-navigate-in-page",
-        (_evento, nuevaURL) => {
+        (_evento, nuevaURL, esMarcoPrincipal) => {
+            if (!esMarcoPrincipal) return;
             pestana.url = nuevaURL;
 
             if (
@@ -351,6 +362,7 @@ function crearPestana(
     navegar(pestana, url);
 
     activarPestana(id);
+    return id;
 }
 
 function activarPestana(id) {
@@ -470,7 +482,12 @@ function crearVentana() {
             ventanaPrincipal.restore();
             ventanaPrincipal.focus();
 
-            crearPestana();
+            const anteriores = sesionInicial?.pestanas || [];
+            const ids = anteriores.map(pestana => crearPestana(pestana.url));
+            if (ids.length) activarPestana(ids[sesionInicial.activa] || ids[0]);
+            else crearPestana();
+            restaurandoSesion = false;
+            recordarSesion();
             enviarEstadoBarraLateral();
         }
     );
@@ -509,9 +526,15 @@ function crearVentana() {
         ajustarVista
     );
 
+    ventanaPrincipal.on("close", () => {
+        recordarSesion();
+        gestorSesion.guardarAhora().catch(error => console.error(error.message));
+    });
+
     ventanaPrincipal.on(
         "closed",
         () => {
+            cerrandoVentana = true;
             pestanas.forEach(
                 (pestana) => {
                     if (
@@ -704,8 +727,14 @@ process.on(
 );
 
 app.whenReady()
-    .then(() => {
+    .then(async () => {
         console.log("Electron listo.");
+        gestorSesion = registrarSesiones({
+            ipcMain,
+            archivo: path.join(app.getPath("userData"), "sesion.json"),
+            obtenerVentana: () => ventanaPrincipal
+        });
+        sesionInicial = await gestorSesion.iniciar();
         registrarDescargas({
             ipcMain,
             sesion: session.defaultSession,
@@ -740,7 +769,7 @@ let historialGuardadoAlSalir = false;
 app.on("will-quit", (evento) => {
     if (historialGuardadoAlSalir || !observarVisitas) return;
     evento.preventDefault();
-    observarVisitas.esperar().finally(() => {
+    Promise.allSettled([observarVisitas.esperar(), gestorSesion?.guardarAhora()]).finally(() => {
         historialGuardadoAlSalir = true;
         app.quit();
     });
