@@ -159,3 +159,40 @@ test("panel preserves focus, renders unsafe filenames as text and ignores stale 
         assert.equal(lista.querySelector("progress").hasAttribute("value"), false);
     } finally { dom.window.close(); }
 });
+
+test("toolbar shortcut opens the sidebar once and brings downloads into view", async () => {
+    const { JSDOM } = require("jsdom");
+    const dom = new JSDOM(fs.readFileSync(path.join(__dirname, "../index.html"), "utf8"), { runScripts: "outside-only" });
+    try {
+        const { window } = dom;
+        let estadoSidebar;
+        let solicitudes = 0;
+        let desplazamientos = 0;
+        window.patagonia = {
+            recibirDescargas: () => {},
+            listarDescargas: async () => ({ correcto: true, revision: 0, descargas: [] }),
+            recibirURL: () => {}, recibirPestanas: () => {},
+            recibirEstadoBarraLateral: fn => { estadoSidebar = fn; },
+            alternarBarraLateral: () => { solicitudes++; }
+        };
+        window.PatagoniaAssistant = { iniciar: () => true };
+        const abrir = window.document.getElementById("abrirDescargas");
+        abrir.scrollIntoView = () => { desplazamientos++; };
+        window.eval(fs.readFileSync(path.join(__dirname, "../ui/modules/downloads.js"), "utf8"));
+        window.eval(fs.readFileSync(path.join(__dirname, "../renderer.js"), "utf8"));
+        const acceso = window.document.getElementById("accesoDescargas");
+        acceso.click();
+        acceso.click();
+        assert.equal(solicitudes, 1);
+        assert.equal(desplazamientos, 0);
+        estadoSidebar(true);
+        assert.equal(window.document.getElementById("panelDescargas").hidden, false);
+        assert.equal(window.document.getElementById("sidebar").classList.contains("abierta"), true);
+        assert.equal(window.document.activeElement, abrir);
+        assert.equal(desplazamientos, 1);
+        acceso.click();
+        assert.equal(solicitudes, 1);
+        assert.equal(desplazamientos, 2);
+        await new Promise(resolve => setImmediate(resolve));
+    } finally { dom.window.close(); }
+});

@@ -79,6 +79,13 @@
         abrir.setAttribute("aria-expanded", String(!panel.hidden));
         if (!panel.hidden) ejecutar(() => window.patagonia.listarDescargas());
     });
+    window.addEventListener("abrir-descargas", () => {
+        panel.hidden = false;
+        abrir.setAttribute("aria-expanded", "true");
+        abrir.scrollIntoView({ block: "start" });
+        abrir.focus({ preventScroll: true });
+        ejecutar(() => window.patagonia.listarDescargas());
+    });
     window.patagonia.recibirDescargas(mostrar);
     ejecutar(() => window.patagonia.listarDescargas());
 })();

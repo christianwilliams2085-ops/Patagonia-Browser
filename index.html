@@ -203,6 +203,7 @@ button{
 
 #direccion{
     flex:1;
+    min-width:0;
     height:40px;
 
     padding:0 14px;
@@ -700,6 +701,9 @@ button{
         Ir
     </button>
 
+    <button id="accesoDescargas" type="button" title="Abrir descargas"
+        aria-controls="panelDescargas">↓ Descargas</button>
+
     <button
         id="alternarSidebar"
         class="boton-navegacion"
@@ -984,6 +988,10 @@ button{
 </style>
 <style>
     #panelDescargas { padding:4px 8px 16px; }
+    #accesoDescargas { flex-shrink:0; height:40px; padding:0 12px; border-radius:7px;
+        background:#303b50; color:#eef2f8; white-space:nowrap; }
+    #accesoDescargas:hover { background:#3a4965; }
+    #accesoDescargas:focus-visible { outline:2px solid #8faaff; outline-offset:2px; }
     #panelDescargas p { color:#c4cbd8; font-size:13px; line-height:1.5; margin:8px 0; }
     #listaDescargas { list-style:none; margin:8px 0; padding:0; }
     #listaDescargas li { background:#2a313d; border-radius:8px; padding:12px; margin:8px 0; }

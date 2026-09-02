@@ -19,6 +19,16 @@ document.getElementById("reintentarCarga").addEventListener("click", () => {
 let urlActual = "";
 let editandoDireccion = false;
 let direccionPendiente = null;
+let descargasPendientes = false;
+
+document.getElementById("accesoDescargas").addEventListener("click", () => {
+    if (sidebar.classList.contains("abierta")) {
+        window.dispatchEvent(new Event("abrir-descargas"));
+    } else if (!descargasPendientes) {
+        descargasPendientes = true;
+        window.patagonia.alternarBarraLateral();
+    }
+});
 
 function obtenerDominio(url) {
     try {
@@ -265,6 +275,10 @@ window.patagonia
                 abierta
                     ? "Cerrar barra lateral"
                     : "Abrir barra lateral";
+            if (abierta && descargasPendientes) {
+                descargasPendientes = false;
+                window.dispatchEvent(new Event("abrir-descargas"));
+            }
         }
     );
 
