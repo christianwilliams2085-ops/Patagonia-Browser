@@ -891,6 +891,30 @@ button{
 
 <div id="contenido"></div>
 
+<section id="errorCarga" hidden role="alert" aria-labelledby="tituloErrorCarga">
+    <div class="error-carga-tarjeta">
+        <p class="error-carga-marca">PATAGONIA BROWSER</p>
+        <h1 id="tituloErrorCarga">No pudimos abrir esta página</h1>
+        <p id="mensajeErrorCarga"></p>
+        <p id="direccionErrorCarga"></p>
+        <button id="reintentarCarga" type="button">Volver a intentar</button>
+    </div>
+</section>
+<style>
+    #errorCarga { position:absolute; top:108px; bottom:0; left:0; right:0;
+        display:grid; place-items:center; padding:32px; overflow:auto;
+        background:#1b1f27; color:#eef2f8; }
+    #errorCarga[hidden] { display:none; }
+    .error-carga-tarjeta { width:100%; max-width:540px; }
+    .error-carga-marca { color:#8faaff; font-size:12px; letter-spacing:2px; }
+    #tituloErrorCarga { font-size:28px; margin:16px 0; }
+    #mensajeErrorCarga { color:#c4cbd8; line-height:1.6; }
+    #direccionErrorCarga { color:#aab4c6; overflow-wrap:anywhere; font-size:13px; margin:20px 0; }
+    #reintentarCarga { background:#4d79ff; color:white; border:0; border-radius:10px;
+        padding:12px 20px; font:inherit; cursor:pointer; }
+    #reintentarCarga:focus-visible { outline:3px solid #c4d1ff; outline-offset:4px; }
+</style>
+
 <script src="ui/modules/assistant.js"></script>
 <script src="renderer.js"></script>
 

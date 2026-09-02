@@ -33,9 +33,11 @@ function navegar(pestana, direccion) {
         return;
     }
 
-    pestana.vista.webContents.loadURL(
+    return pestana.vista.webContents.loadURL(
         prepararDireccion(direccion)
-    );
+    ).catch(() => {
+        // did-fail-load muestra el error en la interfaz de la pestaña.
+    });
 }
 
 function atras(pestana) {
@@ -57,13 +59,14 @@ function adelante(pestana) {
 }
 
 function recargar(pestana) {
+    if (pestana?.errorCarga) {
+        return navegar(pestana, pestana.errorCarga.url);
+    }
     pestana?.vista.webContents.reload();
 }
 
 function irAInicio(pestana) {
-    pestana?.vista.webContents.loadURL(
-        PAGINA_INICIO
-    );
+    return navegar(pestana, PAGINA_INICIO);
 }
 
 module.exports = {

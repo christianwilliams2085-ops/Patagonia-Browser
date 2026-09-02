@@ -20,6 +20,7 @@ const {
 } = require("./src/main/navigation");
 
 const path = require("path");
+const { registrarErroresCarga } = require("./src/main/loadErrors");
 const {
     Readability
 } = require("@mozilla/readability");
@@ -105,6 +106,7 @@ function enviarPestanas() {
             url: pestana.url,
             favicon: pestana.favicon,
             cargando: pestana.cargando,
+            errorCarga: pestana.errorCarga || null,
             activa:
                 pestana.id === idPestanaActiva
         })
@@ -262,6 +264,11 @@ function crearPestana(
 
     pestanas.push(pestana);
 
+    registrarErroresCarga(pestana, () => {
+        enviarURLActual();
+        enviarPestanas();
+    });
+
     ventanaPrincipal.contentView
         .addChildView(vista);
 
@@ -334,7 +341,7 @@ function crearPestana(
         }
     );
 
-    vista.webContents.loadURL(url);
+    navegar(pestana, url);
 
     activarPestana(id);
 }
