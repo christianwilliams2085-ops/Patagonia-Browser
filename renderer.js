@@ -9,6 +9,12 @@ const botonSidebar = document.getElementById("alternarSidebar");
 const barraDireccion = document.getElementById("direccion");
 const contenedorPestanas = document.querySelector(".tabs");
 const sidebar = document.getElementById("sidebar");
+const avisoCarga = document.getElementById("errorCarga");
+const mensajeCarga = document.getElementById("mensajeErrorCarga");
+const direccionCarga = document.getElementById("direccionErrorCarga");
+document.getElementById("reintentarCarga").addEventListener("click", () => {
+    window.patagonia.recargar();
+});
 
 let urlActual = "";
 let editandoDireccion = false;
@@ -107,6 +113,10 @@ function crearElementoPestana(pestana) {
 }
 
 function mostrarPestanas(pestanas) {
+    const error = pestanas.find((pestana) => pestana.activa)?.errorCarga;
+    avisoCarga.hidden = !error;
+    mensajeCarga.textContent = error?.mensaje || "";
+    direccionCarga.textContent = error?.url || "";
     contenedorPestanas
         .querySelectorAll(".tab")
         .forEach((pestana) => {
@@ -232,6 +242,7 @@ window.patagonia.recibirPestanas(
 window.patagonia
     .recibirEstadoBarraLateral(
         (abierta) => {
+            avisoCarga.style.right = abierta ? "320px" : "0";
             sidebar.classList.toggle(
                 "abierta",
                 abierta
