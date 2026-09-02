@@ -20,6 +20,7 @@ const {
 } = require("./src/main/navigation");
 
 const path = require("path");
+const { registrarHistorial } = require("./src/main/history");
 const { registrarFavoritos } = require("./src/main/bookmarks");
 const { registrarErroresCarga } = require("./src/main/loadErrors");
 const {
@@ -43,6 +44,7 @@ let pestanas = [];
 let idPestanaActiva = null;
 let siguienteId = 1;
 let barraLateralAbierta = false;
+let observarVisitas;
 
 function obtenerPestanaActiva() {
     return pestanas.find(
@@ -264,6 +266,7 @@ function crearPestana(
     };
 
     pestanas.push(pestana);
+    observarVisitas(vista.webContents);
 
     registrarErroresCarga(pestana, () => {
         enviarURLActual();
@@ -700,6 +703,13 @@ process.on(
 app.whenReady()
     .then(() => {
         console.log("Electron listo.");
+        observarVisitas = registrarHistorial({
+            ipcMain,
+            archivo: path.join(app.getPath("userData"), "historial.json"),
+            obtenerVentana: () => ventanaPrincipal,
+            obtenerPestana: obtenerPestanaActiva,
+            navegar
+        });
         registrarFavoritos({
             ipcMain,
             archivo: path.join(app.getPath("userData"), "favoritos.json"),
@@ -715,6 +725,16 @@ app.whenReady()
             error
         );
     });
+
+let historialGuardadoAlSalir = false;
+app.on("will-quit", (evento) => {
+    if (historialGuardadoAlSalir || !observarVisitas) return;
+    evento.preventDefault();
+    observarVisitas.esperar().finally(() => {
+        historialGuardadoAlSalir = true;
+        app.quit();
+    });
+});
 
 app.on(
     "window-all-closed",
