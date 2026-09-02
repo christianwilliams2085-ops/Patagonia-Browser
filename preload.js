@@ -1,6 +1,9 @@
 const { contextBridge, ipcRenderer } = require("electron");
 
 contextBridge.exposeInMainWorld("patagonia", {
+    obtenerSesion: () => ipcRenderer.invoke("obtener-sesion"),
+    guardarSesion: () => ipcRenderer.invoke("guardar-sesion"),
+    recibirSesion: (callback) => ipcRenderer.on("sesion-actualizada", (_, estado) => callback(estado)),
     listarDescargas: () => ipcRenderer.invoke("listar-descargas"),
     cancelarDescarga: (id) => ipcRenderer.invoke("cancelar-descarga", id),
     mostrarDescarga: (id) => ipcRenderer.invoke("mostrar-descarga", id),
