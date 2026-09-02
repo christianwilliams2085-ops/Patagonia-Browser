@@ -39,7 +39,7 @@
                 const respuesta = await window.patagonia.abrirFavorito(favorito.id);
                 if (respuesta.correcto) window.dispatchEvent(new Event("favorito-abierto"));
                 return respuesta;
-            }, "Abriendo favorito…"));
+            }));
             const eliminar = document.createElement("button");
             eliminar.className = "favorito-eliminar";
             eliminar.textContent = "×";
