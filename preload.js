@@ -1,6 +1,10 @@
 const { contextBridge, ipcRenderer } = require("electron");
 
 contextBridge.exposeInMainWorld("patagonia", {
+    listarFavoritos: () => ipcRenderer.invoke("listar-favoritos"),
+    alternarFavorito: () => ipcRenderer.invoke("alternar-favorito"),
+    eliminarFavorito: (id) => ipcRenderer.invoke("eliminar-favorito", id),
+    abrirFavorito: (id) => ipcRenderer.invoke("abrir-favorito", id),
 
     navegar: (url) => ipcRenderer.send("navegar", url),
 
