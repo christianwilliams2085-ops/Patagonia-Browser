@@ -843,7 +843,7 @@ button{
             <ul id="listaFavoritos"></ul>
         </section>
 
-        <button class="sidebar-item">
+        <button id="abrirHistorial" class="sidebar-item" aria-expanded="false" aria-controls="panelHistorial">
 
             <span class="sidebar-icono">
                 🕘
@@ -854,6 +854,22 @@ button{
             </span>
 
         </button>
+
+        <section id="panelHistorial" hidden aria-label="Historial de navegación">
+            <p>Últimas 1000 visitas, guardadas en este dispositivo.</p>
+            <input id="buscarHistorial" type="search" placeholder="Buscar en el historial"
+                aria-label="Buscar en el historial" autocomplete="off">
+            <p id="estadoHistorial" role="status"></p>
+            <p id="historialVacio">Todavía no hay páginas visitadas.</p>
+            <ul id="listaHistorial"></ul>
+            <button id="masHistorial" class="historial-accion" hidden>Mostrar más</button>
+            <button id="borrarHistorial" class="historial-accion">Borrar historial</button>
+            <div id="confirmarBorradoHistorial" hidden>
+                <p>¿Borrar todas las visitas? Los favoritos se conservarán. Esta acción no se puede deshacer.</p>
+                <button id="aceptarBorradoHistorial" class="historial-accion">Borrar todo</button>
+                <button id="cancelarBorradoHistorial" class="historial-accion">Cancelar</button>
+            </div>
+        </section>
 
         <button class="sidebar-item">
 
@@ -946,6 +962,19 @@ button{
     #guardarFavorito:focus-visible, .favorito-abrir:focus-visible, .favorito-eliminar:focus-visible {
         outline:2px solid #8faaff; outline-offset:2px; }
 </style>
+<style>
+    #panelHistorial { padding:4px 8px 16px; }
+    #panelHistorial p { color:#c4cbd8; font-size:13px; line-height:1.5; margin:8px 0; }
+    #buscarHistorial { width:100%; padding:10px; border:1px solid #46516a;
+        border-radius:8px; background:#202631; color:white; }
+    #listaHistorial { list-style:none; padding:0; margin:8px 0; }
+    #listaHistorial li { display:flex; align-items:center; gap:6px; margin:6px 0; }
+    #listaHistorial time { display:block; font-size:11px; color:#aab4c6; margin-top:4px; }
+    .historial-accion { margin:4px 4px 4px 0; padding:8px 12px; border-radius:7px; background:#303b50; }
+    .historial-accion:focus-visible, #buscarHistorial:focus-visible { outline:2px solid #8faaff; outline-offset:2px; }
+    #confirmarBorradoHistorial { padding:8px; border:1px solid #46516a; border-radius:8px; }
+</style>
+<script src="ui/modules/history.js"></script>
 <script src="ui/modules/bookmarks.js"></script>
 <script src="ui/modules/assistant.js"></script>
 <script src="renderer.js"></script>

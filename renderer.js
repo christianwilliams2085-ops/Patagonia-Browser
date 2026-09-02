@@ -38,6 +38,10 @@ window.addEventListener("favorito-abierto", () => {
     direccionPendiente = null;
     actualizarBarraDireccion();
 });
+window.addEventListener("historial-abierto", () => {
+    direccionPendiente = null;
+    actualizarBarraDireccion();
+});
 
 function navegar() {
     const direccion = barraDireccion.value.trim();
