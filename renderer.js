@@ -12,6 +12,7 @@ const sidebar = document.getElementById("sidebar");
 
 let urlActual = "";
 let editandoDireccion = false;
+let direccionPendiente = null;
 
 function obtenerDominio(url) {
     try {
@@ -22,9 +23,9 @@ function obtenerDominio(url) {
 }
 
 function actualizarBarraDireccion() {
-    barraDireccion.value = editandoDireccion
+    barraDireccion.value = direccionPendiente ?? (editandoDireccion
         ? urlActual
-        : obtenerDominio(urlActual);
+        : obtenerDominio(urlActual));
 }
 
 function navegar() {
@@ -35,7 +36,9 @@ function navegar() {
     }
 
     window.patagonia.navegar(direccion);
+    direccionPendiente = null;
     barraDireccion.blur();
+    actualizarBarraDireccion();
 }
 
 function crearElementoPestana(pestana) {
@@ -177,6 +180,10 @@ botonSidebar.addEventListener(
     }
 );
 
+barraDireccion.addEventListener("input", () => {
+    direccionPendiente = barraDireccion.value;
+});
+
 barraDireccion.addEventListener(
     "focus",
     () => {
@@ -203,6 +210,7 @@ barraDireccion.addEventListener(
         }
 
         if (evento.key === "Escape") {
+            direccionPendiente = null;
             barraDireccion.blur();
         }
     }
