@@ -37,10 +37,12 @@ test("tracks concurrent downloads, real saved name and completed folder without 
     const f = fixture();
     const uno = f.iniciar();
     const dos = f.iniciar();
+    assert.equal(f.contarActivas(), 2);
     const idUno = f.snapshot().descargas[1].id;
     uno.ruta = path.join(path.resolve("downloads"), "renombrado.txt");
     uno.recibidos = 100;
     uno.emit("done", {}, "completed");
+    assert.equal(f.contarActivas(), 1);
     const datos = (await f.llamar("listar-descargas")).descargas;
     assert.equal(datos[1].nombre, "renombrado.txt");
     assert.equal(datos[1].estado, "completada");
@@ -49,6 +51,7 @@ test("tracks concurrent downloads, real saved name and completed folder without 
     assert.equal((await f.llamar("mostrar-descarga", idUno)).correcto, true);
     assert.deepEqual(f.carpetas, [uno.ruta]);
     dos.cancel();
+    assert.equal(f.contarActivas(), 0);
 });
 
 test("handles unknown size, interruption, recovery, cancellation and final failure", async () => {
@@ -58,6 +61,7 @@ test("handles unknown size, interruption, recovery, cancellation and final failu
     item.total = 0;
     item.recibidos = 27;
     item.emit("updated", {}, "interrupted");
+    assert.equal(f.contarActivas(), 1);
     assert.equal(f.snapshot().descargas[0].estado, "interrumpida");
     item.emit("updated", {}, "progressing");
     assert.equal(f.snapshot().descargas[0].estado, "descargando");

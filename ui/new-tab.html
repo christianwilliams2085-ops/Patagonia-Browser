@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+    <title>Nueva pestaña</title>
+    <link rel="icon" href="../assets/patagonia-mark.svg">
+    <link rel="stylesheet" href="new-tab.css">
+</head>
+<body>
+    <main class="inicio">
+        <section class="presentacion" aria-labelledby="tituloPatagonia">
+            <div class="logo-principal-contenedor">
+                <img class="logo-principal" src="../assets/patagonia-mark.svg" alt="">
+            </div>
+            <h1 id="tituloPatagonia">Patagonia Browser</h1>
+            <p>Navegá libre. Navegá seguro.</p>
+
+            <form id="busquedaPrincipal" class="busqueda-principal" role="search">
+                <span class="lupa" aria-hidden="true"></span>
+                <input id="consultaPrincipal" name="consulta" type="text" autocomplete="off" spellcheck="false"
+                    placeholder="Buscá en la web o escribí una dirección" aria-label="Buscar o escribir una dirección">
+                <button type="submit" aria-label="Buscar">Ir</button>
+            </form>
+
+            <nav id="accesosRapidos" class="accesos-rapidos" aria-label="Accesos rápidos">
+                <a class="acceso-rapido" href="https://www.google.com">
+                    <span class="icono-acceso icono-google" aria-hidden="true">G</span>
+                    <span>Google</span>
+                </a>
+                <a class="acceso-rapido" href="https://www.youtube.com">
+                    <span class="icono-acceso icono-youtube" aria-hidden="true"><i></i></span>
+                    <span>YouTube</span>
+                </a>
+                <a class="acceso-rapido" href="https://github.com">
+                    <span class="icono-acceso icono-github" aria-hidden="true">&lt;/&gt;</span>
+                    <span>GitHub</span>
+                </a>
+                <a class="acceso-rapido" href="https://www.reddit.com">
+                    <span class="icono-acceso icono-reddit" aria-hidden="true">r/</span>
+                    <span>Reddit</span>
+                </a>
+                <button id="agregarAcceso" class="acceso-rapido acceso-agregar" type="button">
+                    <span class="icono-acceso" aria-hidden="true">+</span>
+                    <span>Agregar</span>
+                </button>
+            </nav>
+            <p id="estadoAccesos" role="status" aria-live="polite"></p>
+        </section>
+    </main>
+
+    <footer class="estado-inicio" aria-label="Estado de privacidad">
+        <span><i class="estado-icono escudo" aria-hidden="true"></i>Permisos bajo control</span>
+        <span><i class="estado-icono local" aria-hidden="true"></i>Datos guardados en este equipo</span>
+        <span class="estado-marca"><img src="../assets/patagonia-mark.svg" alt="">Patagonia Browser</span>
+    </footer>
+
+    <dialog id="dialogoAcceso" aria-labelledby="tituloAcceso">
+        <form id="formularioAcceso" method="dialog">
+            <header>
+                <h2 id="tituloAcceso">Agregar acceso rápido</h2>
+                <button id="cancelarAccesoSuperior" class="cerrar-dialogo" type="button" aria-label="Cerrar">×</button>
+            </header>
+            <label for="nombreAcceso">Nombre</label>
+            <input id="nombreAcceso" maxlength="24" autocomplete="off" required placeholder="Mi sitio">
+            <label for="urlAcceso">Dirección</label>
+            <input id="urlAcceso" type="url" maxlength="2048" autocomplete="off" required placeholder="https://ejemplo.com">
+            <p id="errorAcceso" role="alert"></p>
+            <div class="acciones-dialogo">
+                <button id="cancelarAcceso" class="secundario" type="button">Cancelar</button>
+                <button class="primario" type="submit">Guardar</button>
+            </div>
+        </form>
+    </dialog>
+
+    <script src="new-tab.js"></script>
+</body>
+</html>

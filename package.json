@@ -1,20 +1,46 @@
 {
-  "name": "patagonia-browser-main",
-  "version": "1.0.0",
-  "description": "Patagonia Browser",
+  "name": "patagonia-browser",
+  "productName": "Patagonia Browser",
+  "version": "1.0.4",
+  "description": "Navegador de escritorio rápido, privado y sencillo.",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "test": "node --test tests/*.test.cjs",
+    "diagnostico": "node scripts/diagnose-startup.cjs",
+    "build:icon": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-icon.ps1",
+    "build:adblock": "node scripts/build-adblock-engine.cjs",
+    "build:portable": "node scripts/build-portable.cjs",
+    "build:family": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-family-release.ps1",
+    "package:windows": "electron-forge package --platform=win32 --arch=x64",
+    "make:windows": "node scripts/make-windows.cjs"
   },
   "keywords": [],
-  "author": "",
+  "author": "Patagonia Browser Project",
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
+    "@electron-forge/cli": "^7.11.2",
+    "@electron-forge/maker-squirrel": "^7.11.2",
     "electron": "^43.1.1"
   },
   "dependencies": {
+    "@ghostery/adblocker-electron": "^2.18.2",
     "@mozilla/readability": "^0.6.0",
+    "electron-squirrel-startup": "^1.0.1",
     "jsdom": "^29.1.1"
+  },
+  "allowScripts": {
+    "electron-winstaller@5.4.4": true
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "overrides": {
+    "tar": "7.5.22",
+    "tmp": "0.2.7",
+    "@electron/packager": {
+      "extract-zip": "npm:@electron-internal/extract-zip@1.0.5"
+    }
   }
 }

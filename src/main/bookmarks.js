@@ -47,6 +47,10 @@ function crearAlmacenFavoritos(archivo) {
     }
 
     return {
+        esperar: async () => {
+            let pendiente;
+            do { pendiente = cola; await pendiente; } while (pendiente !== cola);
+        },
         listar: () => ejecutar(leer),
         alternar: (pagina) => ejecutar(async () => {
             const url = normalizarURL(pagina.url);
@@ -106,6 +110,7 @@ function registrarFavoritos({ ipcMain, archivo, obtenerVentana, obtenerPestana, 
         navegar(obtenerPestana(), favorito.url);
         return favoritos;
     });
+    return almacen;
 }
 
 module.exports = { crearAlmacenFavoritos, registrarFavoritos };

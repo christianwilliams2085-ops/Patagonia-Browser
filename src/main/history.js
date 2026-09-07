@@ -45,7 +45,10 @@ function crearHistorial(archivo, limite = 1000) {
         return resultado;
     }
     return {
-        esperar: () => cola,
+        esperar: async () => {
+            let pendiente;
+            do { pendiente = cola; await pendiente; } while (pendiente !== cola);
+        },
         listar: () => ejecutar(leer),
         agregar: pagina => ejecutar(async () => {
             const url = urlWeb(pagina.url);

@@ -62,3 +62,9 @@ Mostrará:
 # Regla principal
 
 La interfaz nunca deberá afectar el rendimiento del navegador.
+
+---
+
+# Implementación actual
+
+La revisión del 3 de septiembre de 2026 implementa esta identidad en la ventana real: fondo patagónico propio, logo de montaña, buscador y accesos rápidos en la nueva pestaña, controles superiores integrados y Centro de privacidad lateral. Las cifras de anuncios, rastreadores y cookies no se muestran hasta que existan mediciones reales.
