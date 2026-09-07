@@ -49,6 +49,14 @@ let siguienteId = 1;
 let barraLateralAbierta = false;
 let observarVisitas;
 
+// Los sitios deben ver un navegador Chromium compatible, no el token
+// "Electron/<version>". Algunos servicios sirven código distinto o rechazan
+// funcionalidades cuando detectan el user agent predeterminado de Electron.
+const USER_AGENT_NAVEGADOR =
+    `Mozilla/5.0 (Windows NT 10.0; Win64; x64) ` +
+    `AppleWebKit/537.36 (KHTML, like Gecko) ` +
+    `Chrome/${process.versions.chrome} Safari/537.36`;
+
 function obtenerPestanaActiva() {
     return pestanas.find(
         (pestana) => pestana.id === idPestanaActiva
@@ -255,9 +263,18 @@ function crearPestana(
         webPreferences: {
             contextIsolation: true,
             nodeIntegration: false,
-            sandbox: true
+            sandbox: true,
+            autoplayPolicy:
+                "no-user-gesture-required",
+            webgl: true,
+            backgroundThrottling: false
         }
     });
+
+    vista.webContents.setUserAgent(
+        USER_AGENT_NAVEGADOR
+    );
+    vista.webContents.setAudioMuted(false);
 
     const pestana = {
         id,
@@ -706,6 +723,14 @@ process.on(
 app.whenReady()
     .then(() => {
         console.log("Electron listo.");
+
+        // Debe configurarse antes de crear/cargar pestañas. De este modo el
+        // encabezado HTTP y navigator.userAgent permanecen sincronizados.
+        session.defaultSession.setUserAgent(
+            USER_AGENT_NAVEGADOR,
+            "es-AR,es;q=0.9,en;q=0.8"
+        );
+
         registrarDescargas({
             ipcMain,
             sesion: session.defaultSession,
