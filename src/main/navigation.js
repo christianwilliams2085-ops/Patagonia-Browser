@@ -11,8 +11,15 @@ function prepararDireccion(direccion) {
         return PAGINA_INICIO;
     }
 
+    if (texto.toLowerCase() === "about:blank") return "about:blank";
+
     if (/^https?:\/\//i.test(texto)) {
         return texto;
+    }
+
+    // Los servidores de desarrollo locales suelen usar HTTP y un puerto.
+    if (/^(?:localhost|(?:[a-z0-9-]+\.)+localhost|127(?:\.\d{1,3}){3}|\[::1\])(?::\d{1,5})?(?:[/?#][^\s]*)?$/i.test(texto)) {
+        return `http://${texto}`;
     }
 
     if (
@@ -28,12 +35,26 @@ function prepararDireccion(direccion) {
     return `https://${texto}`;
 }
 
-function navegar(pestana, direccion) {
-    if (!pestana) {
-        return;
-    }
+function obtenerContenido(pestana) {
+    // La vista puede perder webContents al destruirse la página, incluso
+    // mientras la pestaña aún forma parte de la sesión que se está cerrando.
+    const contenido = pestana?.vista?.webContents;
+    return contenido && !contenido.isDestroyed() ? contenido : null;
+}
 
-    return pestana.vista.webContents.loadURL(
+function estadoNavegacion(pestana) {
+    const historial = obtenerContenido(pestana)?.navigationHistory;
+    return {
+        puedeRetroceder: Boolean(historial?.canGoBack()),
+        puedeAvanzar: Boolean(historial?.canGoForward())
+    };
+}
+
+function navegar(pestana, direccion) {
+    const contenido = obtenerContenido(pestana);
+    if (!contenido) return;
+
+    return contenido.loadURL(
         prepararDireccion(direccion)
     ).catch(() => {
         // did-fail-load muestra el error en la interfaz de la pestaña.
@@ -42,7 +63,7 @@ function navegar(pestana, direccion) {
 
 function atras(pestana) {
     const historial =
-        pestana?.vista.webContents.navigationHistory;
+        obtenerContenido(pestana)?.navigationHistory;
 
     if (historial?.canGoBack()) {
         historial.goBack();
@@ -51,7 +72,7 @@ function atras(pestana) {
 
 function adelante(pestana) {
     const historial =
-        pestana?.vista.webContents.navigationHistory;
+        obtenerContenido(pestana)?.navigationHistory;
 
     if (historial?.canGoForward()) {
         historial.goForward();
@@ -62,7 +83,17 @@ function recargar(pestana) {
     if (pestana?.errorCarga) {
         return navegar(pestana, pestana.errorCarga.url);
     }
-    pestana?.vista.webContents.reload();
+    obtenerContenido(pestana)?.reload();
+}
+
+function detener(pestana) {
+    const contenido = obtenerContenido(pestana);
+    if (!contenido || !contenido.isLoading()) return false;
+    contenido.stop();
+    pestana.cargando = false;
+    // Una navegación cancelada puede dejar visible la página anterior.
+    if (!pestana.errorCarga) pestana.url = contenido.getURL() || "about:blank";
+    return true;
 }
 
 function irAInicio(pestana) {
@@ -75,5 +106,8 @@ module.exports = {
     atras,
     adelante,
     recargar,
+    detener,
+    obtenerContenido,
+    estadoNavegacion,
     irAInicio
 };

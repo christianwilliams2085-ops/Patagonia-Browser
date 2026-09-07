@@ -3,14 +3,6 @@ function limpiarTexto(texto) {
         .replace(/\r/g, " ")
         .replace(/\n+/g, " ")
         .replace(/\t+/g, " ")
-        .replace(
-            /\((?:imagen|foto|fotografía|archivo|ilustrativa|crédito)[^)]*\)/gi,
-            " "
-        )
-        .replace(
-            /\((?:[^()]*)?(?:infobae|maximiliano luna|reuters|afp|ap|efe)(?:[^()]*)?\)/gi,
-            " "
-        )
         .replace(/\s{2,}/g, " ")
         .trim();
 }
@@ -19,7 +11,7 @@ function dividirEnOraciones(texto) {
     return limpiarTexto(texto)
         .split(/(?<=[.!?])\s+/)
         .map((oracion) => oracion.trim())
-        .filter((oracion) => oracion.length >= 35);
+        .filter(Boolean);
 }
 
 function contieneDemasiadoRuido(texto) {
@@ -37,7 +29,7 @@ function contieneDemasiadoRuido(texto) {
     ];
 
     return patronesRuido.some((patron) =>
-        contenido.includes(patron)
+        contenido.replace(/[.!:]+$/, "").trim() === patron
     );
 }
 
@@ -46,7 +38,6 @@ function seleccionarOracionesImportantes(texto, cantidad = 5) {
 
     const candidatas = oraciones
         .filter((oracion) => !contieneDemasiadoRuido(oracion))
-        .filter((oracion) => oracion.length <= 260)
         .slice(0, 20);
 
     return candidatas.slice(0, cantidad);

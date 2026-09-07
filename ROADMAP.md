@@ -1,6 +1,6 @@
 # 🗺️ Patagonia Browser - Roadmap Oficial
 
-Este documento describe el plan de desarrollo de Patagonia Browser.
+Este documento describe el plan de desarrollo de Patagonia Browser. Actualizado el 3 de septiembre de 2026. Consultar PROJECT_STATUS.md para el alcance verificado y las limitaciones actuales.
 
 ---
 
@@ -20,7 +20,7 @@ Características:
 - Soporte para múltiples pestañas
 
 Estado:
-🟡 En planificación
+🟡 Base implementada; validación visual completa pendiente.
 
 ---
 
@@ -36,9 +36,11 @@ Características:
 - Descargas
 - Configuración
 - Página de inicio personalizada
+- Búsqueda dentro de la página
+- Menú y atajos de navegación
 
 Estado:
-⚪ Pendiente
+🟡 Funciones básicas implementadas; validación visual completa pendiente.
 
 ---
 
@@ -49,13 +51,13 @@ Mejorar la privacidad.
 
 Características:
 
-- Bloqueador de anuncios
-- Bloqueador de rastreadores
+- Bloqueador de anuncios ✅
+- Bloqueador de rastreadores ✅
 - Bloqueo de pop-ups
 - Protección contra fingerprinting
 
 Estado:
-⚪ Pendiente
+🟡 Bloqueo de anuncios y rastreadores implementado; protección contra fingerprinting pendiente.
 
 ---
 
@@ -70,9 +72,11 @@ Características:
 - Panel de privacidad
 - Configuración avanzada
 - Corrección de errores
+- Versión portátil para Windows
+- Instalador de prueba para la familia
 
 Estado:
-⚪ Pendiente
+🟡 Panel visual, versión portátil e instalador familiar implementados; optimización y configuración avanzada pendientes.
 
 ---
 
@@ -83,7 +87,7 @@ Publicar la primera versión estable.
 
 Características:
 
-- Instalador para Windows
+- Instalador firmado para Windows
 - Actualizaciones automáticas
 - Interfaz final
 - Navegador completamente funcional

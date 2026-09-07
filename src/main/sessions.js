@@ -63,27 +63,31 @@ function crearGestorSesion(archivo, notificar = () => {}) {
     function guardarAhora() {
         clearTimeout(temporizador);
         if (bloqueada) return Promise.reject(new Error(error));
-        const texto = pendiente;
-        pendiente = null;
         const operacion = cola.then(async () => {
-            if (texto === null) {
+            if (pendiente === null) {
                 if (error) throw new Error(error);
                 return;
             }
-            const temporal = `${archivo}.${randomUUID()}.tmp`;
-            try {
-                await fs.mkdir(path.dirname(archivo), { recursive: true });
-                await fs.writeFile(temporal, texto, "utf8");
-                await fs.rename(temporal, archivo);
-                ultimaGuardada = texto;
-                error = "";
-            } catch {
-                error = "No pudimos guardar las pestañas. Volvé a intentar con Guardar ahora.";
-                if (pendiente === null) pendiente = JSON.stringify(datos);
-                throw new Error(error);
-            } finally {
-                await fs.rm(temporal, { force: true }).catch(() => {});
-                avisar();
+            // Incluye cambios que llegaron mientras se escribía la instantánea anterior.
+            while (pendiente !== null) {
+                clearTimeout(temporizador);
+                const texto = pendiente;
+                pendiente = null;
+                const temporal = `${archivo}.${randomUUID()}.tmp`;
+                try {
+                    await fs.mkdir(path.dirname(archivo), { recursive: true });
+                    await fs.writeFile(temporal, texto, "utf8");
+                    await fs.rename(temporal, archivo);
+                    ultimaGuardada = texto;
+                    error = "";
+                } catch {
+                    error = "No pudimos guardar las pestañas. Volvé a intentar con Guardar ahora.";
+                    if (pendiente === null) pendiente = JSON.stringify(datos);
+                    throw new Error(error);
+                } finally {
+                    await fs.rm(temporal, { force: true }).catch(() => {});
+                    avisar();
+                }
             }
         });
         cola = operacion.catch(() => {});

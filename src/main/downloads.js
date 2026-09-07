@@ -86,7 +86,7 @@ function registrarDescargas({ ipcMain, sesion, shell, obtenerVentana, esPestanaP
         }
         shell.showItemInFolder(dato.ruta);
     });
-    return { snapshot };
+    return { snapshot, contarActivas: () => activos.size };
 }
 
 module.exports = { registrarDescargas };

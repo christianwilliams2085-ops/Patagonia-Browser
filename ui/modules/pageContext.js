@@ -31,34 +31,11 @@ function eliminarFragmentosRepetidos(texto) {
 }
 
 function eliminarRuidoComun(texto) {
-const patrones = [
-    /\bskip to content\b/gi,
-    /\bopen(?:s)? in a new tab\b/gi,
-    /\biniciar sesi[oó]n\b/gi,
-    /\bregistrarme\b/gi,
-    /\bsign in\b/gi,
-    /\bsubscribe\b/gi,
-    /\baceptar cookies\b/gi,
-    /\bpol[ií]tica de privacidad\b/gi,
-    /\bt[eé]rminos y condiciones\b/gi,
-    /\badvertisement\b/gi,
-    /\btrends?\b/gi,
-    /\btendencias?\b/gi,
-    /\btemas destacados\b/gi,
-    /\bnoticias relacionadas\b/gi,
-    /\ble[eé] también\b/gi,
-    /\bcompartir\b/gi,
-    /\bpublicidad\b/gi,
-    /\brecomendados?\b/gi,
-    /\bsponsored\b/gi
-];
-    let resultado = limpiarTexto(texto);
-
-    for (const patron of patrones) {
-        resultado = resultado.replace(patron, " ");
-    }
-
-    return limpiarTexto(resultado);
+    // Quitar etiquetas de navegación completas, sin borrar palabras de una
+    // oración: "publicidad", "compartir" o "privacidad" pueden ser el tema.
+    const etiqueta = /^(?:skip to content|opens? in a new tab|iniciar sesi[oó]n|registrarme|sign in|subscribe|aceptar cookies|pol[ií]tica de privacidad|t[eé]rminos y condiciones|advertisement|trends?|tendencias?|temas destacados|noticias relacionadas|le[eé] también|compartir|publicidad|recomendados?|sponsored)[.!:]*$/i;
+    return String(texto || "").split(/\r?\n/)
+        .filter(linea => !etiqueta.test(linea.trim())).join("\n");
 }
 
 function limitarTexto(texto, limite = 12000) {

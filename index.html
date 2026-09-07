@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' https: http: data:; connect-src 'none'; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'">
 
 <title>Patagonia Browser</title>
 
@@ -73,6 +74,22 @@ body{
     background:#4d79ff;
 }
 
+.seleccionar-pestana{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex:1;
+    min-width:0;
+    height:100%;
+    background:transparent;
+    text-align:left;
+}
+
+.tab button:focus-visible, .boton-navegacion:focus-visible{
+    outline:2px solid #b9ccff;
+    outline-offset:-2px;
+}
+
 .favicon-pestana{
     width:16px;
     height:16px;
@@ -118,6 +135,7 @@ body{
 .cerrar-pestana{
     width:22px;
     height:22px;
+    flex-shrink:0;
 
     padding:0;
 
@@ -199,6 +217,13 @@ button{
 
 .boton-navegacion:active{
     transform:scale(.94);
+}
+
+.boton-navegacion:disabled{
+    opacity:.4;
+    cursor:default;
+    transform:none;
+    background:#2a313d;
 }
 
 #direccion{
@@ -640,11 +665,17 @@ button{
 
 <body>
 
-<div class="tabs">
+<div class="marca-navegador" aria-label="Patagonia Browser">
+    <img src="assets/patagonia-mark.svg" alt="">
+    <span>Patagonia Browser</span>
+</div>
+
+<div class="tabs" role="group" aria-label="Pestañas">
 
     <button
         id="nuevaPestana"
         title="Nueva pestaña"
+        aria-label="Nueva pestaña"
     >
         +
     </button>
@@ -657,6 +688,8 @@ button{
         id="atras"
         class="boton-navegacion"
         title="Atrás"
+        aria-label="Atrás"
+        disabled
     >
         ←
     </button>
@@ -665,6 +698,8 @@ button{
         id="adelante"
         class="boton-navegacion"
         title="Adelante"
+        aria-label="Adelante"
+        disabled
     >
         →
     </button>
@@ -673,6 +708,7 @@ button{
         id="recargar"
         class="boton-navegacion"
         title="Recargar"
+        aria-label="Recargar"
     >
         ↻
     </button>
@@ -681,38 +717,55 @@ button{
         id="inicio"
         class="boton-navegacion"
         title="Inicio"
+        aria-label="Página de inicio"
     >
         ⌂
     </button>
 
-    <input
-        id="direccion"
-        type="text"
-        autocomplete="off"
-        spellcheck="false"
-        placeholder="Buscar o escribir una dirección"
-    >
+    <div class="direccion-shell">
+        <span id="estadoConexion" class="estado-conexion interna" title="Inicio de Patagonia" aria-hidden="true"></span>
+        <input
+            id="direccion"
+            type="text"
+            autocomplete="off"
+            spellcheck="false"
+            placeholder="Buscar o escribir una URL"
+            aria-label="Buscar o escribir una dirección"
+        >
 
-    <button id="guardarFavorito" class="boton-navegacion" type="button"
-        title="Guardar en favoritos" aria-label="Guardar en favoritos" aria-pressed="false" disabled>☆</button>
+        <button id="guardarFavorito" class="boton-navegacion" type="button"
+            title="Guardar en favoritos" aria-label="Guardar en favoritos" aria-pressed="false" disabled>☆</button>
+    </div>
     <span id="avisoFavoritos" role="status"></span>
 
-    <button id="ir">
-        Ir
+    <button id="ir" title="Ir a la dirección" aria-label="Ir a la dirección">
+        →
     </button>
 
     <button id="accesoDescargas" type="button" title="Abrir descargas"
-        aria-controls="panelDescargas">↓ Descargas</button>
+        aria-controls="panelDescargas"><span aria-hidden="true">⇩</span><span class="etiqueta-descargas">Descargas</span></button>
 
     <button
         id="alternarSidebar"
         class="boton-navegacion"
-        title="Abrir barra lateral"
+        title="Abrir Centro de privacidad"
+        aria-label="Abrir Centro de privacidad"
+        aria-controls="sidebar"
+        aria-pressed="false"
     >
-        ☰
+        <span class="icono-escudo" aria-hidden="true"></span>
     </button>
 
 </div>
+
+<section id="barraBusqueda" hidden role="search" aria-label="Buscar en la página">
+    <label for="textoBusqueda">Buscar</label>
+    <input id="textoBusqueda" type="search" maxlength="1000" autocomplete="off" placeholder="Texto en esta página">
+    <span id="resultadoBusqueda" role="status" aria-live="polite">Escribí para buscar</span>
+    <button id="busquedaAnterior" type="button" title="Coincidencia anterior (Mayús+Enter)" aria-label="Coincidencia anterior" disabled>↑</button>
+    <button id="busquedaSiguiente" type="button" title="Siguiente coincidencia (Enter)" aria-label="Siguiente coincidencia" disabled>↓</button>
+    <button id="cerrarBusqueda" type="button" title="Cerrar búsqueda (Escape)" aria-label="Cerrar búsqueda">×</button>
+</section>
 
 <aside id="sidebar" class="sidebar">
 
@@ -720,27 +773,50 @@ button{
 
         <div class="sidebar-identidad">
 
-            <div class="sidebar-logo">
-                P
-            </div>
+            <div class="sidebar-logo"><img src="assets/patagonia-mark.svg" alt=""></div>
 
             <div class="sidebar-titulos">
 
                 <span class="sidebar-titulo">
-                    Patagonia
+                    Centro de privacidad
                 </span>
 
                 <span class="sidebar-subtitulo">
-                    Browser Workspace
+                    Protecciones y herramientas
                 </span>
 
             </div>
 
         </div>
 
+        <button id="cerrarSidebar" class="cerrar-sidebar" type="button" title="Cerrar" aria-label="Cerrar Centro de privacidad">×</button>
+
     </header>
 
     <div class="sidebar-contenido">
+
+        <section class="tarjeta-privacidad" aria-labelledby="tituloProteccion">
+            <div class="privacidad-encabezado">
+                <strong id="tituloProteccion">Protección de Patagonia</strong>
+                <span id="estadoProteccion" class="privacidad-estado">Preparando…</span>
+            </div>
+            <div class="proteccion-resumen" aria-live="polite">
+                <strong id="totalBloqueado">0</strong>
+                <span>elementos bloqueados en esta página</span>
+            </div>
+            <div class="proteccion-contadores">
+                <span><b id="anunciosBloqueados">0</b> anuncios</span>
+                <span><b id="rastreadoresBloqueados">0</b> rastreadores</span>
+            </div>
+            <button id="alternarProteccionSitio" class="boton-proteccion-sitio" type="button" disabled>
+                Abrí una página web
+            </button>
+            <p id="detalleProteccion" class="detalle-proteccion">Las listas se actualizan automáticamente.</p>
+            <ul class="lista-privacidad">
+                <li>Los permisos desconocidos se bloquean por defecto.</li>
+                <li>Las páginas funcionan aisladas de la interfaz del navegador.</li>
+            </ul>
+        </section>
 
         <section id="tarjetaIA" class="tarjeta-ia">
 
@@ -908,17 +984,35 @@ button{
         </button>
 
         <section id="panelSesiones" hidden aria-label="Recuperación de pestañas">
-            <p>Al abrir Patagonia recuperamos tus pestañas web en el mismo orden y seleccionamos la que estabas usando.</p>
+            <p>Podés recuperar tus pestañas web al iniciar. Elegí esta opción en Configuración.</p>
             <p>Se guardan las direcciones en este dispositivo. Los formularios sin enviar y el historial de Atrás de cada pestaña no se recuperan.</p>
             <p id="estadoSesion" role="status"></p>
             <button id="guardarSesion" class="historial-accion">Guardar ahora</button>
+        </section>
+
+        <section id="panelConfiguracion" hidden aria-labelledby="tituloConfiguracion">
+            <h2 id="tituloConfiguracion">Configuración</h2>
+            <form id="formularioConfiguracion">
+                <label for="paginaInicio">Página de inicio</label>
+                <input id="paginaInicio" type="url" required maxlength="2048"
+                    placeholder="https://www.google.com" autocomplete="off">
+                <p>Se usa al pulsar el botón Inicio. Las pestañas nuevas abren el inicio de Patagonia.</p>
+                <label class="configuracion-casilla">
+                    <input id="restaurarPestanas" type="checkbox">
+                    Recuperar pestañas al abrir Patagonia
+                </label>
+                <p>Si desactivás esta opción, el próximo inicio abre tu página de inicio. Las direcciones de la sesión siguen guardándose en este dispositivo.</p>
+                <button id="guardarConfiguracion" class="historial-accion" type="submit">Guardar cambios</button>
+            </form>
+            <p id="estadoConfiguracion" role="status" aria-live="polite"></p>
+            <p>Atajos: Ctrl+L dirección · Ctrl+T nueva pestaña · Ctrl+W cerrar · Ctrl+Tab cambiar pestaña · F5 recargar.</p>
         </section>
 
     </div>
 
     <footer class="sidebar-footer">
 
-        <button class="sidebar-item">
+        <button id="abrirConfiguracion" class="sidebar-item" aria-expanded="false" aria-controls="panelConfiguracion">
 
             <span class="sidebar-icono">
                 ⚙
@@ -1011,6 +1105,28 @@ button{
     #panelSesiones { padding:4px 8px 16px; }
     #panelSesiones p { color:#c4cbd8; font-size:13px; line-height:1.5; margin:8px 0; }
 </style>
+<style>
+    #panelConfiguracion { margin:12px 0; padding:14px; border:1px solid #30394a; border-radius:10px; }
+    #panelConfiguracion h2 { font-size:17px; margin-bottom:14px; }
+    #panelConfiguracion label { display:block; font-size:13px; margin:12px 0 6px; }
+    #panelConfiguracion p { color:#c4cbd8; font-size:12px; line-height:1.5; margin:10px 0; }
+    #paginaInicio { width:100%; padding:9px; color:#fff; background:#151a23; border:1px solid #59657c; border-radius:6px; }
+    #panelConfiguracion .configuracion-casilla { display:flex; align-items:start; gap:8px; line-height:1.5; }
+</style>
+<style>
+    #barraBusqueda { position:absolute; top:108px; left:0; right:0; height:44px; display:flex;
+        align-items:center; gap:10px; padding:5px 14px; background:#252d3a; color:#eef2f8; border-bottom:1px solid #3c485e; }
+    #barraBusqueda[hidden] { display:none; }
+    #textoBusqueda { width:260px; max-width:40%; padding:6px 9px; border:1px solid #59657c; border-radius:6px; color:#fff; background:#151a23; }
+    #resultadoBusqueda { font-size:12px; flex:1; }
+    #barraBusqueda button { width:30px; height:30px; background:#35435b; color:#fff; border:0; border-radius:5px; cursor:pointer; }
+    #barraBusqueda button:disabled { opacity:.4; cursor:default; }
+    #barraBusqueda :focus-visible { outline:2px solid #8faaff; outline-offset:2px; }
+    #sidebar, #errorCarga { top:calc(108px + var(--alto-busqueda, 0px)); }
+</style>
+<link rel="stylesheet" href="ui/browser-v2.css">
+<script src="ui/modules/find.js"></script>
+<script src="ui/modules/settings.js"></script>
 <script src="ui/modules/sessions.js"></script>
 <script src="ui/modules/downloads.js"></script>
 <script src="ui/modules/history.js"></script>

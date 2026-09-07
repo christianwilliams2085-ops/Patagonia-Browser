@@ -8,6 +8,14 @@ function mensajeError(codigo) {
 
 function registrarErroresCarga(pestana, actualizar) {
     const contenido = pestana.vista.webContents;
+    function mostrarError(url, mensaje) {
+        pestana.errorCarga = { url: url || pestana.url, mensaje };
+        pestana.cargando = false;
+        pestana.titulo = "No se pudo cargar la página";
+        pestana.favicon = "";
+        pestana.vista.setVisible(false);
+        actualizar();
+    }
     function iniciar(_evento, url, _mismaPagina, principal) {
         if (!principal) return;
         pestana.url = url;
@@ -18,15 +26,24 @@ function registrarErroresCarga(pestana, actualizar) {
     contenido.on("did-start-navigation", iniciar);
     contenido.on("did-redirect-navigation", iniciar);
     contenido.on("did-fail-load", (_evento, codigo, _descripcion, url, principal) => {
-        // Las cancelaciones y los fallos de marcos secundarios no son errores de página.
-        if (!principal || codigo === -3 || contenido.isDestroyed()) return;
+        if (!principal || contenido.isDestroyed()) return;
         if (url && pestana.url !== url) return;
-        pestana.errorCarga = { url: url || pestana.url, mensaje: mensajeError(codigo) };
-        pestana.cargando = false;
-        pestana.titulo = "No se pudo cargar la página";
-        pestana.favicon = "";
-        pestana.vista.setVisible(false);
-        actualizar();
+        if (codigo === -3) {
+            // Una descarga o una navegación cancelada puede dejar visible el
+            // documento anterior. No mostrar la dirección del destino fallido.
+            pestana.url = contenido.getURL() || "about:blank";
+            pestana.errorCarga = null;
+            pestana.cargando = false;
+            actualizar();
+            return;
+        }
+        mostrarError(url, mensajeError(codigo));
+    });
+    contenido.on("render-process-gone", (_evento, detalle) => {
+        if (contenido.isDestroyed() || detalle.reason === "clean-exit") return;
+        mostrarError(pestana.url, detalle.reason === "oom"
+            ? "Esta pestaña se quedó sin memoria. Cerrá otras pestañas y volvé a intentarlo."
+            : "Esta pestaña dejó de funcionar. Podés volver a cargarla.");
     });
 }
 

@@ -1,18 +1,36 @@
 const { contextBridge, ipcRenderer } = require("electron");
 
+function suscribir(canal, callback) {
+    if (typeof callback !== "function") throw new TypeError("El receptor debe ser una función.");
+    const recibir = (_evento, ...datos) => callback(...datos);
+    ipcRenderer.on(canal, recibir);
+    // El renderer recibe únicamente cómo cancelar su suscripción, nunca ipcRenderer.
+    return () => { ipcRenderer.removeListener(canal, recibir); };
+}
+
 contextBridge.exposeInMainWorld("patagonia", {
+    abrirBusqueda: () => ipcRenderer.send("abrir-busqueda"),
+    buscarEnPagina: datos => ipcRenderer.send("buscar-en-pagina", datos),
+    cerrarBusqueda: () => ipcRenderer.send("cerrar-busqueda"),
+    recibirBusqueda: callback => suscribir("estado-busqueda", callback),
+    obtenerConfiguracion: () => ipcRenderer.invoke("obtener-configuracion"),
+    guardarConfiguracion: datos => ipcRenderer.invoke("guardar-configuracion", datos),
+    recibirEnfoqueDireccion: callback => suscribir("enfocar-direccion", callback),
+    obtenerProteccion: () => ipcRenderer.invoke("obtener-proteccion"),
+    alternarProteccionSitio: () => ipcRenderer.invoke("alternar-proteccion-sitio"),
+    recibirProteccion: callback => suscribir("proteccion-actualizada", callback),
     obtenerSesion: () => ipcRenderer.invoke("obtener-sesion"),
     guardarSesion: () => ipcRenderer.invoke("guardar-sesion"),
-    recibirSesion: (callback) => ipcRenderer.on("sesion-actualizada", (_, estado) => callback(estado)),
+    recibirSesion: (callback) => suscribir("sesion-actualizada", callback),
     listarDescargas: () => ipcRenderer.invoke("listar-descargas"),
     cancelarDescarga: (id) => ipcRenderer.invoke("cancelar-descarga", id),
     mostrarDescarga: (id) => ipcRenderer.invoke("mostrar-descarga", id),
-    recibirDescargas: (callback) => ipcRenderer.on("descargas-actualizadas", (_, datos) => callback(datos)),
+    recibirDescargas: (callback) => suscribir("descargas-actualizadas", callback),
     listarHistorial: () => ipcRenderer.invoke("listar-historial"),
     abrirVisita: (id) => ipcRenderer.invoke("abrir-visita", id),
     eliminarVisita: (id) => ipcRenderer.invoke("eliminar-visita", id),
     vaciarHistorial: () => ipcRenderer.invoke("vaciar-historial"),
-    recibirHistorial: (callback) => ipcRenderer.on("historial-actualizado", (_, error) => callback(error)),
+    recibirHistorial: (callback) => suscribir("historial-actualizado", callback),
     listarFavoritos: () => ipcRenderer.invoke("listar-favoritos"),
     alternarFavorito: () => ipcRenderer.invoke("alternar-favorito"),
     eliminarFavorito: (id) => ipcRenderer.invoke("eliminar-favorito", id),
@@ -25,6 +43,7 @@ contextBridge.exposeInMainWorld("patagonia", {
     adelante: () => ipcRenderer.send("adelante"),
 
     recargar: () => ipcRenderer.send("recargar"),
+    detener: () => ipcRenderer.send("detener-carga"),
 
     inicio: () => ipcRenderer.send("inicio"),
 
@@ -46,21 +65,21 @@ contextBridge.exposeInMainWorld("patagonia", {
         ipcRenderer.invoke("procesar-consulta-ia", mensaje),
 
     recibirURL: (callback) =>
-        ipcRenderer.on(
+        suscribir(
             "url-actualizada",
-            (_, url) => callback(url)
+            callback
         ),
 
     recibirPestanas: (callback) =>
-        ipcRenderer.on(
+        suscribir(
             "pestanas-actualizadas",
-            (_, pestanas) => callback(pestanas)
+            callback
         ),
 
     recibirEstadoBarraLateral: (callback) =>
-        ipcRenderer.on(
+        suscribir(
             "estado-barra-lateral",
-            (_, estado) => callback(estado)
+            callback
         )
 
 });

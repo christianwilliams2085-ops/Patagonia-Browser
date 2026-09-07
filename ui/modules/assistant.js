@@ -49,7 +49,7 @@
         panelAsistente.classList.add("abierto");
 
         setTimeout(() => {
-            entradaAsistente.focus();
+            if (panelAsistente.classList.contains("abierto")) entradaAsistente.focus();
         }, 100);
     }
 
@@ -171,7 +171,8 @@
         } finally {
             establecerProcesando(false);
 
-            entradaAsistente.focus();
+            if (panelAsistente.classList.contains("abierto") &&
+                document.getElementById("sidebar")?.classList.contains("abierta")) entradaAsistente.focus();
             desplazarAlFinal();
         }
     }
@@ -182,6 +183,7 @@
     }
 
     function manejarTeclado(evento) {
+        if (evento.isComposing) return;
         if (
             evento.key === "Enter" &&
             !evento.shiftKey
