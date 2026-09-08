@@ -6,7 +6,7 @@ Formulario oficial: https://signpath.org/apply
 ## Antes de enviar
 
 - Revisar e incorporar la política de firma y la documentación de privacidad de Windows.
-- Ejecutar satisfactoriamente el flujo de Windows en GitHub y conservar su enlace. El flujo de este cambio todavía debe validarse con una ejecución real.
+- Confirmar una ejecución satisfactoria del flujo de Windows en GitHub y conservar su enlace. El resultado real se consulta en Actions; disponer del archivo del flujo no acredita por sí solo una compilación correcta.
 - Verificar la autenticación multifactor del mantenedor en GitHub y revisar las [condiciones del programa](https://signpath.org/terms).
 - Completar el correo de la cuenta directamente en SignPath. No agregar correo privado, claves ni tokens a este documento.
 - La aprobación no está garantizada: SignPath también evalúa reputación verificable. Patagonia es un proyecto reciente con uso inicial limitado; no atribuirle usuarios, reseñas ni avales que no tenga.

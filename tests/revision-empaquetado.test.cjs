@@ -35,7 +35,9 @@ test('Packager usa el extractor sustituido, crea un ASAR y no incluye archivos a
         electronZipDir: zips, out: path.join(dir, 'out'), tmpdir: path.join(dir, 'tmp'), asar: true, quiet: true,
         ignore: ruta => !incluirEnPaquete(ruta) });
     const cargar = createRequire(require.resolve('@electron/packager'));
-    const archivos = cargar('@electron/asar').listPackage(path.join(resultado[0], 'resources/app.asar'));
+    // ASAR devuelve rutas con los separadores del sistema que ejecuta la prueba.
+    const archivos = cargar('@electron/asar').listPackage(path.join(resultado[0], 'resources/app.asar'))
+        .map(ruta => ruta.split(path.sep).join('/'));
     assert.ok(archivos.includes('/main.js')); assert.ok(archivos.includes('/src/main/modulo.js'));
     assert.equal(archivos.some(ruta => /diagnostico|respaldo/.test(ruta)), false);
 });
