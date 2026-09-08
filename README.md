@@ -30,6 +30,8 @@ Proyecto de navegador de escritorio enfocado en una experiencia sencilla y en el
 
 ## Usarlo en Windows
 
+Los instaladores publicados y su estado de firma están en la [página de descargas de Windows](DOWNLOADS.md).
+
 La versión portátil queda en `dist/Patagonia Browser-win32-x64`. Abrí `Patagonia Browser.exe` o usá el acceso directo `Patagonia Browser` creado en la carpeta principal del proyecto en el Escritorio. Para trasladarla a otro lugar, copiá la carpeta portátil completa.
 
 Patagonia conserva sus pestañas, preferencias, favoritos e historial en el perfil de Windows del usuario. El cierre normal espera a que se guarden los cambios.

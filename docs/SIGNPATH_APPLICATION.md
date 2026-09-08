@@ -5,12 +5,12 @@ Formulario oficial: https://signpath.org/apply
 
 ## Antes de enviar
 
-- Revisar e incorporar la política de firma y la documentación de privacidad de Windows.
-- Confirmar una ejecución satisfactoria del flujo de Windows en GitHub y conservar su enlace. El resultado real se consulta en Actions; disponer del archivo del flujo no acredita por sí solo una compilación correcta.
+- Las políticas de firma y privacidad de Windows ya se incorporaron a la rama principal mediante la solicitud de cambios #8.
+- Compilación Windows verificada: [ejecución satisfactoria](https://github.com/christianwilliams2085-ops/Patagonia-Browser/actions/runs/34228558369), con 148 pruebas aprobadas y el instalador generado.
 - Verificar la autenticación multifactor del mantenedor en GitHub y revisar las [condiciones del programa](https://signpath.org/terms).
 - Completar el correo de la cuenta directamente en SignPath. No agregar correo privado, claves ni tokens a este documento.
 - La aprobación no está garantizada: SignPath también evalúa reputación verificable. Patagonia es un proyecto reciente con uso inicial limitado; no atribuirle usuarios, reseñas ni avales que no tenga.
-- En las páginas de descargas, enlazar la política con su estado real. La frase que atribuye la firma a SignPath sólo debe presentarse como vigente cuando el servicio esté aprobado y activo.
+- La [página de descargas](../DOWNLOADS.md) enlaza la política con su estado real. La atribución de firma a SignPath sólo debe presentarse como vigente cuando el servicio esté aprobado y activo.
 
 ## Campos del formulario
 
@@ -19,16 +19,16 @@ Formulario oficial: https://signpath.org/apply
 | Project Name | Patagonia Browser |
 | Repository URL | https://github.com/christianwilliams2085-ops/Patagonia-Browser |
 | Homepage URL | https://github.com/christianwilliams2085-ops/Patagonia-Browser |
-| Download URL | https://github.com/christianwilliams2085-ops/Patagonia-Browser/releases |
-| Privacy Policy URL | https://github.com/christianwilliams2085-ops/Patagonia-Browser/blob/main/PRIVACY_WINDOWS.md — usar después de incorporar el documento a main |
+| Download URL | https://github.com/christianwilliams2085-ops/Patagonia-Browser/blob/main/DOWNLOADS.md |
+| Privacy Policy URL | https://github.com/christianwilliams2085-ops/Patagonia-Browser/blob/main/PRIVACY_WINDOWS.md |
 | Wikipedia URL (optional) | Dejar vacío |
 | Maintainer Type | Individual maintainer(s) |
-| Build System | GitHub Actions, sólo después de incorporar y ejecutar el flujo. Al preparar este borrador se usaban compilaciones locales. |
+| Build System | GitHub Actions; flujo incorporado y compilación Windows verificada. |
 | First Name | Christian |
 | Last Name | Williams |
 | Email | Completar directamente en SignPath con el correo elegido por el mantenedor |
 | Company Name | Dejar vacío si la solicitud se hace como proyecto personal |
-| Primary Discovery Channel | Elegir la opción que corresponda a una recomendación de IA, si está disponible; en caso contrario, Other |
+| Primary Discovery Channel | AI / LLM tools |
 | Please specify the exact source (optional) | ChatGPT |
 
 La identidad del mantenedor debe coincidir con sus datos reales. El formulario crea la cuenta de SignPath a partir de los datos de contacto; no es necesario contratar una suscripción comercial para enviar esta solicitud al programa de la fundación.
