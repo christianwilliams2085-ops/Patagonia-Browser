@@ -1,0 +1,62 @@
+name: Windows - candidato para firma
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/windows-candidate.yml'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'forge.config.cjs'
+      - 'scripts/**'
+      - 'src/**'
+      - 'services/**'
+      - 'ui/**'
+      - 'assets/**'
+      - 'tests/**'
+      - 'main.js'
+      - 'preload.js'
+      - 'renderer.js'
+      - 'index.html'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: windows-candidate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Compilar Windows x64 sin firma
+    runs-on: windows-2025
+    timeout-minutes: 30
+    steps:
+      - name: Obtener el código del commit
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Preparar Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Instalar las dependencias del archivo de bloqueo
+        run: npm ci
+
+      - name: Ejecutar las pruebas existentes
+        run: npm test
+
+      - name: Generar el instalador con Electron Forge
+        run: npm run make:windows
+
+      - name: Guardar candidato sin firma y paquetes Squirrel
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: patagonia-windows-sin-firma-${{ github.sha }}
+          path: out-oficial/make/squirrel.windows/x64/
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 0

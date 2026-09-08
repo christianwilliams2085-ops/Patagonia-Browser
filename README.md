@@ -55,6 +55,12 @@ Para regenerar el instalador:
 npm run make:windows
 ```
 
+## Code signing policy
+
+La firma de Windows está en preparación para solicitar el programa de SignPath Foundation. Todavía no hay una solicitud enviada, aprobación ni certificado activo.
+
+La [política de firma](CODE_SIGNING.md) describe el responsable, la compilación verificable y las comprobaciones requeridas antes de publicar una versión firmada. La [guía de solicitud](docs/SIGNPATH_APPLICATION.md) contiene los datos y textos preparados para el formulario. La edición de Windows tiene una [política de privacidad específica](PRIVACY_WINDOWS.md).
+
 ## Android y iPhone
 
 La carpeta `mobile/` contiene la nueva edición para teléfonos. Incluye la pantalla de inicio de Patagonia, navegación por pestañas, favoritos, historial, modo de escritorio y protección integrada contra publicidad y rastreadores.
