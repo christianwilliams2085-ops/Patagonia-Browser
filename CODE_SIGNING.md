@@ -2,7 +2,7 @@
 
 ## Estado
 
-Preparación de una solicitud al programa de SignPath Foundation. La solicitud todavía no fue enviada y no existe una aprobación ni una firma de SignPath para Patagonia Browser.
+La solicitud al programa de SignPath Foundation fue enviada el 8 de septiembre de 2026. El formulario confirmó su recepción. Está pendiente de evaluación y todavía no existe una aprobación ni una firma de SignPath para Patagonia Browser.
 
 Los instaladores actuales de Windows siguen sin firma de un proveedor reconocido. Esta política y la compilación de candidatos no cambian esa situación por sí solas.
 

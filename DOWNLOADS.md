@@ -12,7 +12,7 @@ La versión 1.0.4 fue publicada el 7 de septiembre de 2026. El instalador actual
 
 ## Code signing policy
 
-Patagonia está preparando una solicitud al programa gratuito de SignPath Foundation. Todavía no hay aprobación ni un servicio de firma activo; las versiones disponibles no están firmadas por SignPath.
+Patagonia envió la solicitud al programa gratuito de SignPath Foundation el 8 de septiembre de 2026 y el formulario confirmó su recepción. La evaluación está pendiente. Todavía no hay aprobación ni un servicio de firma activo; las versiones disponibles no están firmadas por SignPath.
 
 La [Code signing policy](CODE_SIGNING.md) identifica al mantenedor, las responsabilidades de firma, el origen verificable de las compilaciones y las condiciones pendientes. La atribución del proveedor se actualizará cuando el programa sea aprobado y las firmas estén en uso.
 

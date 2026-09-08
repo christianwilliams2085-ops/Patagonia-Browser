@@ -59,9 +59,9 @@ npm run make:windows
 
 ## Code signing policy
 
-La firma de Windows está en preparación para solicitar el programa de SignPath Foundation. Todavía no hay una solicitud enviada, aprobación ni certificado activo.
+La solicitud al programa de SignPath Foundation se envió el 8 de septiembre de 2026 y el formulario confirmó su recepción. Está pendiente de evaluación: todavía no hay aprobación ni certificado activo.
 
-La [política de firma](CODE_SIGNING.md) describe el responsable, la compilación verificable y las comprobaciones requeridas antes de publicar una versión firmada. La [guía de solicitud](docs/SIGNPATH_APPLICATION.md) contiene los datos y textos preparados para el formulario. La edición de Windows tiene una [política de privacidad específica](PRIVACY_WINDOWS.md).
+La [política de firma](CODE_SIGNING.md) describe el responsable, la compilación verificable y las comprobaciones requeridas antes de publicar una versión firmada. El [registro de la solicitud](docs/SIGNPATH_APPLICATION.md) contiene los datos del proyecto, los textos enviados y los requisitos pendientes. La edición de Windows tiene una [política de privacidad específica](PRIVACY_WINDOWS.md).
 
 ## Android y iPhone
 

@@ -1,14 +1,14 @@
 # Solicitud de SignPath para Patagonia Browser
 
-**Borrador preparado el 8 de septiembre de 2026. No enviado.**  
+**Solicitud enviada el 8 de septiembre de 2026. Recepción confirmada por el formulario; aprobación pendiente.**  
 Formulario oficial: https://signpath.org/apply
 
-## Antes de enviar
+## Estado y requisitos pendientes
 
 - Las políticas de firma y privacidad de Windows ya se incorporaron a la rama principal mediante la solicitud de cambios #8.
 - Compilación Windows verificada: [ejecución satisfactoria](https://github.com/christianwilliams2085-ops/Patagonia-Browser/actions/runs/34228558369), con 148 pruebas aprobadas y el instalador generado.
-- Verificar la autenticación multifactor del mantenedor en GitHub y revisar las [condiciones del programa](https://signpath.org/terms).
-- Completar el correo de la cuenta directamente en SignPath. No agregar correo privado, claves ni tokens a este documento.
+- Antes de habilitar firmas, verificar la autenticación multifactor del mantenedor en GitHub y SignPath conforme a las [condiciones del programa](https://signpath.org/terms). La recepción de la solicitud no acredita ese requisito.
+- El correo de contacto se completó en el formulario de SignPath y no se reproduce en este documento. No publicar correo privado, claves ni tokens en este registro.
 - La aprobación no está garantizada: SignPath también evalúa reputación verificable. Patagonia es un proyecto reciente con uso inicial limitado; no atribuirle usuarios, reseñas ni avales que no tenga.
 - La [página de descargas](../DOWNLOADS.md) enlaza la política con su estado real. La atribución de firma a SignPath sólo debe presentarse como vigente cuando el servicio esté aprobado y activo.
 
@@ -26,12 +26,12 @@ Formulario oficial: https://signpath.org/apply
 | Build System | GitHub Actions; flujo incorporado y compilación Windows verificada. |
 | First Name | Christian |
 | Last Name | Williams |
-| Email | Completar directamente en SignPath con el correo elegido por el mantenedor |
+| Email | Correo elegido por el mantenedor, incluido en el formulario y omitido de este registro público |
 | Company Name | Dejar vacío si la solicitud se hace como proyecto personal |
 | Primary Discovery Channel | AI / LLM tools |
 | Please specify the exact source (optional) | ChatGPT |
 
-La identidad del mantenedor debe coincidir con sus datos reales. El formulario crea la cuenta de SignPath a partir de los datos de contacto; no es necesario contratar una suscripción comercial para enviar esta solicitud al programa de la fundación.
+La solicitud se presentó a nombre del mantenedor indicado. El formulario usa los datos de contacto para el alta en SignPath; la confirmación de recepción no demuestra que una cuenta operativa o un certificado ya estén activos. Se solicitó el programa gratuito de la fundación.
 
 ## Tagline
 
@@ -43,15 +43,15 @@ Patagonia Browser is an open-source desktop browser focused on straightforward e
 
 ## Reputation
 
-Patagonia Browser is an early-stage project and does not yet have established widespread adoption. The public source code, commit history, issue tracker, and downloadable releases are available at https://github.com/christianwilliams2085-ops/Patagonia-Browser. The initial releases have been shared with family testers. We are providing this public release history as the current evidence of the project's activity and understand that acceptance depends on the Foundation's review.
+Patagonia Browser is an early-stage project and does not yet have established widespread adoption. The public source code, commit history, issue tracker, and downloadable releases are available at https://github.com/christianwilliams2085-ops/Patagonia-Browser. The initial releases have been shared with family testers. A Windows GitHub Actions build completed with 148 passing tests and produced the installer: https://github.com/christianwilliams2085-ops/Patagonia-Browser/actions/runs/34228558369. We are providing this public release and build history as the current evidence of the project's activity and understand that acceptance depends on the Foundation's review.
 
 No afirmar que existe difusión amplia ni copiar las cifras de descargas como si fueran usuarios únicos. Al revisar GitHub el 8 de septiembre de 2026, los tres artefactos de Windows publicados sumaban cuatro descargas; es una medida limitada del uso inicial.
 
 ## Consentimientos y envío
 
-Leer los dos consentimientos obligatorios sobre el código de conducta y el tratamiento de datos. El consentimiento de comunicaciones comerciales es opcional.
+Con autorización explícita del mantenedor, se aceptaron los dos consentimientos obligatorios sobre el código de conducta y el tratamiento de datos. La opción de comunicaciones comerciales quedó desmarcada.
 
-Revisar todos los campos y enviar con Submit cuando los requisitos anteriores estén completos. Este borrador no registra una cuenta, no transmite la solicitud y no acepta las condiciones en nombre del mantenedor.
+Se envió el formulario y se completó la verificación de imágenes con autorización del mantenedor. SignPath mostró “Form submitted” y “Thank you, we'll be in touch soon.”. No se mostró un número de solicitud ni una aprobación del proyecto. Corresponde esperar la respuesta del proveedor; no volver a enviar el formulario para comprobar el estado.
 
 ## Después de la respuesta de SignPath
 
