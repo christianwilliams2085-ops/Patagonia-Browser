@@ -2,6 +2,24 @@ name: Windows - candidato para firma
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/windows-candidate.yml'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'forge.config.cjs'
+      - 'scripts/**'
+      - 'src/**'
+      - 'services/**'
+      - 'ui/**'
+      - 'assets/**'
+      - 'tests/**'
+      - 'main.js'
+      - 'preload.js'
+      - 'renderer.js'
+      - 'index.html'
   pull_request:
     paths:
       - '.github/workflows/windows-candidate.yml'
