@@ -3,7 +3,7 @@
   "productName": "Patagonia Browser",
   "version": "1.0.4",
   "description": "Navegador de escritorio rápido, privado y sencillo.",
-  "main": "main.js",
+  "main": "bootstrap.js",
   "scripts": {
     "start": "electron .",
     "test": "node --test tests/*.test.cjs",
