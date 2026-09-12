@@ -1,4 +1,4 @@
-const archivos = new Set(["main.js", "preload.js", "renderer.js", "index.html", "package.json", "LICENSE"]);
+const archivos = new Set(["bootstrap.js", "main.js", "preload.js", "renderer.js", "index.html", "package.json", "LICENSE"]);
 const carpetas = new Set(["assets", "services", "src", "ui", "node_modules"]);
 
 function incluirEnPaquete(ruta) {
