@@ -7,6 +7,7 @@ Formulario oficial: https://signpath.org/apply
 
 - Las políticas de firma y privacidad de Windows ya se incorporaron a la rama principal mediante la solicitud de cambios #8.
 - Compilación Windows verificada: [ejecución satisfactoria](https://github.com/christianwilliams2085-ops/Patagonia-Browser/actions/runs/34228558369), con 148 pruebas aprobadas y el instalador generado.
+- La versión pública vigente para Windows es la [1.0.4](https://github.com/christianwilliams2085-ops/Patagonia-Browser/releases/tag/v1.0.4). Su instalador no tiene firma de SignPath; no hay certificado activo. La edición móvil no está publicada en la rama `main`.
 - Antes de habilitar firmas, verificar la autenticación multifactor del mantenedor en GitHub y SignPath conforme a las [condiciones del programa](https://signpath.org/terms). La recepción de la solicitud no acredita ese requisito.
 - El correo de contacto se completó en el formulario de SignPath y no se reproduce en este documento. No publicar correo privado, claves ni tokens en este registro.
 - La aprobación no está garantizada: SignPath también evalúa reputación verificable. Patagonia es un proyecto reciente con uso inicial limitado; no atribuirle usuarios, reseñas ni avales que no tenga.
