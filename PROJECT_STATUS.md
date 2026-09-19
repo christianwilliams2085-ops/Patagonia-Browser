@@ -1,16 +1,14 @@
 # Patagonia Browser — estado del proyecto
 
-Actualizado: 3 de septiembre de 2026.
+Actualizado: 20 de septiembre de 2026.
 
 ## Estado actual
 
 Prototipo funcional de escritorio en desarrollo. La base de navegación de Alpha 0.1 está implementada y hay funciones de Alpha 0.2. No se considera una versión estable ni una auditoría de seguridad completa.
 
-## Implementado
+La edición móvil no está publicada en la rama `main` ni disponible como descarga pública; el estado descrito aquí corresponde a la edición de escritorio.
 
-- Edición móvil compartida para Android y iPhone en `mobile/`, con identidad visual oficial, pestañas, navegación, favoritos, historial, modo de escritorio, Centro de Privacidad y Patagonia AI local.
-- APK Android 1.0.0 optimizado y firmado para pruebas familiares, compatible con Android 7 o posterior y verificado con los esquemas de firma APK v2 y v3.
-- Proyecto iPhone generado con iconos completos y configuración de privacidad validada. La compilación y firma final requieren macOS, Xcode y una cuenta Apple.
+## Implementado
 
 - Ventana Electron con páginas en WebContentsView y pestañas independientes.
 - Versión portátil para Windows x64 con ejecutable, icono propio, perfil estable y acceso directo en la carpeta principal del proyecto.
@@ -47,8 +45,6 @@ Electron, JavaScript, HTML/CSS, Node.js, Ghostery Adblocker, Mozilla Readability
 
 ## Verificación de esta revisión
 
-La edición móvil pasa el análisis estático sin problemas y 14 pruebas automatizadas de navegación, privacidad, interfaz y Patagonia AI. El APK Android fue compilado con SDK 36, firmado con una clave familiar RSA de 4096 bits y validado con las herramientas oficiales de Android. Android reconoce el nombre `Patagonia Browser`, la versión 1.0.0, el icono y Android mínimo 7. Todavía falta probar la instalación y navegación en un teléfono físico. iPhone no puede compilarse en Windows; su proyecto e iconos quedaron preparados para abrirse en Xcode sobre una Mac.
-
 101 pruebas automatizadas aprobadas. Cubren el motor de bloqueo integrado contra publicidad y seguimiento conocidos, sus excepciones por dominio, los conteos y su interfaz, además de favoritos, historial, descargas, errores de carga, sesiones, navegación, configuración, permisos, pestañas cerradas, nueva pestaña, validación de emisores, atajos, menú y búsqueda. Incluyen pruebas con DOM simulado y una prueba del arranque y restauración con Electron simulado. Los diálogos de permisos y de fallo del guardado todavía requieren validación manual en Electron.
 
 Las pruebas de cierre y persistencia comprueban escrituras lentas, cambios recibidos durante el guardado, un favorito pendiente al cerrar la ventana, fallos del disco, reintentos, cancelación del cierre y elección explícita de cerrar sin guardar. La protección del cierre se aplica a la salida normal de Patagonia; no garantiza finalizar escrituras ante un corte de energía, una terminación forzada o el apagado de Windows.
@@ -69,7 +65,7 @@ También se construyó y ejecutó `Patagonia-Browser-Setup-1.0.0-Windows-x64.exe
 
 Después se incorporó el icono oficial elegido por Roma. Se extrajo el icono incrustado del nuevo ejecutable y del nuevo instalador y se confirmó visualmente que ambos contienen el diseño correcto.
 
-La versión 1.0.3 incorpora el bloqueador real y corrige el cierre de pestañas y del navegador cuando el contenido ya fue destruido. El motor integrado se comprobó contra solicitudes conocidas de publicidad y seguimiento. La entrega actual, su ZIP y sus hashes verificados están en `dist/PARA COMPARTIR - PATAGONIA 1.0.3`.
+La versión pública actual para Windows es la [1.0.4](https://github.com/christianwilliams2085-ops/Patagonia-Browser/releases/tag/v1.0.4). La [página de descargas](DOWNLOADS.md) indica el estado de firma del instalador; no hay un certificado activo ni una firma de SignPath.
 
 ## Correcciones de esta revisión
 

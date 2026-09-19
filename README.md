@@ -42,20 +42,9 @@ Para volver a crear la versión portátil desde el código:
 npm run build:portable
 ```
 
-## Compartir con la familia
+## Descarga pública
 
-La carpeta `dist/PARA COMPARTIR - PATAGONIA 1.0.3` contiene el icono elegido por Roma y dos opciones para Windows de 64 bits:
-
-- `Patagonia-Browser-Setup-1.0.3-Windows-x64.exe`: instalador recomendado, sin permisos de administrador.
-- `Patagonia-Browser-Portable-1.0.3-Windows-x64.zip`: edición que funciona después de extraer la carpeta completa.
-
-También incluye instrucciones y hashes SHA-256 para comprobar la integridad. Esta edición familiar todavía no posee una firma digital comercial, por lo que Windows puede mostrar una advertencia de aplicación desconocida. La firma será necesaria antes de la publicación general.
-
-Para regenerar el instalador:
-
-```sh
-npm run make:windows
-```
+La versión publicada actualmente es la **1.0.4**. El instalador, su estado de firma y las instrucciones para desinstalar están en [Descargas de Patagonia Browser para Windows](DOWNLOADS.md). El instalador disponible no tiene una firma de un proveedor reconocido; Windows puede mostrar una advertencia.
 
 ## Code signing policy
 
@@ -63,13 +52,9 @@ La solicitud al programa de SignPath Foundation se envió el 8 de septiembre de 
 
 La [política de firma](CODE_SIGNING.md) describe el responsable, la compilación verificable y las comprobaciones requeridas antes de publicar una versión firmada. El [registro de la solicitud](docs/SIGNPATH_APPLICATION.md) contiene los datos del proyecto, los textos enviados y los requisitos pendientes. La edición de Windows tiene una [política de privacidad específica](PRIVACY_WINDOWS.md).
 
-## Android y iPhone
+## Edición móvil
 
-La carpeta `mobile/` contiene la nueva edición para teléfonos. Incluye la pantalla de inicio de Patagonia, navegación por pestañas, favoritos, historial, modo de escritorio y protección integrada contra publicidad y rastreadores.
-
-El APK firmado para compartir con la familia está en `dist/PARA COMPARTIR - PATAGONIA MOVIL 1.0.0`. Es compatible con Android 7 o posterior e incluye Patagonia AI para resumir localmente la página abierta. El proyecto de iPhone y todos sus iconos están preparados en `mobile/ios`; Apple exige una Mac con Xcode y una cuenta Apple para producir el archivo instalable de iPhone.
-
-La guía para preparar y publicar la edición de iPhone está en mobile/IOS_RELEASE_CHECKLIST.md y la política pública en PRIVACY.md.
+La edición móvil no está publicada en la rama `main` ni disponible como descarga pública. Las instrucciones de instalación y las versiones publicadas en este README corresponden a la edición de escritorio para Windows.
 
 ## Ejecutar
 
