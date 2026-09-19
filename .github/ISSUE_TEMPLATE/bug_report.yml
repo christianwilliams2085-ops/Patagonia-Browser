@@ -1,0 +1,65 @@
+name: Reportar un error
+description: Informá un problema reproducible de Patagonia Browser.
+title: "[Error]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Gracias por ayudar a mejorar Patagonia Browser. No publiques contraseñas, datos personales ni información privada.
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Plataforma
+      options:
+        - Windows
+        - Android
+        - iPhone / iOS
+        - Otra
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Versión de Patagonia Browser
+      placeholder: "Ejemplo: 1.0.4"
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: ¿Qué ocurrió?
+      description: Explicá claramente el problema.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Pasos para reproducirlo
+      placeholder: |
+        1. Abrir...
+        2. Pulsar...
+        3. Observar...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Resultado esperado
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Capturas o registros
+      description: Adjuntá solamente información que pueda hacerse pública.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Comprobaciones
+      options:
+        - label: Busqué y no encontré otro reporte abierto sobre el mismo problema.
+          required: true
+        - label: Quité contraseñas y datos personales de las capturas o registros.
+          required: true
