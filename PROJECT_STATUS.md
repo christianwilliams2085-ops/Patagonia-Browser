@@ -1,16 +1,30 @@
 # Patagonia Browser — estado del proyecto
 
-Actualizado: 3 de septiembre de 2026.
+Actualización documental: 30 de septiembre de 2026. Las comprobaciones históricas conservan su alcance; esta actualización no incorpora nuevas pruebas del navegador.
 
 ## Estado actual
 
 Prototipo funcional de escritorio en desarrollo. La base de navegación de Alpha 0.1 está implementada y hay funciones de Alpha 0.2. No se considera una versión estable ni una auditoría de seguridad completa.
 
-## Implementado
+## Versiones y firma
 
-- Edición móvil compartida para Android y iPhone en `mobile/`, con identidad visual oficial, pestañas, navegación, favoritos, historial, modo de escritorio, Centro de Privacidad y Patagonia AI local.
+La versión publicada vigente para Windows x64 es **1.0.4**, del 7 de septiembre de 2026. La [página de descargas](DOWNLOADS.md) enlaza el instalador `Patagonia-Browser-Setup.exe`, sin firma de un proveedor reconocido. Esa publicación no incluye un ZIP portátil ni un archivo de hashes separado.
+
+La solicitud inicial a SignPath Foundation, enviada el 8 de septiembre de 2026, no fue aprobada por falta de suficientes señales públicas de adopción y colaboración, según el [issue #10](https://github.com/christianwilliams2085-ops/Patagonia-Browser/issues/10). Actualmente no existe un certificado activo ni un servicio de firma de SignPath para Patagonia Browser. No hay fechas ni aprobación futura garantizadas.
+
+Consultá la [política de firma](CODE_SIGNING.md) y el [registro de la solicitud](docs/SIGNPATH_APPLICATION.md).
+
+## Artefactos móviles publicados
+
+El código fuente de `mobile/` todavía **no está publicado en `main`**. Los artefactos Android 1.0.0 y el proyecto iPhone 1.0.0 están en la [publicación v1.0.3](https://github.com/christianwilliams2085-ops/Patagonia-Browser/releases/tag/v1.0.3); su disponibilidad no implica que puedan compilarse desde esta rama. La firma APK es independiente del certificado de Windows y de SignPath.
+
+El registro histórico de la edición móvil describe:
+
+- Edición móvil compartida para Android y iPhone, con identidad visual oficial, pestañas, navegación, favoritos, historial, modo de escritorio, Centro de Privacidad y Patagonia AI local.
 - APK Android 1.0.0 optimizado y firmado para pruebas familiares, compatible con Android 7 o posterior y verificado con los esquemas de firma APK v2 y v3.
 - Proyecto iPhone generado con iconos completos y configuración de privacidad validada. La compilación y firma final requieren macOS, Xcode y una cuenta Apple.
+
+## Implementado en escritorio
 
 - Ventana Electron con páginas en WebContentsView y pestañas independientes.
 - Versión portátil para Windows x64 con ejecutable, icono propio, perfil estable y acceso directo en la carpeta principal del proyecto.
@@ -45,7 +59,11 @@ Prototipo funcional de escritorio en desarrollo. La base de navegación de Alpha
 
 Electron, JavaScript, HTML/CSS, Node.js, Ghostery Adblocker, Mozilla Readability y jsdom. Favoritos, historial, sesión y excepciones de protección se guardan dentro del perfil local. React, TypeScript y SQLite figuran en documentos de diseño, pero no están incorporados al código actual.
 
-## Verificación de esta revisión
+## Verificaciones históricas
+
+Los resultados siguientes corresponden al registro previo de desarrollo, no a pruebas ejecutadas con esta actualización documental. Las comprobaciones móviles no se pueden reproducir desde `main` mientras no esté publicado su código fuente.
+
+Como evidencia posterior de escritorio, la [compilación Windows en GitHub Actions](https://github.com/christianwilliams2085-ops/Patagonia-Browser/actions/runs/34228558369) generó un candidato sin firma. El flujo de CI no implica que exista un certificado activo.
 
 La edición móvil pasa el análisis estático sin problemas y 14 pruebas automatizadas de navegación, privacidad, interfaz y Patagonia AI. El APK Android fue compilado con SDK 36, firmado con una clave familiar RSA de 4096 bits y validado con las herramientas oficiales de Android. Android reconoce el nombre `Patagonia Browser`, la versión 1.0.0, el icono y Android mínimo 7. Todavía falta probar la instalación y navegación en un teléfono físico. iPhone no puede compilarse en Windows; su proyecto e iconos quedaron preparados para abrirse en Xcode sobre una Mac.
 
@@ -69,9 +87,9 @@ También se construyó y ejecutó `Patagonia-Browser-Setup-1.0.0-Windows-x64.exe
 
 Después se incorporó el icono oficial elegido por Roma. Se extrajo el icono incrustado del nuevo ejecutable y del nuevo instalador y se confirmó visualmente que ambos contienen el diseño correcto.
 
-La versión 1.0.3 incorpora el bloqueador real y corrige el cierre de pestañas y del navegador cuando el contenido ya fue destruido. El motor integrado se comprobó contra solicitudes conocidas de publicidad y seguimiento. La entrega actual, su ZIP y sus hashes verificados están en `dist/PARA COMPARTIR - PATAGONIA 1.0.3`.
+Como antecedente histórico, la versión 1.0.3 incorporó el bloqueador real y corrigió el cierre de pestañas y del navegador cuando el contenido ya fue destruido. El motor integrado se comprobó contra solicitudes conocidas de publicidad y seguimiento. Ese registro corresponde a una entrega anterior. Para la versión vigente de Windows 1.0.4, consultá [DOWNLOADS.md](DOWNLOADS.md).
 
-## Correcciones de esta revisión
+## Correcciones registradas en la revisión histórica
 
 - El borrador de una dirección deja de mostrarse al cambiar de pestaña.
 - La escritura en curso se conserva ante actualizaciones de URL de la misma pestaña.
@@ -88,10 +106,11 @@ La versión 1.0.3 incorpora el bloqueador real y corrige el cierre de pestañas 
 - Validar la nueva interfaz y la navegación real en otras plataformas antes de anunciarlas.
 - Configuración avanzada, temas y modo privado.
 - Bloqueo y gestión de ventanas emergentes; panel para revisar o revocar permisos sin cerrar la aplicación.
-- Bloqueo de anuncios/rastreadores y controles de privacidad.
+- Ampliar y validar el bloqueo de anuncios/rastreadores y los controles de privacidad existentes.
 - Auditoría del aislamiento, la navegación y todos los canales IPC.
 - Integración opcional de IA: elegir proveedor, consentimiento para enviar contenido y gestión segura de credenciales.
-- Firma digital para distribución pública, actualizaciones y automatización de pruebas en CI. El instalador familiar y el paquete portátil local ya están disponibles.
+- Obtener firma digital reconocida para Windows y desarrollar las actualizaciones de la aplicación. Ya existen flujos de pruebas y compilación de candidatos sin firma en CI.
+- Publicar el código fuente móvil en `main` para permitir su revisión y compilación desde el repositorio.
 - Reconciliar los documentos de arquitectura y planificación con la implementación actual.
 
 Los porcentajes históricos de implementación y las afirmaciones de seguridad de los documentos de planificación no son evidencia del estado del producto.

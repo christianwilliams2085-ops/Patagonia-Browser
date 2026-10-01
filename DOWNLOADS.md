@@ -10,11 +10,15 @@ Patagonia es un navegador de escritorio en desarrollo con navegación por pesta�
 
 La versión 1.0.4 fue publicada el 7 de septiembre de 2026. El instalador actual está **sin firma de un proveedor reconocido** y Windows puede bloquear su ejecución.
 
+La publicación 1.0.4 sólo incluye `Patagonia-Browser-Setup.exe`; no contiene un ZIP portátil ni un archivo de hashes separado. Los artefactos de versiones anteriores no deben presentarse como Windows 1.0.4.
+
 ## Code signing policy
 
-Patagonia envió la solicitud al programa gratuito de SignPath Foundation el 8 de septiembre de 2026 y el formulario confirmó su recepción. La evaluación está pendiente. Todavía no hay aprobación ni un servicio de firma activo; las versiones disponibles no están firmadas por SignPath.
+La solicitud inicial a SignPath Foundation, enviada el 8 de septiembre de 2026, no fue aprobada por falta de suficientes señales públicas de adopción y colaboración, según el [issue #10](https://github.com/christianwilliams2085-ops/Patagonia-Browser/issues/10). Actualmente no existe un certificado activo ni un servicio de firma de SignPath para Patagonia Browser. No hay fechas ni aprobación futura garantizadas.
 
-La [Code signing policy](CODE_SIGNING.md) identifica al mantenedor, las responsabilidades de firma, el origen verificable de las compilaciones y las condiciones pendientes. La atribución del proveedor se actualizará cuando el programa sea aprobado y las firmas estén en uso.
+El instalador de Windows 1.0.4 no está firmado por SignPath.
+
+La [Code signing policy](CODE_SIGNING.md) identifica al mantenedor, las responsabilidades de firma, el origen verificable de las compilaciones y las condiciones pendientes. La atribución del proveedor sólo correspondería si se obtuviera aprobación y el servicio estuviera activo.
 
 ## Privacidad y desinstalación
 

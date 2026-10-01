@@ -1,6 +1,7 @@
 # Solicitud de SignPath para Patagonia Browser
 
-**Solicitud enviada el 8 de septiembre de 2026. Recepción confirmada por el formulario; aprobación pendiente.**  
+La solicitud inicial a SignPath Foundation, enviada el 8 de septiembre de 2026, no fue aprobada por falta de suficientes señales públicas de adopción y colaboración, según el [issue #10](https://github.com/christianwilliams2085-ops/Patagonia-Browser/issues/10). Actualmente no existe un certificado activo ni un servicio de firma de SignPath para Patagonia Browser. No hay fechas ni aprobación futura garantizadas.
+
 Formulario oficial: https://signpath.org/apply
 
 ## Estado y requisitos pendientes
@@ -11,6 +12,10 @@ Formulario oficial: https://signpath.org/apply
 - El correo de contacto se completó en el formulario de SignPath y no se reproduce en este documento. No publicar correo privado, claves ni tokens en este registro.
 - La aprobación no está garantizada: SignPath también evalúa reputación verificable. Patagonia es un proyecto reciente con uso inicial limitado; no atribuirle usuarios, reseñas ni avales que no tenga.
 - La [página de descargas](../DOWNLOADS.md) enlaza la política con su estado real. La atribución de firma a SignPath sólo debe presentarse como vigente cuando el servicio esté aprobado y activo.
+
+## Registro histórico de la solicitud enviada
+
+Los campos y textos en inglés siguientes documentan el envío original del 8 de septiembre de 2026; no representan una solicitud pendiente ni una aprobación vigente.
 
 ## Campos del formulario
 
@@ -51,10 +56,12 @@ No afirmar que existe difusión amplia ni copiar las cifras de descargas como si
 
 Con autorización explícita del mantenedor, se aceptaron los dos consentimientos obligatorios sobre el código de conducta y el tratamiento de datos. La opción de comunicaciones comerciales quedó desmarcada.
 
-Se envió el formulario y se completó la verificación de imágenes con autorización del mantenedor. SignPath mostró “Form submitted” y “Thank you, we'll be in touch soon.”. No se mostró un número de solicitud ni una aprobación del proyecto. Corresponde esperar la respuesta del proveedor; no volver a enviar el formulario para comprobar el estado.
+Se envió el formulario y se completó la verificación de imágenes con autorización del mantenedor. SignPath mostró “Form submitted” y “Thank you, we'll be in touch soon.”. No se mostró un número de solicitud ni una aprobación del proyecto. La respuesta posterior fue la no aprobación de la solicitud inicial, registrada en el issue #10; la confirmación del formulario sólo acredita el envío.
 
 ## Después de la respuesta de SignPath
 
-Si aceptan el proyecto, seguir la incorporación indicada por el proveedor, conectar el sistema de compilación, definir el alcance del certificado y configurar la aprobación de cada firma. La integración de firma aún debe añadirse; el flujo incluido aquí sólo genera candidatos **sin firma**.
+La prioridad es mejorar la documentación pública y reunir evidencia verificable de adopción y colaboración. No hay una nueva solicitud ni una fecha de reconsideración confirmadas en este registro.
+
+Sólo si se obtiene una aceptación explícita en el futuro, seguir la incorporación indicada por el proveedor, conectar el sistema de compilación, definir el alcance del certificado y configurar la aprobación de cada firma. La integración de firma aún debe añadirse; el flujo incluido aquí sólo genera candidatos **sin firma**.
 
 Antes de distribuir, verificar tanto el instalador como el ejecutable instalado y comprobar el arranque en una notebook con Control inteligente de aplicaciones activado. SmartScreen también evalúa reputación, por lo que no se debe prometer la eliminación inmediata de todos los avisos de Windows.
