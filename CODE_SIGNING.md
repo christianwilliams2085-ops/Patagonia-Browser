@@ -2,7 +2,7 @@
 
 ## Estado
 
-La solicitud al programa de SignPath Foundation fue enviada el 8 de septiembre de 2026. El formulario confirmó su recepción. Está pendiente de evaluación y todavía no existe una aprobación ni una firma de SignPath para Patagonia Browser.
+La solicitud inicial a SignPath Foundation, enviada el 8 de septiembre de 2026, no fue aprobada por falta de suficientes señales públicas de adopción y colaboración, según el [issue #10](https://github.com/christianwilliams2085-ops/Patagonia-Browser/issues/10). Actualmente no existe un certificado activo ni un servicio de firma de SignPath para Patagonia Browser. No hay fechas ni aprobación futura garantizadas.
 
 Los instaladores actuales de Windows siguen sin firma de un proveedor reconocido. Esta política y la compilación de candidatos no cambian esa situación por sí solas.
 
@@ -18,7 +18,9 @@ El flujo [Windows - candidato para firma](.github/workflows/windows-candidate.ym
 
 Los artefactos se identifican expresamente como **sin firma**. Los candidatos producidos en una solicitud de cambios sirven para revisión y no se enviarán a producción ni a firma automáticamente. Para solicitar una firma de publicación se utilizará una compilación de una versión revisada en la rama principal o en una etiqueta de publicación.
 
-## Condiciones para habilitar SignPath
+## Condiciones para una eventual habilitación de SignPath
+
+Estas condiciones describen una integración posible; no anuncian una nueva solicitud, una aprobación ni un plazo.
 
 1. Obtener la aceptación explícita de SignPath Foundation.
 2. Configurar el repositorio, el flujo de compilación confiable, el alcance de los archivos y una política de firma en SignPath.
