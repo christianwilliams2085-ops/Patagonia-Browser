@@ -1,9 +1,15 @@
 # Solicitud de SignPath para Patagonia Browser
 
-**Solicitud enviada el 8 de septiembre de 2026. Recepción confirmada por el formulario; aprobación pendiente.**  
+**Solicitud inicial enviada el 8 de septiembre de 2026 y no aprobada. No existe un certificado ni un servicio de firma activo.**
+
 Formulario oficial: https://signpath.org/apply
 
 ## Estado y requisitos pendientes
+
+La solicitud inicial a SignPath Foundation, enviada el 8 de septiembre de 2026, no fue aprobada porque el proyecto todavía no presenta suficientes señales públicas de adopción y colaboración. Actualmente no existe un certificado ni un servicio de firma activo para Patagonia Browser. No hay fechas ni aprobación futura garantizadas. El motivo de la respuesta está registrado en el [issue #10](https://github.com/christianwilliams2085-ops/Patagonia-Browser/issues/10).
+
+- Windows 1.0.4 es la versión vigente publicada; sus instaladores siguen sin firma de un proveedor reconocido.
+- El código móvil y la carpeta `mobile/` todavía no están publicados en `main`; los adjuntos de Releases no cambian ese estado.
 
 - Las políticas de firma y privacidad de Windows ya se incorporaron a la rama principal mediante la solicitud de cambios #8.
 - Compilación Windows verificada: [ejecución satisfactoria](https://github.com/christianwilliams2085-ops/Patagonia-Browser/actions/runs/34228558369), con 148 pruebas aprobadas y el instalador generado.
@@ -12,7 +18,11 @@ Formulario oficial: https://signpath.org/apply
 - La aprobación no está garantizada: SignPath también evalúa reputación verificable. Patagonia es un proyecto reciente con uso inicial limitado; no atribuirle usuarios, reseñas ni avales que no tenga.
 - La [página de descargas](../DOWNLOADS.md) enlaza la política con su estado real. La atribución de firma a SignPath sólo debe presentarse como vigente cuando el servicio esté aprobado y activo.
 
-## Campos del formulario
+## Registro histórico del formulario enviado
+
+Los campos y textos siguientes documentan la solicitud inicial; no describen una aprobación vigente.
+
+### Campos del formulario
 
 | Campo | Respuesta |
 |---|---|
@@ -33,15 +43,15 @@ Formulario oficial: https://signpath.org/apply
 
 La solicitud se presentó a nombre del mantenedor indicado. El formulario usa los datos de contacto para el alta en SignPath; la confirmación de recepción no demuestra que una cuenta operativa o un certificado ya estén activos. Se solicitó el programa gratuito de la fundación.
 
-## Tagline
+### Tagline
 
 An open-source Windows browser with a simple interface and built-in ad and tracker blocking.
 
-## Description
+### Description
 
 Patagonia Browser is an open-source desktop browser focused on straightforward everyday browsing and user control. It provides tabbed navigation, local bookmarks and browsing history, and built-in ad and tracker blocking. The project is actively maintained and is initially being shared with family testers. We are seeking sponsored code signing to verify the origin of our Windows releases and make distribution easier for users.
 
-## Reputation
+### Reputation
 
 Patagonia Browser is an early-stage project and does not yet have established widespread adoption. The public source code, commit history, issue tracker, and downloadable releases are available at https://github.com/christianwilliams2085-ops/Patagonia-Browser. The initial releases have been shared with family testers. A Windows GitHub Actions build completed with 148 passing tests and produced the installer: https://github.com/christianwilliams2085-ops/Patagonia-Browser/actions/runs/34228558369. We are providing this public release and build history as the current evidence of the project's activity and understand that acceptance depends on the Foundation's review.
 
@@ -51,10 +61,10 @@ No afirmar que existe difusión amplia ni copiar las cifras de descargas como si
 
 Con autorización explícita del mantenedor, se aceptaron los dos consentimientos obligatorios sobre el código de conducta y el tratamiento de datos. La opción de comunicaciones comerciales quedó desmarcada.
 
-Se envió el formulario y se completó la verificación de imágenes con autorización del mantenedor. SignPath mostró “Form submitted” y “Thank you, we'll be in touch soon.”. No se mostró un número de solicitud ni una aprobación del proyecto. Corresponde esperar la respuesta del proveedor; no volver a enviar el formulario para comprobar el estado.
+Se envió el formulario y se completó la verificación de imágenes con autorización del mantenedor. SignPath mostró “Form submitted” y “Thank you, we'll be in touch soon.”. No se mostró un número de solicitud ni una aprobación del proyecto. Esa confirmación sólo acreditó la recepción. Posteriormente, la solicitud inicial no fue aprobada por el motivo indicado arriba. No volver a enviar el formulario únicamente para comprobar el estado.
 
 ## Después de la respuesta de SignPath
 
-Si aceptan el proyecto, seguir la incorporación indicada por el proveedor, conectar el sistema de compilación, definir el alcance del certificado y configurar la aprobación de cada firma. La integración de firma aún debe añadirse; el flujo incluido aquí sólo genera candidatos **sin firma**.
+El trabajo actual consiste en mejorar la documentación pública y facilitar contribuciones verificables. No se da por comprometida una nueva solicitud, una fecha ni una aprobación futura. Si el proveedor acepta el proyecto en el futuro, se deberá seguir la incorporación que indique, conectar el sistema de compilación, definir el alcance del certificado y configurar la aprobación de cada firma. La integración de firma aún debe añadirse; el flujo incluido aquí sólo genera candidatos **sin firma**.
 
 Antes de distribuir, verificar tanto el instalador como el ejecutable instalado y comprobar el arranque en una notebook con Control inteligente de aplicaciones activado. SmartScreen también evalúa reputación, por lo que no se debe prometer la eliminación inmediata de todos los avisos de Windows.

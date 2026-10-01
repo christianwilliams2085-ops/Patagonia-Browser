@@ -12,9 +12,9 @@ La versión 1.0.4 fue publicada el 7 de septiembre de 2026. El instalador actual
 
 ## Code signing policy
 
-Patagonia envió la solicitud al programa gratuito de SignPath Foundation el 8 de septiembre de 2026 y el formulario confirmó su recepción. La evaluación está pendiente. Todavía no hay aprobación ni un servicio de firma activo; las versiones disponibles no están firmadas por SignPath.
+La solicitud inicial a SignPath Foundation, enviada el 8 de septiembre de 2026, no fue aprobada porque el proyecto todavía no presenta suficientes señales públicas de adopción y colaboración. Actualmente no existe un certificado ni un servicio de firma activo para Patagonia Browser. No hay fechas ni aprobación futura garantizadas. Las versiones disponibles no están firmadas por SignPath. Véase el [registro de la solicitud](docs/SIGNPATH_APPLICATION.md).
 
-La [Code signing policy](CODE_SIGNING.md) identifica al mantenedor, las responsabilidades de firma, el origen verificable de las compilaciones y las condiciones pendientes. La atribución del proveedor se actualizará cuando el programa sea aprobado y las firmas estén en uso.
+La [Code signing policy](CODE_SIGNING.md) identifica al mantenedor, las responsabilidades de firma, el origen verificable de las compilaciones y las condiciones pendientes. La atribución del proveedor sólo podrá publicarse si el programa se aprueba y las firmas están en uso; esa posibilidad no implica un compromiso ni una fecha.
 
 ## Privacidad y desinstalación
 

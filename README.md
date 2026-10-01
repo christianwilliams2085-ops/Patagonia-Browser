@@ -44,12 +44,9 @@ npm run build:portable
 
 ## Compartir con la familia
 
-La carpeta `dist/PARA COMPARTIR - PATAGONIA 1.0.3` contiene el icono elegido por Roma y dos opciones para Windows de 64 bits:
+La versión vigente de Windows es **1.0.4**. El [instalador publicado y su estado de firma](DOWNLOADS.md) son la referencia para compartirla.
 
-- `Patagonia-Browser-Setup-1.0.3-Windows-x64.exe`: instalador recomendado, sin permisos de administrador.
-- `Patagonia-Browser-Portable-1.0.3-Windows-x64.zip`: edición que funciona después de extraer la carpeta completa.
-
-También incluye instrucciones y hashes SHA-256 para comprobar la integridad. Esta edición familiar todavía no posee una firma digital comercial, por lo que Windows puede mostrar una advertencia de aplicación desconocida. La firma será necesaria antes de la publicación general.
+El instalador está **sin firma de un proveedor reconocido** y Windows puede advertir o bloquear su ejecución. Las carpetas `dist/` son salidas locales de compilación y no forman parte de `main`. Los paquetes portátiles de versiones anteriores no deben presentarse como una entrega 1.0.4.
 
 Para regenerar el instalador:
 
@@ -59,17 +56,17 @@ npm run make:windows
 
 ## Code signing policy
 
-La solicitud al programa de SignPath Foundation se envió el 8 de septiembre de 2026 y el formulario confirmó su recepción. Está pendiente de evaluación: todavía no hay aprobación ni certificado activo.
+La solicitud inicial a SignPath Foundation, enviada el 8 de septiembre de 2026, no fue aprobada porque el proyecto todavía no presenta suficientes señales públicas de adopción y colaboración. Actualmente no existe un certificado ni un servicio de firma activo para Patagonia Browser. No hay fechas ni aprobación futura garantizadas.
 
 La [política de firma](CODE_SIGNING.md) describe el responsable, la compilación verificable y las comprobaciones requeridas antes de publicar una versión firmada. El [registro de la solicitud](docs/SIGNPATH_APPLICATION.md) contiene los datos del proyecto, los textos enviados y los requisitos pendientes. La edición de Windows tiene una [política de privacidad específica](PRIVACY_WINDOWS.md).
 
 ## Android y iPhone
 
-La carpeta `mobile/` contiene la nueva edición para teléfonos. Incluye la pantalla de inicio de Patagonia, navegación por pestañas, favoritos, historial, modo de escritorio y protección integrada contra publicidad y rastreadores.
+El código de la edición móvil, incluida la carpeta `mobile/`, **todavía no está publicado en `main`**. Por eso no se puede compilar ni ejecutar sus pruebas desde esta rama.
 
-El APK firmado para compartir con la familia está en `dist/PARA COMPARTIR - PATAGONIA MOVIL 1.0.0`. Es compatible con Android 7 o posterior e incluye Patagonia AI para resumir localmente la página abierta. El proyecto de iPhone y todos sus iconos están preparados en `mobile/ios`; Apple exige una Mac con Xcode y una cuenta Apple para producir el archivo instalable de iPhone.
+La [publicación móvil 1.0.0](https://github.com/christianwilliams2085-ops/Patagonia-Browser/releases/tag/mobile-v1.0.0) contiene un APK Android y un ZIP del proyecto de iPhone para Mac. Esos adjuntos no equivalen a tener el código móvil integrado en `main`. El ZIP de iPhone es un proyecto para compilar, no una aplicación instalable; su compilación y firma requieren macOS, Xcode y una cuenta Apple.
 
-La guía para preparar y publicar la edición de iPhone está en mobile/IOS_RELEASE_CHECKLIST.md y la política pública en PRIVACY.md.
+La firma del APK Android es independiente de la firma de Windows y no implica aprobación de SignPath. La [política de privacidad móvil](PRIVACY.md) está disponible en el repositorio; las rutas `mobile/ios` y `mobile/IOS_RELEASE_CHECKLIST.md` no están disponibles en `main`.
 
 ## Ejecutar
 

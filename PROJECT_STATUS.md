@@ -1,16 +1,22 @@
 # Patagonia Browser — estado del proyecto
 
-Actualizado: 3 de septiembre de 2026.
+Actualizado: 30 de septiembre de 2026 (revisión documental del issue #10; no se ejecutaron nuevas pruebas del navegador).
 
 ## Estado actual
 
 Prototipo funcional de escritorio en desarrollo. La base de navegación de Alpha 0.1 está implementada y hay funciones de Alpha 0.2. No se considera una versión estable ni una auditoría de seguridad completa.
 
-## Implementado
+## Distribución y firma
 
-- Edición móvil compartida para Android y iPhone en `mobile/`, con identidad visual oficial, pestañas, navegación, favoritos, historial, modo de escritorio, Centro de Privacidad y Patagonia AI local.
-- APK Android 1.0.0 optimizado y firmado para pruebas familiares, compatible con Android 7 o posterior y verificado con los esquemas de firma APK v2 y v3.
-- Proyecto iPhone generado con iconos completos y configuración de privacidad validada. La compilación y firma final requieren macOS, Xcode y una cuenta Apple.
+- Windows **1.0.4** es la versión vigente, publicada el 7 de septiembre de 2026. Ver [descargas](DOWNLOADS.md).
+- La solicitud inicial a SignPath Foundation, enviada el 8 de septiembre de 2026, no fue aprobada porque el proyecto todavía no presenta suficientes señales públicas de adopción y colaboración. Actualmente no existe un certificado ni un servicio de firma activo para Patagonia Browser. No hay fechas ni aprobación futura garantizadas.
+- El instalador Windows 1.0.4 está sin firma de un proveedor reconocido y Windows puede advertir o bloquear su ejecución. Ver [política de firma](CODE_SIGNING.md) y [registro de la solicitud](docs/SIGNPATH_APPLICATION.md).
+
+## Edición móvil fuera de `main`
+
+La carpeta `mobile/` todavía no está publicada en `main`. La [publicación móvil 1.0.0](https://github.com/christianwilliams2085-ops/Patagonia-Browser/releases/tag/mobile-v1.0.0) ofrece un APK Android y un ZIP del proyecto de iPhone para Mac; esos adjuntos no constituyen código móvil integrado en esta rama. El proyecto de iPhone requiere compilación y firma en macOS con Xcode y una cuenta Apple; no es un instalador de iPhone. La firma Android es independiente de la de Windows.
+
+## Implementado en escritorio
 
 - Ventana Electron con páginas en WebContentsView y pestañas independientes.
 - Versión portátil para Windows x64 con ejecutable, icono propio, perfil estable y acceso directo en la carpeta principal del proyecto.
@@ -47,7 +53,9 @@ Electron, JavaScript, HTML/CSS, Node.js, Ghostery Adblocker, Mozilla Readability
 
 ## Verificación de esta revisión
 
-La edición móvil pasa el análisis estático sin problemas y 14 pruebas automatizadas de navegación, privacidad, interfaz y Patagonia AI. El APK Android fue compilado con SDK 36, firmado con una clave familiar RSA de 4096 bits y validado con las herramientas oficiales de Android. Android reconoce el nombre `Patagonia Browser`, la versión 1.0.0, el icono y Android mínimo 7. Todavía falta probar la instalación y navegación en un teléfono físico. iPhone no puede compilarse en Windows; su proyecto e iconos quedaron preparados para abrirse en Xcode sobre una Mac.
+Las comprobaciones siguientes son registros históricos de escritorio del 3 de septiembre de 2026, no resultados de esta revisión documental. No se presenta el análisis ni las pruebas móviles como verificables desde `main`, porque su código aún no está publicado aquí.
+
+La [compilación Windows en GitHub Actions](https://github.com/christianwilliams2085-ops/Patagonia-Browser/actions/runs/34228558369) registrada para la solicitud de SignPath terminó correctamente; el registro documenta 148 pruebas aprobadas y un candidato sin firma. Esto no acredita una aprobación ni un certificado activo.
 
 101 pruebas automatizadas aprobadas. Cubren el motor de bloqueo integrado contra publicidad y seguimiento conocidos, sus excepciones por dominio, los conteos y su interfaz, además de favoritos, historial, descargas, errores de carga, sesiones, navegación, configuración, permisos, pestañas cerradas, nueva pestaña, validación de emisores, atajos, menú y búsqueda. Incluyen pruebas con DOM simulado y una prueba del arranque y restauración con Electron simulado. Los diálogos de permisos y de fallo del guardado todavía requieren validación manual en Electron.
 
@@ -69,7 +77,7 @@ También se construyó y ejecutó `Patagonia-Browser-Setup-1.0.0-Windows-x64.exe
 
 Después se incorporó el icono oficial elegido por Roma. Se extrajo el icono incrustado del nuevo ejecutable y del nuevo instalador y se confirmó visualmente que ambos contienen el diseño correcto.
 
-La versión 1.0.3 incorpora el bloqueador real y corrige el cierre de pestañas y del navegador cuando el contenido ya fue destruido. El motor integrado se comprobó contra solicitudes conocidas de publicidad y seguimiento. La entrega actual, su ZIP y sus hashes verificados están en `dist/PARA COMPARTIR - PATAGONIA 1.0.3`.
+La versión vigente de Windows es 1.0.4 y su instalador público se enlaza desde [DOWNLOADS.md](DOWNLOADS.md). Las entregas familiares locales y los ZIP portátiles anteriores son registros históricos, no paquetes 1.0.4 disponibles en `main`.
 
 ## Correcciones de esta revisión
 
@@ -88,10 +96,12 @@ La versión 1.0.3 incorpora el bloqueador real y corrige el cierre de pestañas 
 - Validar la nueva interfaz y la navegación real en otras plataformas antes de anunciarlas.
 - Configuración avanzada, temas y modo privado.
 - Bloqueo y gestión de ventanas emergentes; panel para revisar o revocar permisos sin cerrar la aplicación.
-- Bloqueo de anuncios/rastreadores y controles de privacidad.
+- Ampliar y validar el bloqueo de anuncios/rastreadores y los controles de privacidad implementados.
 - Auditoría del aislamiento, la navegación y todos los canales IPC.
 - Integración opcional de IA: elegir proveedor, consentimiento para enviar contenido y gestión segura de credenciales.
-- Firma digital para distribución pública, actualizaciones y automatización de pruebas en CI. El instalador familiar y el paquete portátil local ya están disponibles.
+- Habilitar firma digital sólo si se obtiene aprobación y se cumplen las condiciones de la política; no hay certificado activo ni fecha comprometida. Las compilaciones de candidatos sin firma ya cuentan con un flujo de GitHub Actions.
+- Actualizaciones de la aplicación y ampliación de la automatización de pruebas.
+- Publicar e integrar el código móvil en `main` antes de documentar su compilación y pruebas como disponibles desde esta rama.
 - Reconciliar los documentos de arquitectura y planificación con la implementación actual.
 
 Los porcentajes históricos de implementación y las afirmaciones de seguridad de los documentos de planificación no son evidencia del estado del producto.
