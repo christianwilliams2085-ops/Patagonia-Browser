@@ -69,7 +69,7 @@ class PrivacyProtection {
     ContentBlocker domainRule(List<String> domains) => ContentBlocker(
       trigger: ContentBlockerTrigger(
         urlFilter: '.*',
-        ifDomain: domains.map((domain) => '*$domain').toList(),
+        ifDomain: domains.expand((domain) => [domain, '*.$domain']).toList(),
         resourceType: resources,
       ),
       action: ContentBlockerAction(type: ContentBlockerActionType.BLOCK),
@@ -79,7 +79,12 @@ class PrivacyProtection {
       domainRule(advertisementDomains),
       domainRule(trackerDomains),
       ContentBlocker(
-        trigger: ContentBlockerTrigger(urlFilter: '.*'),
+        // YouTube is handled by its player script; generic CSS must not hide
+        // a container that also owns the video or its controls.
+        trigger: ContentBlockerTrigger(
+          urlFilter: '.*',
+          unlessDomain: ['youtube.com', '*.youtube.com'],
+        ),
         action: ContentBlockerAction(
           type: ContentBlockerActionType.CSS_DISPLAY_NONE,
           selector:

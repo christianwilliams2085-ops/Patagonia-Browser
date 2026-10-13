@@ -73,7 +73,7 @@ public class ContentBlockerHandler {
         // thread safe copy list
         List<ContentBlocker> ruleListCopy = new CopyOnWriteArrayList<ContentBlocker>(ruleList);
 
-        for (ContentBlocker contentBlocker : ruleListCopy) {
+        rules: for (ContentBlocker contentBlocker : ruleListCopy) {
             ContentBlockerTrigger trigger =  contentBlocker.getTrigger();
             List<ContentBlockerTriggerResourceType> resourceTypes = trigger.getResourceType();
             if (resourceTypes.contains(ContentBlockerTriggerResourceType.IMAGE) && !resourceTypes.contains(ContentBlockerTriggerResourceType.SVG_DOCUMENT)) {
@@ -86,7 +86,7 @@ public class ContentBlockerHandler {
             if (m.matches()) {
 
                 if (!resourceTypes.isEmpty() && !resourceTypes.contains(responseResourceType)) {
-                    return null;
+                    continue;
                 }
                 if (!trigger.getIfDomain().isEmpty()) {
                     boolean matchFound = false;
@@ -97,12 +97,12 @@ public class ContentBlockerHandler {
                         }
                     }
                     if (!matchFound)
-                        return null;
+                        continue;
                 }
                 if (!trigger.getUnlessDomain().isEmpty()) {
                     for (String domain : trigger.getUnlessDomain())
                         if ((domain.startsWith("*") && host.endsWith(domain.replace("*", ""))) || domain.equals(host))
-                            return null;
+                            continue rules;
                 }
 
                 final String[] webViewUrl = new String[1];
@@ -128,7 +128,7 @@ public class ContentBlockerHandler {
 
                         if ( (trigger.getLoadType().contains("first-party") && cHost != null && !(cScheme.equals(scheme) && cHost.equals(host) && cPort == port)) ||
                                 (trigger.getLoadType().contains("third-party") && cHost != null && cHost.equals(host)) )
-                            return null;
+                            continue;
                     }
                     if (!trigger.getIfTopUrl().isEmpty()) {
                         boolean matchFound = false;
@@ -139,12 +139,12 @@ public class ContentBlockerHandler {
                             }
                         }
                         if (!matchFound)
-                            return null;
+                            continue;
                     }
                     if (!trigger.getUnlessTopUrl().isEmpty()) {
                         for (String topUrl : trigger.getUnlessTopUrl())
                             if (webViewUrl[0].startsWith(topUrl))
-                                return null;
+                                continue rules;
                     }
                 }
 

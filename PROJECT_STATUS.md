@@ -16,7 +16,9 @@ Consultá la [política de firma](CODE_SIGNING.md) y el [registro de la solicitu
 
 ## Artefactos móviles publicados
 
-El código fuente de `mobile/` todavía **no está publicado en `main`**. Los artefactos Android 1.0.0 y el proyecto iPhone 1.0.0 están en la [publicación v1.0.3](https://github.com/christianwilliams2085-ops/Patagonia-Browser/releases/tag/v1.0.3); su disponibilidad no implica que puedan compilarse desde esta rama. La firma APK es independiente del certificado de Windows y de SignPath.
+Las fuentes compartidas Flutter están en `mobile/`, importadas del proyecto 1.0.0+3 publicado en el ZIP de [v1.0.3](https://github.com/christianwilliams2085-ops/Patagonia-Browser/releases/tag/v1.0.3). El origen y sus límites están en [mobile/SOURCE_PROVENANCE.md](mobile/SOURCE_PROVENANCE.md). Los APK existentes siguen siendo los originales; corregir las fuentes no reemplaza una publicación. La firma APK es independiente del certificado de Windows y de SignPath.
+
+La corrección del issue #12 permite evaluar las reglas posteriores cuando una no coincide, delimita los subdominios y actualiza excepciones al navegar. El script de YouTube filtra datos publicitarios del reproductor y usa botones de salto habilitados, conservando datos de medios y controles. No fuerza la reproducción ni salta mediante cambios de tiempo. Hay pruebas de regresión del script, del motor Java y de la integración Dart, más un flujo de CI móvil. La reproducción en Android real debe verificarse antes de publicar un nuevo APK.
 
 El registro histórico de la edición móvil describe:
 
@@ -61,7 +63,7 @@ Electron, JavaScript, HTML/CSS, Node.js, Ghostery Adblocker, Mozilla Readability
 
 ## Verificaciones históricas
 
-Los resultados siguientes corresponden al registro previo de desarrollo, no a pruebas ejecutadas con esta actualización documental. Las comprobaciones móviles no se pueden reproducir desde `main` mientras no esté publicado su código fuente.
+Los resultados siguientes corresponden al registro previo de desarrollo. Las comprobaciones móviles históricas no prueban la nueva protección de YouTube; para esta se deben ejecutar las pruebas incluidas y completar la comprobación en un dispositivo real.
 
 Como evidencia posterior de escritorio, la [compilación Windows en GitHub Actions](https://github.com/christianwilliams2085-ops/Patagonia-Browser/actions/runs/34228558369) generó un candidato sin firma. El flujo de CI no implica que exista un certificado activo.
 

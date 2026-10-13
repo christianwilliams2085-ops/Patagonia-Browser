@@ -33,7 +33,7 @@ La guía completa para instalarlo desde una Mac y distribuirlo mediante TestFlig
 
 Apple exige macOS con Xcode para compilar y firmar la aplicación para un iPhone físico. Una cuenta personal permite pruebas en dispositivos propios; TestFlight y la App Store requieren una membresía activa del Apple Developer Program.
 
-## Verificación
+## Verificación histórica de 1.0.0+3
 
 - `flutter analyze`: sin errores ni avisos del código de Patagonia.
 - `flutter test`: 14 pruebas aprobadas, incluidas la alineación del emblema, la apertura de Patagonia AI y sus respuestas locales.
@@ -45,3 +45,24 @@ Apple exige macOS con Xcode para compilar y firmar la aplicación para un iPhone
 - Flujo de GitHub Actions preparado para compilar con Xcode 26 en un simulador.
 
 La ejecución en un teléfono físico sigue siendo la comprobación final antes de compartirla ampliamente.
+
+## Correcciones y pruebas de YouTube
+
+El código incorpora las correcciones del issue #12; no cambia los APK ya
+publicados. Ver [SOURCE_PROVENANCE.md](SOURCE_PROVENANCE.md) para el origen del
+proyecto y las limitaciones de la protección.
+
+```sh
+flutter pub get
+flutter analyze
+flutter test
+```
+
+Desde la raíz del repositorio, `npm ci` y `npm test` ejecutan también las
+pruebas del script real y del motor Java Android. Se requiere Node compatible
+con package.json y un JDK 17 o posterior. La prueba Java simula las clases
+del framework Android y ejecuta las reglas reales; no sustituye un WebView.
+
+Antes de distribuir una nueva versión, probar la matriz manual de
+SOURCE_PROVENANCE.md en Android. Los anuncios sin botón de salto o integrados
+en el flujo de video pueden requerir otra estrategia y registros reales.

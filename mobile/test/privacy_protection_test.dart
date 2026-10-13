@@ -24,5 +24,31 @@ void main() {
     test('genera reglas de red y limpieza visual', () {
       expect(PrivacyProtection.rules(), hasLength(3));
     });
+
+    test('las reglas incluyen el dominio exacto y subdominios con límite', () {
+      final domains = PrivacyProtection.rules().first.trigger.ifDomain;
+      expect(domains, contains('doubleclick.net'));
+      expect(domains, contains('*.doubleclick.net'));
+      expect(domains, isNot(contains('*doubleclick.net')));
+      expect(
+        PrivacyProtection.classify('https://notdoubleclick.net/ad'),
+        isNull,
+      );
+      expect(
+        PrivacyProtection.classify('https://doubleclick.net.other.invalid/ad'),
+        isNull,
+      );
+    });
+
+    test('conserva los servidores de reproducción de YouTube', () {
+      for (final url in [
+        'https://m.youtube.com/watch?v=content',
+        'https://www.youtube.com/youtubei/v1/player',
+        'https://r1.googlevideo.com/videoplayback?range=0-1024',
+        'https://i.ytimg.com/vi/content/default.jpg',
+      ]) {
+        expect(PrivacyProtection.classify(url), isNull);
+      }
+    });
   });
 }

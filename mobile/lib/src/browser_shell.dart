@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -8,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'navigation_input.dart';
 import 'local_assistant.dart';
 import 'privacy_protection.dart';
+import 'youtube_protection.dart';
 
 const _navy = Color(0xFF071827);
 const _surface = Color(0xFF102B41);
@@ -32,6 +34,8 @@ class _BrowserShellState extends State<BrowserShell> {
   final List<_SavedPage> _favorites = [];
   final List<_SavedPage> _history = [];
   final Set<String> _unprotectedHosts = {};
+  late final Future<void> _initialization;
+  String _youtubeScript = '';
   int _currentIndex = 0;
   int _nextTabId = 1;
 
@@ -41,7 +45,7 @@ class _BrowserShellState extends State<BrowserShell> {
   void initState() {
     super.initState();
     _tabs.add(_BrowserTab(id: _nextTabId++));
-    _loadPreferences();
+    _initialization = _loadPreferences();
   }
 
   @override
@@ -53,8 +57,10 @@ class _BrowserShellState extends State<BrowserShell> {
 
   Future<void> _loadPreferences() async {
     final preferences = await SharedPreferences.getInstance();
+    final youtubeScript = await YouTubeProtection.loadScript();
     if (!mounted) return;
     setState(() {
+      _youtubeScript = youtubeScript;
       _favorites
         ..clear()
         ..addAll(_decodePages(preferences.getStringList('favorites')));
@@ -96,6 +102,8 @@ class _BrowserShellState extends State<BrowserShell> {
   }
 
   Future<void> _navigate(String value) async {
+    await _initialization;
+    if (!mounted) return;
     final uri = NavigationInput.resolve(value);
     final tab = _current;
     final shouldProtect = !_unprotectedHosts.contains(uri.host.toLowerCase());
@@ -111,10 +119,8 @@ class _BrowserShellState extends State<BrowserShell> {
       return;
     }
 
-    if (tab.protectionEnabled != shouldProtect) {
-      setState(() => tab.protectionEnabled = shouldProtect);
-      await tab.controller!.setSettings(settings: _webSettings(tab));
-    }
+    await _prepareNavigation(tab, uri);
+    if (!mounted || !_tabs.contains(tab)) return;
     await tab.controller!.loadUrl(urlRequest: URLRequest(url: WebUri.uri(uri)));
   }
 
@@ -195,8 +201,8 @@ class _BrowserShellState extends State<BrowserShell> {
     await SystemNavigator.pop();
   }
 
-  void _onUrlChanged(_BrowserTab tab, Uri? url) {
-    if (!mounted || url == null) return;
+  Future<void> _onUrlChanged(_BrowserTab tab, Uri? url) async {
+    if (!mounted || !_tabs.contains(tab) || url == null) return;
     setState(() {
       tab.url = url;
       tab.errorMessage = null;
@@ -204,7 +210,63 @@ class _BrowserShellState extends State<BrowserShell> {
         _address.text = url.toString();
       }
     });
+    await _prepareNavigation(tab, url);
   }
+
+  Future<void> _prepareNavigation(_BrowserTab tab, Uri url) async {
+    if (!mounted || !_tabs.contains(tab)) return;
+    final enabled = !_unprotectedHosts.contains(url.host.toLowerCase());
+    if (tab.protectionEnabled != enabled) {
+      setState(() => tab.protectionEnabled = enabled);
+    }
+    await _applyProtection(tab);
+  }
+
+  Future<void> _applyProtection(_BrowserTab tab) {
+    final signature = YouTubeProtection.configuration(_unprotectedHosts);
+    if (tab.protectionSignature == signature &&
+        tab.appliedProtection == tab.protectionEnabled &&
+        tab.appliedController == tab.controller) return Future.value();
+    final revision = ++tab.protectionRevision;
+    // Serialize native changes; a delayed callback must not overwrite a newer
+    // site's protection or configure a replacement WebView.
+    tab.protectionUpdate = tab.protectionUpdate.then((_) async {
+      final controller = tab.controller;
+      if (!mounted || !_tabs.contains(tab) || controller == null ||
+          revision != tab.protectionRevision) return;
+      await controller.setSettings(settings: _webSettings(tab));
+      if (!mounted || !_tabs.contains(tab) || controller != tab.controller ||
+          revision != tab.protectionRevision) return;
+      await controller.removeUserScriptsByGroupName(
+        groupName: YouTubeProtection.scriptGroup,
+      );
+      await controller.addUserScripts(userScripts: _youtubeUserScripts());
+      await controller.evaluateJavascript(
+        source: YouTubeProtection.configuration(_unprotectedHosts),
+      );
+      tab.protectionSignature = signature;
+      tab.appliedProtection = tab.protectionEnabled;
+      tab.appliedController = controller;
+    });
+    final operation = tab.protectionUpdate;
+    // Recover the queue for later navigation, while propagating this failure
+    // to the caller rather than reporting that native protection is active.
+    tab.protectionUpdate = operation.catchError((Object error) {
+      debugPrint('No se pudo actualizar la protección: $error');
+    });
+    return operation;
+  }
+
+  UnmodifiableListView<UserScript> _youtubeUserScripts() =>
+      UnmodifiableListView([
+        UserScript(
+          groupName: YouTubeProtection.scriptGroup,
+          source: '${YouTubeProtection.configuration(_unprotectedHosts)}\n'
+              '$_youtubeScript',
+          injectionTime: UserScriptInjectionTime.AT_DOCUMENT_START,
+          forMainFrameOnly: true,
+        ),
+      ]);
 
   void _onTitleChanged(_BrowserTab tab, String? title) {
     if (!mounted || title == null || title.trim().isEmpty) return;
@@ -347,7 +409,11 @@ class _BrowserShellState extends State<BrowserShell> {
       );
     }
 
-    await tab.controller?.setSettings(settings: _webSettings(tab));
+    // Existing YouTube tabs also receive the changed exception immediately.
+    for (final other in _tabs.toList()) {
+      final url = other.url;
+      if (url != null) await _prepareNavigation(other, url);
+    }
     await tab.controller?.reload();
   }
 
@@ -406,6 +472,8 @@ class _BrowserShellState extends State<BrowserShell> {
                           key: ValueKey(tab.id),
                           tab: tab,
                           settings: _webSettings(tab),
+                          userScripts: _youtubeUserScripts(),
+                          onBeforeNavigate: (url) => _prepareNavigation(tab, url),
                           onNavigate: _navigate,
                           onController: (controller) =>
                               tab.controller = controller,
@@ -708,13 +776,13 @@ class _BrowserShellState extends State<BrowserShell> {
                 _PrivacyRow(
                   icon: Icons.block,
                   color: const Color(0xFFFF5353),
-                  label: 'Anuncios bloqueados',
+                  label: 'Recursos publicitarios detectados',
                   value: tab.blockedAds,
                 ),
                 _PrivacyRow(
                   icon: Icons.visibility_outlined,
                   color: _green,
-                  label: 'Rastreadores bloqueados',
+                  label: 'Rastreadores detectados',
                   value: tab.blockedTrackers,
                 ),
                 const Divider(height: 28, color: Color(0x336F8DA5)),
@@ -722,12 +790,12 @@ class _BrowserShellState extends State<BrowserShell> {
                   children: [
                     const Expanded(
                       child: Text(
-                        'Nivel de privacidad',
+                        'Estado de protección',
                         style: TextStyle(fontWeight: FontWeight.w600),
                       ),
                     ),
                     Text(
-                      tab.protectionEnabled ? '95%' : 'Bajo',
+                      tab.protectionEnabled ? 'Activa' : 'Desactivada',
                       style: TextStyle(
                         color: tab.protectionEnabled
                             ? _green
@@ -738,21 +806,9 @@ class _BrowserShellState extends State<BrowserShell> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(5),
-                  child: LinearProgressIndicator(
-                    value: tab.protectionEnabled ? .95 : .25,
-                    minHeight: 9,
-                    color: tab.protectionEnabled
-                        ? _green
-                        : const Color(0xFFFFC857),
-                    backgroundColor: _surfaceLight,
-                  ),
-                ),
                 const SizedBox(height: 18),
                 const Text(
-                  'Patagonia bloquea redes publicitarias y rastreadores conocidos antes de que carguen. Los permisos de cámara, micrófono y ubicación se preguntan por separado.',
+                  'Patagonia filtra redes publicitarias y rastreadores conocidos. Los contadores indican recursos detectados, no bloqueos confirmados. La protección no garantiza eliminar todos los anuncios.',
                   style: TextStyle(color: _muted, height: 1.4),
                 ),
               ],
@@ -1030,6 +1086,8 @@ class _TabContent extends StatefulWidget {
     super.key,
     required this.tab,
     required this.settings,
+    required this.userScripts,
+    required this.onBeforeNavigate,
     required this.onNavigate,
     required this.onController,
     required this.onUrlChanged,
@@ -1043,6 +1101,8 @@ class _TabContent extends StatefulWidget {
 
   final _BrowserTab tab;
   final InAppWebViewSettings settings;
+  final UnmodifiableListView<UserScript> userScripts;
+  final Future<void> Function(Uri url) onBeforeNavigate;
   final ValueChanged<String> onNavigate;
   final ValueChanged<InAppWebViewController> onController;
   final ValueChanged<Uri?> onUrlChanged;
@@ -1069,6 +1129,7 @@ class _TabContentState extends State<_TabContent> {
         InAppWebView(
           initialUrlRequest: URLRequest(url: WebUri.uri(widget.tab.url!)),
           initialSettings: widget.settings,
+          initialUserScripts: widget.userScripts,
           onWebViewCreated: widget.onController,
           onLoadStart: (controller, url) => widget.onUrlChanged(url),
           onLoadStop: (controller, url) => widget.onPageFinished(url),
@@ -1083,6 +1144,9 @@ class _TabContentState extends State<_TabContent> {
             final url = action.request.url;
             if (url == null) return NavigationActionPolicy.CANCEL;
             if (url.scheme == 'http' || url.scheme == 'https') {
+              if (action.isForMainFrame == true) {
+                await widget.onBeforeNavigate(url);
+              }
               return NavigationActionPolicy.ALLOW;
             }
             return NavigationActionPolicy.CANCEL;
@@ -1659,6 +1723,11 @@ class _BrowserTab {
   int blockedAds = 0;
   int blockedTrackers = 0;
   bool protectionEnabled = true;
+  int protectionRevision = 0;
+  Future<void> protectionUpdate = Future.value();
+  String? protectionSignature;
+  bool? appliedProtection;
+  InAppWebViewController? appliedController;
   bool desktopMode = false;
   String? errorMessage;
   final Set<String> seenBlockedResources = {};
