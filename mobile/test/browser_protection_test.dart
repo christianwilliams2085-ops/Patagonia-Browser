@@ -99,8 +99,14 @@ void main() {
   });
 
   Future<void> open(WidgetTester tester, String url) async {
-    await tester.enterText(find.byType(TextField).first, url);
-    await tester.testTextInput.receiveAction(TextInputAction.go);
+    final address = find.byType(TextField).first;
+    await tester.enterText(address, url);
+    final submit = tester.widget<TextField>(address).onSubmitted!;
+    // Text input dispatch discards the callback's Future. Await the real
+    // navigation handler outside FakeAsync so asset/prefs I/O can complete.
+    await tester.runAsync(() async {
+      await (submit as dynamic)(url);
+    });
     await tester.pumpAndSettle();
   }
 
