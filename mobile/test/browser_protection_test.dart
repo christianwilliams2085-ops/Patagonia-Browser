@@ -52,8 +52,7 @@ class TestController extends PlatformInAppWebViewController {
 }
 
 class TestWebView extends PlatformInAppWebViewWidget {
-  TestWebView(PlatformInAppWebViewWidgetCreationParams params)
-      : super.implementation(params);
+  TestWebView(super.params) : super.implementation();
 
   @override
   Widget build(BuildContext context) => const SizedBox();

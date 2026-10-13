@@ -226,17 +226,23 @@ class _BrowserShellState extends State<BrowserShell> {
     final signature = YouTubeProtection.configuration(_unprotectedHosts);
     if (tab.protectionSignature == signature &&
         tab.appliedProtection == tab.protectionEnabled &&
-        tab.appliedController == tab.controller) return Future.value();
+        tab.appliedController == tab.controller) {
+      return Future.value();
+    }
     final revision = ++tab.protectionRevision;
     // Serialize native changes; a delayed callback must not overwrite a newer
     // site's protection or configure a replacement WebView.
     tab.protectionUpdate = tab.protectionUpdate.then((_) async {
       final controller = tab.controller;
       if (!mounted || !_tabs.contains(tab) || controller == null ||
-          revision != tab.protectionRevision) return;
+          revision != tab.protectionRevision) {
+        return;
+      }
       await controller.setSettings(settings: _webSettings(tab));
       if (!mounted || !_tabs.contains(tab) || controller != tab.controller ||
-          revision != tab.protectionRevision) return;
+          revision != tab.protectionRevision) {
+        return;
+      }
       await controller.removeUserScriptsByGroupName(
         groupName: YouTubeProtection.scriptGroup,
       );
