@@ -1,6 +1,6 @@
 # Patagonia Browser — estado del proyecto
 
-Actualización documental: 30 de septiembre de 2026. Las comprobaciones históricas conservan su alcance; esta actualización no incorpora nuevas pruebas del navegador.
+Actualización: 13 de octubre de 2026. Se incorporan las fuentes móviles publicadas y las correcciones del issue #12. Las comprobaciones históricas conservan su alcance.
 
 ## Estado actual
 
@@ -60,6 +60,12 @@ El registro histórico de la edición móvil describe:
 ## Tecnología real
 
 Electron, JavaScript, HTML/CSS, Node.js, Ghostery Adblocker, Mozilla Readability y jsdom. Favoritos, historial, sesión y excepciones de protección se guardan dentro del perfil local. React, TypeScript y SQLite figuran en documentos de diseño, pero no están incorporados al código actual.
+
+## Verificación de las correcciones del issue #12
+
+- [Pruebas Node/Java en GitHub Actions](https://github.com/christianwilliams2085-ops/Patagonia-Browser/actions/runs/38397836455): 170 pruebas aprobadas. Incluyen 11 del script de YouTube y 9 del motor Java real con el framework Android simulado.
+- [Pruebas móviles en GitHub Actions](https://github.com/christianwilliams2085-ops/Patagonia-Browser/actions/runs/38397836470): `flutter analyze` sin problemas y 22 pruebas Flutter aprobadas, incluidas navegación, excepciones y actualizaciones nativas demoradas.
+- Todavía falta verificar publicidad, audio y controles en un Android/WebView real con la matriz de `mobile/SOURCE_PROVENANCE.md`. No se publicó un nuevo APK ni se considera cerrado el issue #12.
 
 ## Verificaciones históricas
 
