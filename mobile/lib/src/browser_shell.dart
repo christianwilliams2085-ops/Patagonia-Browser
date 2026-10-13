@@ -224,11 +224,13 @@ class _BrowserShellState extends State<BrowserShell> {
 
   Future<void> _applyProtection(_BrowserTab tab) {
     final signature = YouTubeProtection.configuration(_unprotectedHosts);
-    if (tab.protectionSignature == signature &&
+    if (tab.protectionPending == 0 &&
+        tab.protectionSignature == signature &&
         tab.appliedProtection == tab.protectionEnabled &&
         tab.appliedController == tab.controller) {
       return Future.value();
     }
+    tab.protectionPending++;
     final revision = ++tab.protectionRevision;
     // Serialize native changes; a delayed callback must not overwrite a newer
     // site's protection or configure a replacement WebView.
@@ -253,6 +255,8 @@ class _BrowserShellState extends State<BrowserShell> {
       tab.protectionSignature = signature;
       tab.appliedProtection = tab.protectionEnabled;
       tab.appliedController = controller;
+    }).whenComplete(() {
+      tab.protectionPending--;
     });
     final operation = tab.protectionUpdate;
     // Recover the queue for later navigation, while propagating this failure
@@ -1730,6 +1734,7 @@ class _BrowserTab {
   int blockedTrackers = 0;
   bool protectionEnabled = true;
   int protectionRevision = 0;
+  int protectionPending = 0;
   Future<void> protectionUpdate = Future.value();
   String? protectionSignature;
   bool? appliedProtection;

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -13,9 +15,13 @@ class TestController extends PlatformInAppWebViewController {
   InAppWebViewSettings? settings;
   final List<String> scripts = [];
   final List<String> calls = [];
+  Completer<void>? nextSettings;
 
   @override
   Future<void> setSettings({required InAppWebViewSettings settings}) async {
+    final pending = nextSettings;
+    nextSettings = null;
+    if (pending != null) await pending.future;
     this.settings = settings;
     calls.add('settings');
   }
@@ -151,5 +157,38 @@ void main() {
         lessThan(platform.controller.calls.indexOf('load')));
     expect(platform.controller.settings!.mediaPlaybackRequiresUserGesture, isTrue);
     expect(platform.controller.settings!.allowsInlineMediaPlayback, isTrue);
+  });
+
+  testWidgets('una actualización demorada no restaura reglas de otro sitio',
+      (tester) async {
+    await tester.pumpWidget(const PatagoniaBrowserApp());
+    await tester.pumpAndSettle();
+    await open(tester, 'https://m.youtube.com');
+    final controller = InAppWebViewController.fromPlatform(
+      platform: platform.controller,
+    );
+    platform.params.onUpdateVisitedHistory!(
+      controller,
+      WebUri('https://m.youtube.com/watch?v=first'),
+      false,
+    );
+    await tester.pumpAndSettle();
+
+    final pending = Completer<void>();
+    platform.controller.nextSettings = pending;
+    platform.params.onUpdateVisitedHistory!(
+      controller,
+      WebUri('https://example.com'),
+      false,
+    );
+    await tester.pump();
+    platform.params.onUpdateVisitedHistory!(
+      controller,
+      WebUri('https://m.youtube.com/watch?v=second'),
+      false,
+    );
+    pending.complete();
+    await tester.pumpAndSettle();
+    expect(platform.controller.settings!.contentBlockers, isEmpty);
   });
 }
