@@ -62,7 +62,9 @@ La [política de firma](CODE_SIGNING.md) describe el responsable, la compilació
 
 ## Android y iPhone
 
-El código fuente de `mobile/` todavía **no está publicado en `main`**. Por lo tanto, clonar esta rama no proporciona `mobile/ios` ni `mobile/IOS_RELEASE_CHECKLIST.md`.
+El proyecto compartido Flutter está en [`mobile/`](mobile/README.md), incluido `mobile/android` y `mobile/ios`. Se recuperó del ZIP publicado en v1.0.3; el [registro de origen](mobile/SOURCE_PROVENANCE.md) identifica la base 1.0.0+3 y el alcance de las correcciones de YouTube. Requiere Dart 3.13.2 o posterior.
+
+Para comprobar las fuentes móviles: `cd mobile`, `flutter pub get`, `flutter analyze` y `flutter test`. Las pruebas de JavaScript y del motor Java se ejecutan desde la raíz con `npm test` y requieren un JDK 17 o posterior. Las correcciones del código no actualizan los APK de las publicaciones existentes; antes de distribuir una nueva compilación falta verificar YouTube en un Android real.
 
 Los artefactos móviles 1.0.0 para pruebas familiares están disponibles en la [publicación v1.0.3](https://github.com/christianwilliams2085-ops/Patagonia-Browser/releases/tag/v1.0.3): APK Android y ZIP del proyecto para iPhone. Esa etiqueta corresponde a la publicación que los contiene; la versión vigente de Windows es 1.0.4.
 
