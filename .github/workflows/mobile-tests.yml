@@ -31,6 +31,8 @@ jobs:
           persist-credentials: false
       - name: Preparar Flutter
         run: |
+          git -C .flutter-sdk fetch --depth=1 origin refs/tags/3.47.7:refs/tags/3.47.7
+          test "$(git -C .flutter-sdk rev-parse refs/tags/3.47.7)" = "abaf9c523780a608bd46686fd5e53740a07077f8"
           echo "$GITHUB_WORKSPACE/.flutter-sdk/bin" >> "$GITHUB_PATH"
           .flutter-sdk/bin/flutter --version
       - name: Instalar dependencias móviles
