@@ -113,7 +113,30 @@ void main() {
   Future<void> open(WidgetTester tester, String url) async {
     final address = find.byType(TextField).first;
     await tester.enterText(address, url);
-    await tester.testTextInput.receiveAction(TextInputAction.go);
+    final submit = tester.widget<TextField>(address).onSubmitted!;
+    late Future<void> navigation;
+    await tester.runAsync(() async {
+      navigation = (submit as Future<void> Function(String))(url);
+    });
+    var completed = false;
+    Object? failure;
+    navigation.then<void>((_) {
+      completed = true;
+    }, onError: (Object error, StackTrace stack) {
+      failure = error;
+      completed = true;
+    });
+    // Flutter's fake clock doesn't wait for filesystem/platform I/O, and
+    // pumpAndSettle alone can return before initialization schedules a frame.
+    for (var attempt = 0; attempt < 100 && !completed; attempt++) {
+      await tester.pump();
+      if (!completed) {
+        await tester.runAsync(() =>
+            Future<void>.delayed(const Duration(milliseconds: 10)));
+      }
+    }
+    expect(failure, isNull);
+    expect(completed, isTrue, reason: 'Navigation initialization did not finish');
     await tester.pumpAndSettle();
   }
 
