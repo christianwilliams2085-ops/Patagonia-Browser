@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:patagonia_browser/main.dart';
+import 'package:patagonia_browser/src/youtube_protection.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class TestController extends PlatformInAppWebViewController {
@@ -98,22 +99,27 @@ void main() {
     });
   });
 
+  Future<void> start(WidgetTester tester) async {
+    // Resolve native I/O before entering the fake frame clock. The tests
+    // exercise navigation, not the test binding's asset loading scheduler.
+    await tester.runAsync(() async {
+      await SharedPreferences.getInstance();
+      await YouTubeProtection.loadScript();
+    });
+    await tester.pumpWidget(const PatagoniaBrowserApp());
+    await tester.pumpAndSettle();
+  }
+
   Future<void> open(WidgetTester tester, String url) async {
     final address = find.byType(TextField).first;
     await tester.enterText(address, url);
-    final submit = tester.widget<TextField>(address).onSubmitted!;
-    // Text input dispatch discards the callback's Future. Await the real
-    // navigation handler outside FakeAsync so asset/prefs I/O can complete.
-    await tester.runAsync(() async {
-      await (submit as dynamic)(url);
-    });
+    await tester.testTextInput.receiveAction(TextInputAction.go);
     await tester.pumpAndSettle();
   }
 
   testWidgets('instala protección temprana y respeta una excepción guardada',
       (tester) async {
-    await tester.pumpWidget(const PatagoniaBrowserApp());
-    await tester.pumpAndSettle();
+    await start(tester);
     await open(tester, 'https://m.youtube.com');
 
     expect(platform.params.initialSettings!.contentBlockers, isEmpty);
@@ -126,8 +132,7 @@ void main() {
 
   testWidgets('actualiza reglas antes de permitir una navegación principal',
       (tester) async {
-    await tester.pumpWidget(const PatagoniaBrowserApp());
-    await tester.pumpAndSettle();
+    await start(tester);
     await open(tester, 'https://m.youtube.com');
     final controller = InAppWebViewController.fromPlatform(
       platform: platform.controller,
@@ -155,8 +160,7 @@ void main() {
 
   testWidgets('la dirección aplica protección antes de cargar y no altera medios',
       (tester) async {
-    await tester.pumpWidget(const PatagoniaBrowserApp());
-    await tester.pumpAndSettle();
+    await start(tester);
     await open(tester, 'https://m.youtube.com');
     await open(tester, 'https://example.com');
     expect(platform.controller.calls.indexOf('settings'),
@@ -167,8 +171,7 @@ void main() {
 
   testWidgets('una actualización demorada no restaura reglas de otro sitio',
       (tester) async {
-    await tester.pumpWidget(const PatagoniaBrowserApp());
-    await tester.pumpAndSettle();
+    await start(tester);
     await open(tester, 'https://m.youtube.com');
     final controller = InAppWebViewController.fromPlatform(
       platform: platform.controller,
