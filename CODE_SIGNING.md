@@ -36,6 +36,10 @@ La atribución prevista, **sólo después de la aprobación y activación**, es:
 
 El certificado del programa se emite a nombre de SignPath Foundation; no se debe presentar como un certificado emitido personalmente al mantenedor. Las condiciones y decisiones del proveedor determinan qué puede firmarse.
 
+## Distribucion alternativa por Microsoft Store (MSIX)
+
+El flujo [MSIX](docs/MICROSOFT_STORE_MSIX.md) prepara un paquete Windows desde el mismo codigo Electron, separado del instalador Squirrel actual. El candidato generado esta sin firma. Si Microsoft Store aprueba la aplicacion empaquetada como MSIX, la tienda firma ese paquete para distribuirlo. Eso **no firma ni desbloquea el EXE descargado por separado** y no equivale a obtener un certificado para el proyecto.
+
 ## Privacidad
 
 La edición de Windows tiene una [política de privacidad específica](PRIVACY_WINDOWS.md). El navegador realiza conexiones a los sitios visitados, al buscador elegido y a los servicios de actualización de las listas de bloqueo. Por esa razón no se declara que toda conexión de red dependa de una orden manual individual.
