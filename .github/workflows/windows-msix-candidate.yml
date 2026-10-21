@@ -1,0 +1,65 @@
+name: Windows - candidato MSIX (sin firma)
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/windows-msix-candidate.yml'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'forge.config.cjs'
+      - 'scripts/**'
+      - 'tests/**'
+      - 'assets/**'
+      - 'src/**'
+      - 'services/**'
+      - 'ui/**'
+      - 'bootstrap.js'
+      - 'main.js'
+      - 'preload.js'
+      - 'renderer.js'
+      - 'index.html'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: windows-msix-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Pruebas y MSIX x64 de demostracion
+    runs-on: windows-2025
+    timeout-minutes: 45
+    steps:
+      - name: Obtener codigo del commit
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Preparar Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Instalar dependencias bloqueadas
+        run: npm ci
+
+      - name: Ejecutar pruebas
+        run: npm test
+
+      - name: Generar MSIX de prueba sin firma
+        run: npm run make:msix:test
+
+      - name: Publicar artefacto de evaluacion, NO version final
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: patagonia-msix-test-unsigned-${{ github.sha }}
+          path: |
+            dist/msix/*-TEST-UNSIGNED.msix
+            dist/msix/*-TEST-UNSIGNED.msix.sha256
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 0
