@@ -139,10 +139,20 @@ try {
         -not (Test-Path -LiteralPath (Join-Path $verificar "Patagonia Browser.exe"))) {
         throw "La verificacion de integridad/estructura de MSIX fallo."
     }
-    $hash = Get-FileHash -LiteralPath $salida -Algorithm SHA256
-    Set-Content -LiteralPath "$salida.sha256" -Value "$($hash.Hash)  $nombre" -Encoding ASCII
+    $sha256 = [System.Security.Cryptography.SHA256]::Create()
+    try {
+        $flujo = [IO.File]::OpenRead($salida)
+        try {
+            $hashHex = ([BitConverter]::ToString($sha256.ComputeHash($flujo))).Replace("-", "")
+        } finally {
+            $flujo.Dispose()
+        }
+    } finally {
+        $sha256.Dispose()
+    }
+    Set-Content -LiteralPath "$salida.sha256" -Value "$hashHex  $nombre" -Encoding ASCII
     Write-Host "MSIX SIN FIRMA creado: $salida"
-    Write-Host "SHA256: $($hash.Hash)"
+    Write-Host "SHA256: $hashHex"
     if ($Test) {
         Write-Warning "IDENTIDAD DE PRUEBA. No presentar este MSIX a Microsoft Store ni instalarlo sin firmarlo con un certificado de desarrollo confiable."
     } else {
