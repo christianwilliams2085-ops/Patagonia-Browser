@@ -54,6 +54,10 @@ Para regenerar el instalador:
 npm run make:windows
 ```
 
+## Microsoft Store (MSIX)
+
+Estamos preparando una distribucion alternativa mediante **MSIX** sin sustituir el instalador EXE actual. El procedimiento, comandos y pruebas pendientes estan en [Preparar Microsoft Store](docs/MICROSOFT_STORE_MSIX.md). El candidato MSIX actual esta **sin firma** y no constituye una publicacion aprobada por Microsoft Store.
+
 ## Code signing policy
 
 La solicitud inicial a SignPath Foundation, enviada el 8 de septiembre de 2026, no fue aprobada por falta de suficientes señales públicas de adopción y colaboración, según el [issue #10](https://github.com/christianwilliams2085-ops/Patagonia-Browser/issues/10). Actualmente no existe un certificado activo ni un servicio de firma de SignPath para Patagonia Browser. No hay fechas ni aprobación futura garantizadas.
