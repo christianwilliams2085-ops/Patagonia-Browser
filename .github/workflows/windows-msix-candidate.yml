@@ -9,6 +9,7 @@ on:
       - 'package-lock.json'
       - 'forge.config.cjs'
       - 'scripts/**'
+      - 'config/**'
       - 'tests/**'
       - 'assets/**'
       - 'src/**'
@@ -29,7 +30,7 @@ concurrency:
 
 jobs:
   build:
-    name: Pruebas y MSIX x64 de demostracion
+    name: Pruebas y candidatos MSIX x64
     runs-on: windows-2025
     timeout-minutes: 45
     steps:
@@ -53,13 +54,18 @@ jobs:
       - name: Generar MSIX de prueba sin firma
         run: npm run make:msix:test
 
-      - name: Publicar artefacto de evaluacion, NO version final
+      - name: Generar candidato MSIX con identidad oficial (sin firma)
+        run: npm run make:msix
+
+      - name: Publicar candidatos de evaluacion, NO version final
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: patagonia-msix-test-unsigned-${{ github.sha }}
+          name: patagonia-msix-candidates-unsigned-${{ github.sha }}
           path: |
             dist/msix/*-TEST-UNSIGNED.msix
             dist/msix/*-TEST-UNSIGNED.msix.sha256
+            dist/msix/*-STORE-UNSIGNED.msix
+            dist/msix/*-STORE-UNSIGNED.msix.sha256
           if-no-files-found: error
           retention-days: 7
           compression-level: 0
