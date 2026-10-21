@@ -13,13 +13,18 @@ if ($Test) {
     $editor = "CN=Patagonia Browser Test"
     $editorVisible = "Patagonia Browser Test"
 } else {
-    $identidad = $env:PATAGONIA_MSIX_IDENTITY_NAME
-    $editor = $env:PATAGONIA_MSIX_PUBLISHER
-    $editorVisible = $env:PATAGONIA_MSIX_PUBLISHER_DISPLAY_NAME
+    $configRuta = Join-Path $raiz "config\microsoft-store-identity.json"
+    if (-not (Test-Path -LiteralPath $configRuta -PathType Leaf)) {
+        throw "Falta la identidad oficial de Partner Center en config\microsoft-store-identity.json."
+    }
+    $configStore = Get-Content -LiteralPath $configRuta -Raw | ConvertFrom-Json
+    $identidad = $configStore.identityName
+    $editor = $configStore.publisher
+    $editorVisible = $configStore.publisherDisplayName
     if ([string]::IsNullOrWhiteSpace($identidad) -or
         [string]::IsNullOrWhiteSpace($editor) -or
         [string]::IsNullOrWhiteSpace($editorVisible)) {
-        throw "Faltan los valores de Partner Center: PATAGONIA_MSIX_IDENTITY_NAME, PATAGONIA_MSIX_PUBLISHER y PATAGONIA_MSIX_PUBLISHER_DISPLAY_NAME. Para un candidato usa npm run make:msix:test."
+        throw "Identidad de Microsoft Store incompleta. Revisar config\microsoft-store-identity.json y Partner Center."
     }
 }
 
