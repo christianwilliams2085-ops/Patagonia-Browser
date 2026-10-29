@@ -1,3 +1,10 @@
+// Squirrel debe atender instalacion/desinstalacion antes de cargar servicios.
+// Los paquetes MSIX son administrados por Windows, no por Squirrel.
+if (!process.windowsStore && require("electron-squirrel-startup")) {
+    require("electron").app.quit();
+    return;
+}
+
 const { ElectronBlocker } = require("@ghostery/adblocker-electron");
 const { instalarCompatibilidadGhostery } = require("./src/main/siteCompatibility");
 
@@ -5,3 +12,4 @@ const { instalarCompatibilidadGhostery } = require("./src/main/siteCompatibility
 instalarCompatibilidadGhostery(ElectronBlocker);
 
 require("./main.js");
+

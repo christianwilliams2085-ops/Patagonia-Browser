@@ -131,4 +131,20 @@ function registrarCierre({ ventana, dialog, contarDescargas, guardarDatos = asyn
     });
 }
 
-module.exports = { registrarInstanciaUnica, registrarCierre, cerrarContenido };
+function crearManejadorFalloInicio({ app, dialog }) {
+    let informado = false;
+    return error => {
+        if (informado) return;
+        informado = true;
+        try {
+            dialog.showErrorBox("Patagonia Browser no pudo iniciar",
+                "No se pudo cargar la interfaz. Volve a abrir Patagonia. Si el problema continua, reinstala la aplicacion.\n\n" +
+                String(error?.message || error));
+        } finally {
+            // Una ventana oculta con una carga fallida retiene el bloqueo de instancia.
+            app.exit(1);
+        }
+    };
+}
+
+module.exports = { registrarInstanciaUnica, registrarCierre, cerrarContenido, crearManejadorFalloInicio };

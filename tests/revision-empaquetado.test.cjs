@@ -91,10 +91,10 @@ test('integrar NuGet no modifica electron-winstaller en disco y detecta versione
 async function proyectoPortable(t) {
     const dir = await temporal(t);
     const version = '1.0.3';
-    await escribir(dir, 'package.json', JSON.stringify({ name: 'patagonia-prueba', version, main: 'main.js', type: 'commonjs', dependencies: { '@ghostery/adblocker-electron': '2.18.2' } }));
+    await escribir(dir, 'package.json', JSON.stringify({ name: 'patagonia-prueba', version, main: 'bootstrap.js', type: 'commonjs', dependencies: { '@ghostery/adblocker-electron': '2.18.2' } }));
     await escribir(dir, 'package-lock.json', JSON.stringify({ packages: { '': { version }, 'node_modules/@ghostery/adblocker-electron': { version: '2.18.2' } } }));
     await escribir(dir, 'node_modules/electron/package.json', JSON.stringify({ version: '43.1.1' }));
-    for (const recurso of ['main.js', 'preload.js', 'renderer.js', 'index.html', 'LICENSE', 'services/ai.js', 'src/main/modulo.js',
+    for (const recurso of ['bootstrap.js', 'main.js', 'preload.js', 'renderer.js', 'index.html', 'LICENSE', 'services/ai.js', 'src/main/modulo.js',
         'ui/new-tab.html', 'assets/patagonia-oficial.ico', 'assets/patagonia-adblock.bin', 'node_modules/electron/dist/electron.exe',
         'node_modules/electron/dist/resources/default_app.asar', 'node_modules/@ghostery/adblocker-electron/package.json']) await escribir(dir, recurso);
     const destino = path.join(dir, 'dist/Patagonia Browser-win32-x64');
@@ -118,9 +118,12 @@ test('una compilación portátil válida publica recursos y dependencias y retir
     await escribir(p.dir, 'diagnostico.zip'); await escribir(p.dir, 'services/copia.bak');
     await construir(p.opciones);
     const app = path.join(p.destino, 'resources/app');
+    const paquete = JSON.parse(await fs.readFile(path.join(app, 'package.json'), 'utf8'));
+    await fs.access(path.join(app, paquete.main));
     await fs.access(path.join(app, 'main.js'));
     await fs.access(path.join(app, 'node_modules/@ghostery/adblocker-electron/package.json'));
     await assert.rejects(fs.access(path.join(app, 'services/copia.bak')));
     await assert.rejects(fs.access(path.join(p.destino, 'anterior.txt')));
     assert.equal((await fs.readdir(path.dirname(p.destino))).length, 1);
 });
+

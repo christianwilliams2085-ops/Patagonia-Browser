@@ -17,6 +17,7 @@ on:
       - 'assets/**'
       - 'tests/**'
       - 'main.js'
+      - 'bootstrap.js'
       - 'preload.js'
       - 'renderer.js'
       - 'index.html'
@@ -33,6 +34,7 @@ on:
       - 'assets/**'
       - 'tests/**'
       - 'main.js'
+      - 'bootstrap.js'
       - 'preload.js'
       - 'renderer.js'
       - 'index.html'
@@ -78,3 +80,4 @@ jobs:
           if-no-files-found: error
           retention-days: 7
           compression-level: 0
+

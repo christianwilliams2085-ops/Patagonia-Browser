@@ -9,7 +9,7 @@ const {
     Menu
 } = require("electron");
 
-if (require("electron-squirrel-startup")) {
+if (!process.windowsStore && require("electron-squirrel-startup")) {
     app.quit();
     return;
 }
@@ -37,7 +37,8 @@ const { pathToFileURL } = require("node:url");
 const { crearIPCInterfaz, protegerInterfaz } = require("./src/main/security");
 const { registrarAtajos } = require("./src/main/shortcuts");
 const { registrarConfiguracion } = require("./src/main/settings");
-const { registrarInstanciaUnica, registrarCierre, cerrarContenido } = require("./src/main/lifecycle");
+const { registrarInstanciaUnica, registrarCierre, cerrarContenido, crearManejadorFalloInicio } = require("./src/main/lifecycle");
+const informarFalloInicio = crearManejadorFalloInicio({ app, dialog });
 const { registrarAperturas, PREFERENCIAS_WEB } = require("./src/main/newWindows");
 const { crearBusqueda } = require("./src/main/find");
 const { registrarMenu } = require("./src/main/menu");
@@ -88,7 +89,8 @@ const RUTA_NUEVA_PESTANA = path.join(__dirname, "ui", "new-tab.html");
 const URL_NUEVA_PESTANA = pathToFileURL(RUTA_NUEVA_PESTANA).href;
 const RUTA_ICONO = path.join(__dirname, "assets", "patagonia-oficial.ico");
 
-app.setAppUserModelId?.("com.squirrel.PatagoniaBrowser.PatagoniaBrowser");
+// MSIX obtiene su identidad de Windows; no reemplazarla por la de Squirrel.
+if (!process.windowsStore) app.setAppUserModelId?.("com.squirrel.PatagoniaBrowser.PatagoniaBrowser");
 if (typeof app.setPath === "function") {
     const perfilEstable = path.join(app.getPath("appData"), "patagonia-browser-main");
     fs.mkdirSync(perfilEstable, { recursive: true });
@@ -676,6 +678,7 @@ function crearVentana() {
                 "Error al cargar index.html:",
                 error
             );
+            informarFalloInicio(error);
         });
 
     ventanaPrincipal.on(
@@ -1013,6 +1016,7 @@ if (registrarInstanciaUnica(app, () => ventanaPrincipal)) app.whenReady()
             "Error al iniciar Electron:",
             error
         );
+        informarFalloInicio(error);
     });
 
 let datosGuardadosAlSalir = false;

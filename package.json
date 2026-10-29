@@ -13,11 +13,13 @@
     "build:portable": "node scripts/build-portable.cjs",
     "build:family": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-family-release.ps1",
     "package:windows": "electron-forge package --platform=win32 --arch=x64",
-    "make:windows": "node scripts/make-windows.cjs"
+    "make:windows": "node scripts/make-windows.cjs",
+    "make:msix": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-msix.ps1",
+    "make:msix:test": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-msix.ps1 -Test"
   },
   "keywords": [],
   "author": "Patagonia Browser Project",
-  "license": "ISC",
+  "license": "MIT",
   "type": "commonjs",
   "devDependencies": {
     "@electron-forge/cli": "^7.11.2",
@@ -44,3 +46,4 @@
     }
   }
 }
+

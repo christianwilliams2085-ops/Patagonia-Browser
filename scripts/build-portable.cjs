@@ -14,7 +14,7 @@ async function construir({ raiz = path.resolve(__dirname, ".."), plataforma = pr
     }
     const destino = path.join(raiz, "dist", "Patagonia Browser-win32-x64");
     const electron = path.join(raiz, "node_modules", "electron", "dist");
-    const recursos = ["main.js", "preload.js", "renderer.js", "index.html", "LICENSE", "assets", "services", "src", "ui"];
+    const recursos = ["bootstrap.js", "main.js", "preload.js", "renderer.js", "index.html", "LICENSE", "assets", "services", "src", "ui"];
     const paquete = JSON.parse(await fs.readFile(path.join(raiz, "package.json"), "utf8"));
     const motor = JSON.parse(await fs.readFile(path.join(raiz, "node_modules", "electron", "package.json"), "utf8"));
     const lock = JSON.parse(await fs.readFile(path.join(raiz, "package-lock.json"), "utf8"));

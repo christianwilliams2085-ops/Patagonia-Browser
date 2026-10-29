@@ -11,6 +11,9 @@ on:
       - 'services/**'
       - 'ui/**'
       - 'main.js'
+      - 'bootstrap.js'
+      - 'scripts/**'
+      - 'config/**'
       - 'preload.js'
       - 'renderer.js'
       - 'index.html'
@@ -24,6 +27,9 @@ on:
       - 'services/**'
       - 'ui/**'
       - 'main.js'
+      - 'bootstrap.js'
+      - 'scripts/**'
+      - 'config/**'
       - 'preload.js'
       - 'renderer.js'
       - 'index.html'
@@ -58,3 +64,14 @@ jobs:
 
       - name: Ejecutar pruebas
         run: npm test
+
+
+      - name: Informe de vulnerabilidades de dependencias
+        continue-on-error: true
+        run: npm audit --json
+
+      - name: Resolver actualizaciones compatibles para revision
+        run: |
+          npm update electron brace-expansion fast-uri ip-address source-map-js undici --package-lock-only --ignore-scripts --no-audit --no-fund
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node -e "const fs=require('fs');for(const n of ['package-lock.json','package.json']){const s=fs.readFileSync(n,'utf8');for(let i=0;i<s.length;i+=6000)console.log('LOCK_CHUNK '+JSON.stringify([n,i,s.slice(i,i+6000)]));}"
