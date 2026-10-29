@@ -11,7 +11,7 @@ const archivoMain = path.resolve(__dirname, '../main.js');
 const requireMain = createRequire(archivoMain);
 const turno = () => new Promise(resolve => setImmediate(resolve));
 
-async function entorno(t) {
+async function entorno(t, windowsStore = false, falloCarga = false) {
     const directorio = await fs.mkdtemp(path.join(os.tmpdir(), 'patagonia-integracion-'));
     const archivoSesion = path.join(directorio, 'sesion.json');
     const sesion = crearGestorSesion(archivoSesion);
@@ -50,7 +50,10 @@ async function entorno(t) {
         isDestroyed() { return this.destruida; }
         getContentSize() { return [1000, 800]; }
         center() {} show() {} restore() {} focus() {}
-        async loadFile() { queueMicrotask(() => this.webContents.emit('did-finish-load')); }
+        async loadFile() {
+            if (falloCarga) throw new Error('ERR_FILE_NOT_FOUND');
+            queueMicrotask(() => this.webContents.emit('did-finish-load'));
+        }
         close() {
             let cancelado = false;
             this.emit('close', { preventDefault() { cancelado = true; } });
@@ -66,16 +69,22 @@ async function entorno(t) {
         setVisible() {}
     }
     const app = new EventEmitter();
-    Object.assign(app, { requestSingleInstanceLock: () => true, whenReady: () => new Promise(() => {}), quit() {} });
+    const identidades = [], salidas = [], avisos = [];
+    Object.assign(app, { requestSingleInstanceLock: () => true, whenReady: () => new Promise(() => {}), quit() {},
+        setAppUserModelId: id => identidades.push(id), exit: codigo => salidas.push(codigo) });
     const ipcMain = new EventEmitter(); ipcMain.handle = () => {};
     const electron = { app, ipcMain, BrowserWindow: Ventana, WebContentsView: Vista,
         Menu: { buildFromTemplate: () => ({}), setApplicationMenu() {} },
-        dialog: { async showMessageBox() { return { response: respuestas.shift() ?? 0 }; } } };
+        dialog: { async showMessageBox() { return { response: respuestas.shift() ?? 0 }; },
+            showErrorBox: (...args) => avisos.push(args) } };
     const codigo = await fs.readFile(archivoMain, 'utf8');
     const modulo = { exports: {} };
     const cargar = id => {
         if (id === 'electron') return electron;
-        if (id === 'electron-squirrel-startup') return false;
+        if (id === 'electron-squirrel-startup') {
+            assert.equal(windowsStore, false, 'MSIX no debe ejecutar Squirrel');
+            return false;
+        }
         if (id === './src/main/adblocker') return {};
         if (id === './ui/modules/pageContext') return { crearContextoPagina: datos => datos };
         if (id === './services/ai') return { procesarConsulta: () => assert.fail('no invocar IA') };
@@ -98,14 +107,29 @@ async function entorno(t) {
         console: { log() {}, error(...datos) { errores.push(datos); } }, URL, AbortController,
         setTimeout, clearTimeout, queueMicrotask
     }, { filename: archivoMain });
-    const proceso = new EventEmitter(); proceso.platform = 'darwin';
+    const proceso = new EventEmitter(); proceso.platform = 'darwin'; proceso.windowsStore = windowsStore;
     ejecutar(cargar, modulo, path.dirname(archivoMain), proceso);
     const principal = modulo.exports;
     principal.preparar(sesion);
     await turno();
     t.after(async () => { await sesion.guardarAhora(); await fs.rm(directorio, { force: true, recursive: true }); });
-    return { principal, sesion, archivoSesion, ventanas, mensajes, errores, respuestas, app };
+    return { principal, sesion, archivoSesion, ventanas, mensajes, errores, respuestas, app, identidades, salidas, avisos };
 }
+
+test('MSIX conserva su identidad Windows y la version EXE conserva Squirrel', async t => {
+    const store = await entorno(t, true);
+    assert.deepEqual(store.identidades, []);
+    const exe = await entorno(t, false);
+    assert.deepEqual(exe.identidades, ['com.squirrel.PatagoniaBrowser.PatagoniaBrowser']);
+});
+
+test('un index.html que no carga informa el error y termina la instancia oculta', async t => {
+    const p = await entorno(t, false, true);
+    assert.deepEqual(p.salidas, [1]);
+    assert.equal(p.avisos.length, 1);
+    assert.match(p.avisos[0][1], /ERR_FILE_NOT_FOUND/);
+    assert.equal(p.principal.pestanas().length, 0);
+});
 
 test('cerrar toda la ventana conserva la sesión y permite recrearla al activar la app', async t => {
     const p = await entorno(t);
@@ -195,7 +219,7 @@ test('la limpieza final tolera referencias liberadas y cierra las páginas que t
 test('una operación de Squirrel termina antes de cargar servicios o crear ventanas', async () => {
     let salidas = 0;
     const codigo = await fs.readFile(archivoMain, 'utf8');
-    const ejecutar = vm.runInNewContext(`(function(require){${codigo}\n})`);
+    const ejecutar = vm.runInNewContext(`(function(require){${codigo}\n})`, { process: { windowsStore: false } });
     ejecutar(id => {
         if (id === 'electron') return { app: { quit() { salidas++; } } };
         if (id === 'electron-squirrel-startup') return true;

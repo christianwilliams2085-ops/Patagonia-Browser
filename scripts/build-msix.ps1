@@ -70,6 +70,8 @@ try {
     if (-not (Test-Path -LiteralPath $ejecutable -PathType Leaf)) {
         throw "No se encontro Patagonia Browser.exe en $origen"
     }
+    & node.exe (Join-Path $raiz "scripts\verify-packaged-app.cjs") $origen
+    if ($LASTEXITCODE -ne 0) { throw "El contenido de la aplicacion empaquetada esta incompleto." }
 
     $destino = Join-Path $raiz "dist\msix"
     $stage = Join-Path $raiz "dist\msix-stage"
@@ -144,6 +146,8 @@ try {
         -not (Test-Path -LiteralPath (Join-Path $verificar "Patagonia Browser.exe"))) {
         throw "La verificacion de integridad/estructura de MSIX fallo."
     }
+    & node.exe (Join-Path $raiz "scripts\verify-packaged-app.cjs") $verificar
+    if ($LASTEXITCODE -ne 0) { throw "El MSIX no contiene una aplicacion completa." }
     $sha256 = [System.Security.Cryptography.SHA256]::Create()
     try {
         $flujo = [IO.File]::OpenRead($salida)
@@ -166,3 +170,4 @@ try {
 } finally {
     Pop-Location
 }
+

@@ -4,6 +4,20 @@ const { EventEmitter } = require("node:events");
 const { registrarInstanciaUnica, registrarCierre } = require("../src/main/lifecycle");
 const completar = () => new Promise(resolve => setImmediate(resolve));
 
+test('un fallo de inicio se informa una sola vez y no deja un proceso invisible bloqueando el reinicio', () => {
+    const { crearManejadorFalloInicio } = require('../src/main/lifecycle');
+    const salidas = [], avisos = [];
+    const fallar = crearManejadorFalloInicio({
+        app: { exit: codigo => salidas.push(codigo) },
+        dialog: { showErrorBox: (...args) => avisos.push(args) }
+    });
+    fallar(new Error('ERR_FILE_NOT_FOUND'));
+    fallar(new Error('segundo evento'));
+    assert.deepEqual(salidas, [1]);
+    assert.equal(avisos.length, 1);
+    assert.match(avisos[0][1], /ERR_FILE_NOT_FOUND/);
+});
+
 test("a second launch exits before startup and the primary launch restores its window", () => {
     const segunda = new EventEmitter();
     segunda.requestSingleInstanceLock = () => false;

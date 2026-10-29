@@ -11,6 +11,9 @@ on:
       - 'services/**'
       - 'ui/**'
       - 'main.js'
+      - 'bootstrap.js'
+      - 'scripts/**'
+      - 'config/**'
       - 'preload.js'
       - 'renderer.js'
       - 'index.html'
@@ -24,6 +27,9 @@ on:
       - 'services/**'
       - 'ui/**'
       - 'main.js'
+      - 'bootstrap.js'
+      - 'scripts/**'
+      - 'config/**'
       - 'preload.js'
       - 'renderer.js'
       - 'index.html'
@@ -58,3 +64,4 @@ jobs:
 
       - name: Ejecutar pruebas
         run: npm test
+
