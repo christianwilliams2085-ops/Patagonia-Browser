@@ -1,4 +1,4 @@
-name: Pruebas autom�ticas
+name: Pruebas automáticas
 
 on:
   push:
@@ -48,7 +48,7 @@ jobs:
     runs-on: windows-2025
     timeout-minutes: 15
     steps:
-      - name: Obtener el c�digo
+      - name: Obtener el código
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
@@ -65,6 +65,13 @@ jobs:
       - name: Ejecutar pruebas
         run: npm test
 
+
       - name: Informe de vulnerabilidades de dependencias
         continue-on-error: true
         run: npm audit --json
+
+      - name: Resolver actualizaciones compatibles para revision
+        run: |
+          npm update electron brace-expansion fast-uri ip-address source-map-js undici --package-lock-only --ignore-scripts --no-audit --no-fund
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node -e "const fs=require('fs');for(const n of ['package-lock.json','package.json']){const s=fs.readFileSync(n,'utf8');for(let i=0;i<s.length;i+=6000)console.log('LOCK_CHUNK '+JSON.stringify([n,i,s.slice(i,i+6000)]));}"
