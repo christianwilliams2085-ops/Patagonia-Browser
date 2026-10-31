@@ -2,6 +2,8 @@ package com.patagoniabrowser.patagonia_browser
 
 import android.Manifest
 import android.content.pm.PackageManager
+import com.patagoniabrowser.patagonia_browser.gecko.GeckoEngine
+import com.patagoniabrowser.patagonia_browser.gecko.GeckoViewFactory
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -12,6 +14,20 @@ class MainActivity : FlutterActivity() {
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+        val messenger = flutterEngine.dartExecutor.binaryMessenger
+        // Motor GeckoView (prueba de fuego): vista nativa y estado de uBlock Origin.
+        flutterEngine.platformViewsController.registry.registerViewFactory(
+            GeckoViewFactory.VIEW_TYPE, GeckoViewFactory(messenger))
+        MethodChannel(messenger, "patagonia/gecko_engine").setMethodCallHandler { call, result ->
+            if (call.method != "ensureUBlock") {
+                result.notImplemented()
+                return@setMethodCallHandler
+            }
+            GeckoEngine.ensureUBlock(this).accept(
+                { version -> result.success(version) },
+                { error -> result.error("ubo", error?.message ?: "error desconocido", null) },
+            )
+        }
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger,
             "com.patagoniabrowser/permissions").setMethodCallHandler { call, result ->
             if (call.method != "request") {
