@@ -19,13 +19,15 @@ async function escribir(dir, nombre, contenido = 'fixture') {
 }
 
 test('el filtro de distribución conserva recursos y excluye diagnósticos, respaldos y perfiles', () => {
-    for (const ruta of ['/', '/main.js', '/src/main/pageSnapshot.js', '/ui/new-tab.html', '/assets/patagonia-adblock.bin', '/node_modules/lib/index.js']) assert.equal(incluirEnPaquete(ruta), true, ruta);
+    for (const ruta of ['/', '/bootstrap.js', '/main.js', '/src/main/pageSnapshot.js', '/ui/new-tab.html', '/assets/patagonia-adblock.bin', '/node_modules/lib/index.js']) assert.equal(incluirEnPaquete(ruta), true, ruta);
     for (const ruta of ['/patagonia-diagnostico.zip', '/respaldo-anterior/main.js', '/data/perfil.json', '/tests/test.cjs', '/scripts/build-portable.cjs', '/src/copia.bak', '/services/.env', '/ui/../perfil.json']) assert.equal(incluirEnPaquete(ruta), false, ruta);
 });
 
 test('Packager usa el extractor sustituido, crea un ASAR y no incluye archivos ajenos a la app', async t => {
     const dir = await temporal(t), app = path.join(dir, 'app'), zips = path.join(dir, 'zips');
-    await escribir(app, 'package.json', JSON.stringify({ name: 'patagonia-prueba', version: '1.0.0', main: 'main.js' }));
+    // Igual que la app real: package.json arranca por bootstrap.js, que carga main.js.
+    await escribir(app, 'package.json', JSON.stringify({ name: 'patagonia-prueba', version: '1.0.0', main: 'bootstrap.js' }));
+    await escribir(app, 'bootstrap.js', 'require("./main.js");');
     await escribir(app, 'main.js', 'module.exports = 42;');
     await escribir(app, 'src/main/modulo.js'); await escribir(app, 'diagnostico.zip'); await escribir(app, 'respaldo/main.js');
     await fs.mkdir(zips);
@@ -40,8 +42,14 @@ test('Packager usa el extractor sustituido, crea un ASAR y no incluye archivos a
     const archivos = cargar('@electron/asar').listPackage(path.join(resultado[0], 'resources/app.asar'))
         .map(ruta => String(ruta).replace(/\\/g, '/'))
         .map(ruta => ruta.startsWith('/') ? ruta : `/${ruta}`);
-    assert.ok(archivos.includes('/main.js')); assert.ok(archivos.includes('/src/main/modulo.js'));
+    assert.ok(archivos.includes('/bootstrap.js')); assert.ok(archivos.includes('/main.js')); assert.ok(archivos.includes('/src/main/modulo.js'));
     assert.equal(archivos.some(ruta => /diagnostico|respaldo/.test(ruta)), false);
+});
+
+test('el punto de entrada real de package.json entra en el instalador y en la versión portátil', async () => {
+    const { main } = JSON.parse(await fs.readFile(path.join(raiz, 'package.json'), 'utf8'));
+    assert.equal(incluirEnPaquete(`/${main}`), true, main);
+    await fs.access(path.join(raiz, main));
 });
 
 test('el extractor usado por Packager rechaza rutas que escapan del directorio', async t => {
@@ -91,10 +99,10 @@ test('integrar NuGet no modifica electron-winstaller en disco y detecta versione
 async function proyectoPortable(t) {
     const dir = await temporal(t);
     const version = '1.0.3';
-    await escribir(dir, 'package.json', JSON.stringify({ name: 'patagonia-prueba', version, main: 'main.js', type: 'commonjs', dependencies: { '@ghostery/adblocker-electron': '2.18.2' } }));
+    await escribir(dir, 'package.json', JSON.stringify({ name: 'patagonia-prueba', version, main: 'bootstrap.js', type: 'commonjs', dependencies: { '@ghostery/adblocker-electron': '2.18.2' } }));
     await escribir(dir, 'package-lock.json', JSON.stringify({ packages: { '': { version }, 'node_modules/@ghostery/adblocker-electron': { version: '2.18.2' } } }));
     await escribir(dir, 'node_modules/electron/package.json', JSON.stringify({ version: '43.1.1' }));
-    for (const recurso of ['main.js', 'preload.js', 'renderer.js', 'index.html', 'LICENSE', 'services/ai.js', 'src/main/modulo.js',
+    for (const recurso of ['bootstrap.js', 'main.js', 'preload.js', 'renderer.js', 'index.html', 'LICENSE', 'services/ai.js', 'src/main/modulo.js',
         'ui/new-tab.html', 'assets/patagonia-oficial.ico', 'assets/patagonia-adblock.bin', 'node_modules/electron/dist/electron.exe',
         'node_modules/electron/dist/resources/default_app.asar', 'node_modules/@ghostery/adblocker-electron/package.json']) await escribir(dir, recurso);
     const destino = path.join(dir, 'dist/Patagonia Browser-win32-x64');
@@ -118,6 +126,7 @@ test('una compilación portátil válida publica recursos y dependencias y retir
     await escribir(p.dir, 'diagnostico.zip'); await escribir(p.dir, 'services/copia.bak');
     await construir(p.opciones);
     const app = path.join(p.destino, 'resources/app');
+    await fs.access(path.join(app, 'bootstrap.js'));
     await fs.access(path.join(app, 'main.js'));
     await fs.access(path.join(app, 'node_modules/@ghostery/adblocker-electron/package.json'));
     await assert.rejects(fs.access(path.join(app, 'services/copia.bak')));
