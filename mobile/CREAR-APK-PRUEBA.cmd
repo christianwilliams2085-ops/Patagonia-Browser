@@ -31,11 +31,11 @@ if errorlevel 1 goto fallo
 call flutter --no-version-check --suppress-analytics build apk --release --no-pub
 if errorlevel 1 goto fallo
 if not exist "entrega-android" mkdir "entrega-android"
-copy /y "build\app\outputs\flutter-apk\app-release.apk" "entrega-android\Patagonia-Android-1.0.4-Prueba.apk" >nul
+copy /y "build\app\outputs\flutter-apk\app-release.apk" "entrega-android\Patagonia-Android-1.0.5-Prueba.apk" >nul
 if errorlevel 1 goto fallo
 echo.
 echo LISTO. Se creo Patagonia Pruebas. Se instala separada de la version anterior.
-explorer /select,"%CD%\entrega-android\Patagonia-Android-1.0.4-Prueba.apk"
+explorer /select,"%CD%\entrega-android\Patagonia-Android-1.0.5-Prueba.apk"
 popd
 pause
 exit /b 0

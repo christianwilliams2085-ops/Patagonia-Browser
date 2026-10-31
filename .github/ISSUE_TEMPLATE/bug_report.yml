@@ -23,7 +23,7 @@ body:
     id: version
     attributes:
       label: Versión de Patagonia Browser
-      placeholder: "Ejemplo: 1.0.4"
+      placeholder: "Ejemplo: 1.0.5"
     validations:
       required: true
   - type: textarea

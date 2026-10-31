@@ -25,7 +25,7 @@ try {
     Invoke-Flutter -Arguments @('build', 'apk', '--release', '--no-pub')
     $output = Join-Path $PSScriptRoot 'entrega-android'
     New-Item -ItemType Directory -Path $output -Force | Out-Null
-    $apk = Join-Path $output "Patagonia-Android-1.0.4-$Modo.apk"
+    $apk = Join-Path $output "Patagonia-Android-1.0.5-$Modo.apk"
     Copy-Item -LiteralPath 'build\app\outputs\flutter-apk\app-release.apk' -Destination $apk -Force
     Write-Host "APK creado: $apk"
     if ($Modo -eq 'Prueba') { Write-Host 'Se instala como Patagonia Pruebas, separado de la versión anterior.' }

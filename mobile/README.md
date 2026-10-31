@@ -1,4 +1,4 @@
-# Patagonia Browser móvil — revisión 1.0.4+7
+# Patagonia Browser móvil — revisión 1.0.5+8
 
 Proyecto Flutter para Android y iPhone. Esta revisión se centra en Android.
 
@@ -44,7 +44,7 @@ En el entorno de revisión se reprodujo el mismo fallo manteniendo un bundle de 
 
 Con Flutter, el SDK Android y Java disponibles (o las herramientas portátiles de esta PC), abrir `CREAR-APK-PRUEBA.cmd` con doble clic. Ejecuta dependencias, análisis, pruebas y compilación; se detiene ante un error.
 
-Resultado: `entrega-android/Patagonia-Android-1.0.4-Prueba.apk`.
+Resultado: `entrega-android/Patagonia-Android-1.0.5-Prueba.apk`.
 
 Se instala como **Patagonia Pruebas**, identificador `com.patagoniabrowser.patagonia_browser.preview`. Usa la firma de desarrollo local en una compilación optimizada. No sustituye la aplicación familiar ni comparte su historial o sesiones. No publicar este APK como actualización oficial.
 
