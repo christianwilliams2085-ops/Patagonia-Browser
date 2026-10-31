@@ -63,7 +63,7 @@ jobs:
           plutil -lint ios/Runner/PrivacyInfo.xcprivacy
 
       - name: Compilar Patagonia para el simulador de iPhone
-        run: flutter build ios --simulator --release
+        run: flutter build ios --simulator --debug
 
       - name: Guardar compilación de comprobación
         uses: actions/upload-artifact@v4
