@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:patagonia_browser/main.dart';
+import 'package:patagonia_browser/src/browser_shell.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class TestWebPlatform extends InAppWebViewPlatform {
@@ -116,6 +117,9 @@ class TestWebController extends PlatformInAppWebViewController {
 
 void main() {
   late TestWebPlatform platform;
+  // Estas pruebas cubren el motor WebView (el de iPhone y el Android anterior).
+  setUp(() => BrowserShell.debugUseGecko = false);
+  tearDown(() => BrowserShell.debugUseGecko = null);
   setUp(() {
     platform = TestWebPlatform();
     InAppWebViewPlatform.instance = platform;
