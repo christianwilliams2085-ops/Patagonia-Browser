@@ -19,5 +19,14 @@
 - Licencia: **Mozilla Public License 2.0**.
 - Código fuente: https://github.com/mozilla-firefox/firefox
 
+## Patagonia Lector (propio)
+
+- Archivo: `android/app/src/main/assets/patagonia_lector/`. Extensión chiquita de Patagonia (licencia MIT)
+  que le pasa a Patagonia AI el texto de la página abierta. No envía nada fuera del teléfono.
+
+En la app, el menú **Acerca de y licencias** muestra estos créditos, el texto completo de la licencia
+de uBlock Origin (copiado sin cambios del `LICENSE.txt` del `.xpi` a `assets/licenses/`) y los enlaces
+al código fuente.
+
 Patagonia no es un producto de Mozilla ni de Raymond Hill, y ellos no lo respaldan. "Firefox" es una
 marca de Mozilla y Patagonia no la usa.

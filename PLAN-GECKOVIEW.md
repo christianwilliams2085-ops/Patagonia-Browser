@@ -1,6 +1,6 @@
 # Plan: pasar Patagonia móvil (Android) a GeckoView + uBlock Origin
 
-Fecha: 31-10-2026 · Estado: **solo plan, no se escribió código.**
+Fecha: 31-10-2026 · Estado: **opción A hecha en la rama `motor/geckoview-android` (versión 1.1.0+9).** La prueba de fuego anduvo en el Motorola con el modo "Textura", que es el que quedó.
 
 Punto de partida: la prueba `prueba-geckoview` (GeckoView 159 + uBlock Origin 1.75.0) anduvo en el
 Motorola y YouTube se vio sin anuncios. En iPhone la app sigue con WebKit, porque Apple no deja usar

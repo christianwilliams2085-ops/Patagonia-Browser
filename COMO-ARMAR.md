@@ -83,7 +83,7 @@ El script limpia, descarga dependencias, corre `flutter analyze` y `flutter test
 con `PATAGONIA_PREVIEW=1`. Resultado:
 
 ```
-mobile\entrega-android\Patagonia-Android-1.0.5-Prueba.apk
+mobile\entrega-android\Patagonia-Android-1.1.0-Prueba.apk
 ```
 
 ---
@@ -136,7 +136,7 @@ publicar actualizaciones: los teléfonos tendrían que desinstalar e instalar de
    cd ..
    ```
 
-   Resultado: `mobile\entrega-android\Patagonia-Android-1.0.5-Publicacion.apk`.
+   Resultado: `mobile\entrega-android\Patagonia-Android-1.1.0-Publicacion.apk`.
 
 5. **Borrá el archivo temporal** apenas termina (aunque haya fallado):
 
@@ -150,7 +150,7 @@ publicar actualizaciones: los teléfonos tendrían que desinstalar e instalar de
 
    ```powershell
    & "$env:LOCALAPPDATA\Android\sdk\build-tools\36.0.0\apksigner.bat" verify --print-certs `
-       mobile\entrega-android\Patagonia-Android-1.0.5-Publicacion.apk
+       mobile\entrega-android\Patagonia-Android-1.1.0-Publicacion.apk
    ```
 
 ---
