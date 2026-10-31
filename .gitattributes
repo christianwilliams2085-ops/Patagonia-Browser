@@ -1,15 +1,30 @@
-*.command text eol=lf
-*.dart text eol=lf
-*.gradle text eol=lf
-*.kts text eol=lf
-*.md text eol=lf
-*.pbxproj text eol=lf
-*.plist text eol=lf
+# Finales de línea del repositorio
+# --------------------------------
+# Todo archivo de texto se guarda y se descarga con LF (formato Unix),
+# sin importar la configuración core.autocrlf de cada computadora.
+* text=auto eol=lf
+
+# Los scripts de Windows necesitan CRLF para funcionar bien.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# Scripts de Mac/Linux: siempre LF.
 *.sh text eol=lf
-*.storyboard text eol=lf
-*.swift text eol=lf
-*.xcconfig text eol=lf
-*.xcprivacy text eol=lf
-*.xml text eol=lf
-*.yaml text eol=lf
-*.yml text eol=lf
+*.command text eol=lf
+
+# Binarios: nunca convertir.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.icns binary
+*.webp binary
+*.bin binary
+*.jar binary
+*.zip binary
+*.ttf binary
+*.otf binary
+*.woff binary
+*.woff2 binary
