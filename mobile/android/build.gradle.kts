@@ -2,6 +2,11 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        // GeckoView (motor de Mozilla) se publica solo en el repositorio de Mozilla.
+        maven {
+            url = uri("https://maven.mozilla.org/maven2/")
+            content { includeGroup("org.mozilla.geckoview") }
+        }
     }
 }
 

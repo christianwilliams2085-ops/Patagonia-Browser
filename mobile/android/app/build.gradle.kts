@@ -7,6 +7,9 @@ plugins {
 }
 
 val previewBuild = System.getenv("PATAGONIA_PREVIEW") == "1"
+// Prueba de fuego de GeckoView: app aparte ("Patagonia Gecko Prueba"), firmada con la
+// clave de debug. Nunca reemplaza a la app de la familia.
+val geckoSpikeBuild = System.getenv("PATAGONIA_GECKO_SPIKE") == "1"
 val signingProperties = Properties()
 val signingFile = rootProject.file("key.properties")
 if (signingFile.exists()) {
@@ -15,7 +18,10 @@ if (signingFile.exists()) {
 
 android {
     namespace = "com.patagoniabrowser.patagonia_browser"
-    compileSdk = flutter.compileSdkVersion
+    // GeckoView 159 pide compilar contra Android 37.2.
+    compileSdk {
+        version = release(37) { minorApiLevel = 2 }
+    }
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
@@ -28,7 +34,8 @@ android {
         applicationId = "com.patagoniabrowser.patagonia_browser"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = 24
+        // GeckoView necesita Android 8.0 (API 26) como mínimo.
+        minSdk = 26
         targetSdk = flutter.targetSdkVersion
         // Uses the version code from pubspec.yaml. When using split APKs, 1000 * ABI_VERSION
         // is added automatically by Flutter. (https://developer.android.com/studio/build/configure-apk-splits#configure-APK-versions)
@@ -36,15 +43,22 @@ android {
         // flag during build.
         versionCode = flutter.versionCode
         versionName = flutter.versionName
-        manifestPlaceholders["appLabel"] = if (previewBuild) "Patagonia Pruebas" else "Patagonia Browser"
-        if (previewBuild) {
+        manifestPlaceholders["appLabel"] = when {
+            geckoSpikeBuild -> "Patagonia Gecko Prueba"
+            previewBuild -> "Patagonia Pruebas"
+            else -> "Patagonia Browser"
+        }
+        if (geckoSpikeBuild) {
+            applicationIdSuffix = ".geckoprueba"
+            versionNameSuffix = "-gecko-prueba"
+        } else if (previewBuild) {
             applicationIdSuffix = ".preview"
             versionNameSuffix = "-prueba"
         }
     }
 
     signingConfigs {
-        if (signingFile.exists() && !previewBuild) {
+        if (signingFile.exists() && !previewBuild && !geckoSpikeBuild) {
             create("patagoniaRelease") {
                 storeFile = rootProject.file(requireNotNull(signingProperties.getProperty("storeFile")))
                 storePassword = signingProperties.getProperty("storePassword")
@@ -58,13 +72,32 @@ android {
         release {
             // Preview installs separately. Official updates use the original
             // local key, or remain unsigned for the existing external signer.
-            if (previewBuild) {
+            if (previewBuild || geckoSpikeBuild) {
                 signingConfig = signingConfigs.getByName("debug")
             } else if (signingFile.exists()) {
                 signingConfig = signingConfigs.getByName("patagoniaRelease")
             }
         }
     }
+
+    packaging {
+        // Comprime las bibliotecas nativas (libxul.so de GeckoView) dentro del APK.
+        jniLibs {
+            useLegacyPackaging = true
+            // Todos los celulares de la familia son de 64 bits: solo arm64. GeckoView pesa
+            // ~65 MB por arquitectura y Flutter ignora ndk.abiFilters, por eso se excluye acá.
+            excludes += listOf("lib/armeabi-v7a/**", "lib/x86_64/**", "lib/x86/**")
+        }
+    }
+
+    androidResources {
+        // El .xpi de uBlock Origin ya es un zip: se guarda tal cual.
+        noCompress += "xpi"
+    }
+}
+
+dependencies {
+    implementation("org.mozilla.geckoview:geckoview:159.0.20261022150525")
 }
 
 kotlin {
