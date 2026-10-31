@@ -4,6 +4,8 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
+// Usa el JDK de JAVA_HOME si está definido (Android Studio o el SDK local); si no, el java del PATH.
+const java = process.env.JAVA_HOME ? path.join(process.env.JAVA_HOME, 'bin', 'java') : 'java';
 
 // Compile and execute the actual vendored Java classes. Only Android's
 // framework, network I/O and the WebView are stubbed; rule evaluation is real.
@@ -81,14 +83,14 @@ test.before(() => {
   const filename = path.join(dir, 'RegressionTest.java');
   fs.writeFileSync(filename, harness);
   files.push(filename, ...fs.readdirSync(`${javaRoot}/content_blocker`).filter(n => n.endsWith('.java')).map(n => `${javaRoot}/content_blocker/${n}`));
-  const compiled = spawnSync('java', ['-m', 'jdk.compiler/com.sun.tools.javac.Main', '-d', dir, ...files], { encoding: 'utf8' });
+  const compiled = spawnSync(java, ['-m', 'jdk.compiler/com.sun.tools.javac.Main', '-d', dir, ...files], { encoding: 'utf8' });
   assert.equal(compiled.status, 0, compiled.stderr || compiled.error?.message);
 });
 test.after(() => { if (dir) fs.rmSync(dir, { recursive: true, force: true }); });
 
 for (const scenario of ['domain', 'resource', 'unlessDomain', 'loadType', 'ifTopUrl', 'unlessTopUrl', 'lookalike', 'media', 'css']) {
   test(`native Android rule evaluation: ${scenario}`, () => {
-    const result = spawnSync('java', ['-cp', dir, `${packageName}.content_blocker.RegressionTest`, scenario], { encoding: 'utf8' });
+    const result = spawnSync(java, ['-cp', dir, `${packageName}.content_blocker.RegressionTest`, scenario], { encoding: 'utf8' });
     assert.equal(result.status, 0, result.stderr);
   });
 }
