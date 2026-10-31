@@ -1,0 +1,74 @@
+name: Verificar iPhone
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "mobile/**"
+      - ".github/workflows/ios-validate.yml"
+  pull_request:
+    paths:
+      - "mobile/**"
+      - ".github/workflows/ios-validate.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ios-simulator:
+    name: Compilar con Xcode 26
+    runs-on: macos-26
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: mobile
+
+    steps:
+      - name: Descargar el proyecto
+        uses: actions/checkout@v4
+
+      - name: Preparar Flutter 3.47.7
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.47.7"
+          channel: stable
+          architecture: arm64
+          cache: true
+
+      - name: Mostrar versiones
+        run: |
+          flutter --version
+          xcodebuild -version
+
+      - name: Preparar dependencias
+        run: |
+          flutter config --enable-swift-package-manager
+          flutter pub get
+
+      - name: Revisar formato y código
+        run: |
+          dart format --output=none --set-exit-if-changed lib test
+          flutter analyze
+          flutter test
+
+      - name: Validar archivos de Apple
+        run: |
+          plutil -lint ios/Runner/Info.plist
+          plutil -lint ios/Runner/PrivacyInfo.xcprivacy
+
+      - name: Compilar Patagonia para el simulador de iPhone
+        run: flutter build ios --simulator --release
+
+      - name: Guardar compilación de comprobación
+        uses: actions/upload-artifact@v4
+        with:
+          name: Patagonia-Browser-iOS-Simulator
+          path: mobile/build/ios/iphonesimulator/Runner.app
+          if-no-files-found: error
+          retention-days: 7
