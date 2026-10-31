@@ -80,17 +80,11 @@ class PrivacyProtection {
       action: ContentBlockerAction(type: ContentBlockerActionType.BLOCK),
     );
 
-    return [
-      domainRule(advertisementDomains),
-      domainRule(trackerDomains),
-      ContentBlocker(
-        trigger: ContentBlockerTrigger(urlFilter: '.*'),
-        action: ContentBlockerAction(
-          type: ContentBlockerActionType.CSS_DISPLAY_NONE,
-          selector: cosmeticSelector,
-        ),
-      ),
-    ];
+    // No CSS_DISPLAY_NONE rule here: the native engine decides by the host of
+    // each resource, not by the page, so a request to ytimg.com or
+    // googlevideo.com would still inject generic CSS into YouTube. The
+    // generic cleanup lives in pageScript, which knows the page URL.
+    return [domainRule(advertisementDomains), domainRule(trackerDomains)];
   }
 
   static const cosmeticSelector =
@@ -125,10 +119,12 @@ class PrivacyProtection {
 
   static Future<String> pageScript(Uri? uri) async {
     if (!isYouTube(uri)) return cosmeticScript;
-    return '$cosmeticScript\n${await youtubeProtectionScript}';
+    // YouTube is handled only by its player script: generic CSS could hide a
+    // container that also owns the video or its controls (PR #16).
+    return youtubeProtectionScript;
   }
 
-  // Generic cosmetic fallback for non-YouTube pages and late DOM nodes.
+  // Generic cosmetic cleanup for non-YouTube pages and late DOM nodes.
   static String get cosmeticScript =>
       """
     (() => {

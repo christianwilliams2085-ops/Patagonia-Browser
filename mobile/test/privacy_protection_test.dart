@@ -122,8 +122,33 @@ void main() {
       expect(PrivacyProtection.classify('https://www.wikipedia.org'), isNull);
     });
 
-    test('genera reglas de red y limpieza visual', () {
-      expect(PrivacyProtection.rules(), hasLength(3));
+    test('genera solo reglas de red; la limpieza visual no es global', () {
+      final rules = PrivacyProtection.rules();
+      expect(rules, hasLength(2));
+      expect(
+        rules.map((rule) => rule.action.type),
+        everyElement(ContentBlockerActionType.BLOCK),
+      );
+    });
+
+    test('la limpieza CSS genérica no se aplica en YouTube', () async {
+      TestWidgetsFlutterBinding.ensureInitialized();
+      for (final url in [
+        'https://m.youtube.com/watch?v=a',
+        'https://www.youtube.com/',
+        'https://music.youtube.com/',
+      ]) {
+        final script = await PrivacyProtection.pageScript(Uri.parse(url));
+        expect(script, isNot(contains('patagonia-ad-style')), reason: url);
+        expect(script, contains('__patagoniaYouTubeProtection'), reason: url);
+      }
+      for (final url in [
+        'https://www.example.com/',
+        'https://youtube.com.other.org/',
+      ]) {
+        final script = await PrivacyProtection.pageScript(Uri.parse(url));
+        expect(script, contains('patagonia-ad-style'), reason: url);
+      }
     });
   });
 }
