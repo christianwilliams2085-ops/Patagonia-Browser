@@ -4,97 +4,242 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
-/// Cómo se mete GeckoView adentro de Flutter. La prueba de fuego compara las tres.
-enum GeckoComposition {
-  /// Flutter dibuja la vista nativa en una textura (TLHC) y GeckoView usa TextureView.
-  texture('Textura', 'Flutter dibuja la página como una imagen. Suele ser la más fluida.', 'texture', false),
+/// Lo que avisa una pestaña Gecko (ver GeckoPlatformView.kt). Todo es opcional.
+class GeckoEvents {
+  const GeckoEvents({
+    this.onLocation,
+    this.onTitle,
+    this.onProgress,
+    this.onCanGoBack,
+    this.onCanGoForward,
+    this.onPageStart,
+    this.onPageStop,
+    this.onLoadError,
+    this.onFullScreen,
+    this.onCrash,
+    this.onCloseRequest,
+    this.onNewWindow,
+    this.onPermission,
+    this.onDownload,
+  });
 
-  /// Composición híbrida de Flutter con GeckoView usando SurfaceView (lo normal en Firefox).
-  hybridSurface('Híbrida + Surface', 'La página va en su propia capa, como en Firefox.', 'surface', true),
+  final ValueChanged<String>? onLocation;
+  final ValueChanged<String>? onTitle;
+  final ValueChanged<int>? onProgress;
+  final ValueChanged<bool>? onCanGoBack;
+  final ValueChanged<bool>? onCanGoForward;
+  final ValueChanged<String>? onPageStart;
+  final ValueChanged<bool>? onPageStop;
+  final ValueChanged<String>? onLoadError;
+  final ValueChanged<bool>? onFullScreen;
+  final VoidCallback? onCrash;
+  final VoidCallback? onCloseRequest;
 
-  /// Composición híbrida de Flutter con GeckoView usando TextureView.
-  hybridTexture('Híbrida + Textura', 'Mezcla de las dos anteriores.', 'texture', true);
+  /// Una página abre una ventana nueva. Devolver true la muestra en una pestaña nueva
+  /// con `windowId: id`; false la cancela.
+  final Future<bool> Function(int id, String url)? onNewWindow;
 
-  const GeckoComposition(this.label, this.description, this.backend, this.hybrid);
+  /// La página pide `kinds` ('camera', 'microphone', 'location') para `origin`.
+  final Future<bool> Function(String origin, List<String> kinds)? onPermission;
 
-  final String label;
-  final String description;
-  final String backend;
-  final bool hybrid;
+  /// status: 'start' | 'done' | 'error'.
+  final void Function(String status, String name)? onDownload;
 }
 
-/// Habla con una vista GeckoView nativa (ver GeckoPlatformView.kt).
+/// Texto de la página para el asistente, leído por la extensión patagonia_lector.
+class GeckoPageText {
+  const GeckoPageText({required this.title, required this.url, required this.text});
+
+  final String title;
+  final String url;
+  final String text;
+}
+
+/// Habla con una pestaña GeckoView nativa.
 class GeckoController {
-  GeckoController._(int id) : _channel = MethodChannel('patagonia/gecko_view_$id') {
+  GeckoController(int id, this.events)
+    : _channel = MethodChannel('patagonia/gecko_view_$id') {
     _channel.setMethodCallHandler(_onEvent);
   }
 
   final MethodChannel _channel;
+  final GeckoEvents events;
+  bool _disposed = false;
 
-  final ValueNotifier<String> url = ValueNotifier('');
-  final ValueNotifier<String> title = ValueNotifier('');
-  final ValueNotifier<int> progress = ValueNotifier(0);
-  final ValueNotifier<bool> canGoBack = ValueNotifier(false);
-  final ValueNotifier<bool> canGoForward = ValueNotifier(false);
-  final ValueNotifier<bool> fullScreen = ValueNotifier(false);
-  final ValueNotifier<bool> crashed = ValueNotifier(false);
+  static String _text(Object? value) => value is String ? value : '';
 
-  Future<void> _onEvent(MethodCall call) async {
+  Future<Object?> _onEvent(MethodCall call) async {
+    if (_disposed) return null;
+    final value = call.arguments;
     switch (call.method) {
       case 'location':
-        url.value = call.arguments as String? ?? '';
+        events.onLocation?.call(_text(value));
       case 'title':
-        title.value = call.arguments as String? ?? '';
+        events.onTitle?.call(_text(value));
       case 'progress':
-        progress.value = call.arguments as int? ?? 0;
+        events.onProgress?.call(value is int ? value : 0);
       case 'canGoBack':
-        canGoBack.value = call.arguments == true;
+        events.onCanGoBack?.call(value == true);
       case 'canGoForward':
-        canGoForward.value = call.arguments == true;
+        events.onCanGoForward?.call(value == true);
+      case 'pageStart':
+        events.onPageStart?.call(_text(value));
+      case 'pageStop':
+        events.onPageStop?.call(value == true);
+      case 'loadError':
+        events.onLoadError?.call(_text(value));
       case 'fullScreen':
-        fullScreen.value = call.arguments == true;
+        events.onFullScreen?.call(value == true);
       case 'crash':
-        crashed.value = true;
+        events.onCrash?.call();
+      case 'closeRequest':
+        events.onCloseRequest?.call();
+      case 'newWindow':
+        final map = value is Map ? value : const {};
+        final id = map['id'];
+        if (id is! int) return false;
+        return await events.onNewWindow?.call(id, _text(map['url'])) ?? false;
+      case 'permission':
+        final map = value is Map ? value : const {};
+        final kinds = (map['kinds'] as List? ?? const [])
+            .whereType<String>()
+            .toList();
+        return await events.onPermission?.call(_text(map['origin']), kinds) ??
+            false;
+      case 'download':
+        final map = value is Map ? value : const {};
+        events.onDownload?.call(_text(map['status']), _text(map['name']));
+    }
+    return null;
+  }
+
+  Future<void> _call(String method, [Object? arguments]) async {
+    if (_disposed) return;
+    try {
+      await _channel.invokeMethod<void>(method, arguments);
+    } on MissingPluginException {
+      // La vista nativa ya se cerró.
     }
   }
 
-  Future<void> load(String url) => _channel.invokeMethod('load', url);
-  Future<void> back() => _channel.invokeMethod('back');
-  Future<void> forward() => _channel.invokeMethod('forward');
-  Future<void> reload() => _channel.invokeMethod('reload');
-  Future<void> exitFullScreen() => _channel.invokeMethod('exitFullScreen');
-  Future<void> setDesktop(bool enabled) => _channel.invokeMethod('setDesktop', enabled);
+  Future<void> load(String url) => _call('load', url);
+  Future<void> back() => _call('back');
+  Future<void> forward() => _call('forward');
+  Future<void> reload() => _call('reload');
+  Future<void> stop() => _call('stop');
+  Future<void> exitFullScreen() => _call('exitFullScreen');
+  Future<void> setDesktop(bool enabled) => _call('setDesktop', enabled);
+  Future<void> setActive(bool active) => _call('setActive', active);
+
+  /// null si la página no se puede leer (o no contesta a tiempo).
+  Future<GeckoPageText?> readPage() async {
+    if (_disposed) return null;
+    try {
+      final value = await _channel.invokeMethod<Object?>('readPage');
+      if (value is! Map) return null;
+      return GeckoPageText(
+        title: _text(value['title']),
+        url: _text(value['url']),
+        text: _text(value['text']),
+      );
+    } on PlatformException {
+      return null;
+    } on MissingPluginException {
+      return null;
+    }
+  }
 
   void dispose() {
+    _disposed = true;
     _channel.setMethodCallHandler(null);
-    for (final notifier in [url, title, progress, canGoBack, canGoForward, fullScreen, crashed]) {
-      notifier.dispose();
-    }
   }
 }
 
-/// Estado de uBlock Origin dentro del motor Gecko.
+/// Canal general del motor: uBlock Origin y pestañas que abre uBO por su cuenta.
 class GeckoEngineInfo {
-  static const _channel = MethodChannel('patagonia/gecko_engine');
+  const GeckoEngineInfo._();
+
+  static const channel = MethodChannel('patagonia/gecko_engine');
+
+  /// Avisos del motor. [onPanel] muestra el panel de uBO (sesión `id`);
+  /// [onExtensionTab] abre una pestaña de uBO (configuración, registro).
+  static void listen({
+    required ValueChanged<int> onPanel,
+    required Future<bool> Function(int id, String url) onExtensionTab,
+  }) {
+    channel.setMethodCallHandler((call) async {
+      final value = call.arguments;
+      switch (call.method) {
+        case 'uboPanel':
+          if (value is int) onPanel(value);
+        case 'extensionTab':
+          final map = value is Map ? value : const {};
+          final id = map['id'];
+          if (id is! int) return false;
+          final url = map['url'];
+          return onExtensionTab(id, url is String ? url : '');
+      }
+      return null;
+    });
+  }
+
+  static void stopListening() => channel.setMethodCallHandler(null);
 
   /// Devuelve la versión de uBO instalada (lo instala si hace falta).
   static Future<String> ensureUBlock() async =>
-      await _channel.invokeMethod<String>('ensureUBlock') ?? '';
+      await channel.invokeMethod<String>('ensureUBlock') ?? '';
+
+  /// Abre el panel de uBO de la pestaña que se ve. false si uBO todavía no está listo.
+  static Future<bool> openUBlockPanel() async {
+    try {
+      return await channel.invokeMethod<bool>('openUBlockPanel') ?? false;
+    } on PlatformException {
+      return false;
+    } on MissingPluginException {
+      return false;
+    }
+  }
+
+  /// Libera una sesión que se preparó pero nunca se llegó a mostrar.
+  static Future<void> dropPending(int id) async {
+    try {
+      await channel.invokeMethod<void>('dropPending', id);
+    } on PlatformException {
+      // Nada que liberar.
+    } on MissingPluginException {
+      // Nada que liberar.
+    }
+  }
 }
 
-/// Una página web con el motor Gecko, solo Android.
+/// Una página web con el motor Gecko (solo Android).
+///
+/// Se dibuja como textura dentro de Flutter (TLHC) con GeckoView en TextureView: es la
+/// combinación que anduvo bien en la prueba de fuego. Así los menús y hojas de Patagonia
+/// se pueden mostrar encima de la página.
 class GeckoBrowserView extends StatelessWidget {
   const GeckoBrowserView({
     super.key,
-    required this.initialUrl,
-    required this.composition,
+    this.initialUrl,
+    this.windowId,
+    this.desktop = false,
+    this.active = true,
+    this.popup = false,
+    required this.events,
     required this.onCreated,
   });
 
   static const viewType = 'patagonia/gecko_view';
 
-  final String initialUrl;
-  final GeckoComposition composition;
+  /// Página a abrir. Se ignora si hay [windowId] (la sesión ya existe del lado nativo).
+  final String? initialUrl;
+  final int? windowId;
+  final bool desktop;
+  final bool active;
+
+  /// Panel de una extensión (uBO): se muestra, pero no cuenta como pestaña.
+  final bool popup;
+  final GeckoEvents events;
   final void Function(GeckoController controller) onCreated;
 
   @override
@@ -110,27 +255,25 @@ class GeckoBrowserView extends StatelessWidget {
         hitTestBehavior: PlatformViewHitTestBehavior.opaque,
       ),
       onCreatePlatformView: (params) {
-        final args = {'url': initialUrl, 'backend': composition.backend};
-        final AndroidViewController controller = composition.hybrid
-            ? PlatformViewsService.initExpensiveAndroidView(
-                id: params.id,
-                viewType: viewType,
-                layoutDirection: TextDirection.ltr,
-                creationParams: args,
-                creationParamsCodec: const StandardMessageCodec(),
-                onFocus: () => params.onFocusChanged(true),
-              )
-            : PlatformViewsService.initSurfaceAndroidView(
-                id: params.id,
-                viewType: viewType,
-                layoutDirection: TextDirection.ltr,
-                creationParams: args,
-                creationParamsCodec: const StandardMessageCodec(),
-                onFocus: () => params.onFocusChanged(true),
-              );
+        final controller = PlatformViewsService.initSurfaceAndroidView(
+          id: params.id,
+          viewType: viewType,
+          layoutDirection: TextDirection.ltr,
+          creationParams: <String, Object?>{
+            'url': initialUrl,
+            'windowId': windowId,
+            'desktop': desktop,
+            'active': active,
+            'popup': popup,
+          },
+          creationParamsCodec: const StandardMessageCodec(),
+          onFocus: () => params.onFocusChanged(true),
+        );
         controller
           ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
-          ..addOnPlatformViewCreatedListener((id) => onCreated(GeckoController._(id)))
+          ..addOnPlatformViewCreatedListener(
+            (id) => onCreated(GeckoController(id, events)),
+          )
           ..create();
         return controller;
       },

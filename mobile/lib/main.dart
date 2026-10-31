@@ -1,12 +1,7 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'src/browser_shell.dart';
-import 'src/gecko/gecko_spike_page.dart';
-
-/// Solo el APK "Patagonia Gecko Prueba" se compila con este valor en true.
-const _geckoSpike = bool.fromEnvironment('PATAGONIA_GECKO_SPIKE');
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -50,9 +45,7 @@ class PatagoniaBrowserApp extends StatelessWidget {
           contentTextStyle: TextStyle(color: Colors.white),
         ),
       ),
-      home: _geckoSpike && defaultTargetPlatform == TargetPlatform.android
-          ? const GeckoSpikePage()
-          : const BrowserShell(),
+      home: const BrowserShell(),
     );
   }
 }

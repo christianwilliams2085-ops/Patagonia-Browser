@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'gecko/gecko_view.dart';
 import 'navigation_input.dart';
 import 'local_assistant.dart';
 import 'privacy_protection.dart';
@@ -25,6 +26,15 @@ const _privacyPolicyUrl =
 class BrowserShell extends StatefulWidget {
   const BrowserShell({super.key});
 
+  /// Motor de páginas: en Android, GeckoView + uBlock Origin; en iPhone, WebKit.
+  /// Las pruebas pueden forzar uno u otro.
+  @visibleForTesting
+  static bool? debugUseGecko;
+
+  static bool get usesGecko =>
+      debugUseGecko ??
+      (!kIsWeb && defaultTargetPlatform == TargetPlatform.android);
+
   @override
   State<BrowserShell> createState() => _BrowserShellState();
 }
@@ -40,6 +50,9 @@ class _BrowserShellState extends State<BrowserShell> {
   int _nextTabId = 1;
   bool _preferencesReady = false;
   bool _handlingBack = false;
+  bool _askingPermission = false;
+  bool _immersive = false;
+  final bool _gecko = BrowserShell.usesGecko;
   String _youtubeDocumentStartSource = '';
   Future<void> _pendingSave = Future<void>.value();
 
@@ -68,18 +81,32 @@ class _BrowserShellState extends State<BrowserShell> {
   void initState() {
     super.initState();
     _tabs.add(_BrowserTab(id: _nextTabId++));
+    if (_gecko) {
+      GeckoEngineInfo.listen(
+        onPanel: _showUBlockPanel,
+        onExtensionTab: _openExtensionTab,
+      );
+      // uBlock Origin se prepara mientras se muestra el inicio.
+      GeckoEngineInfo.ensureUBlock().catchError((Object _) => '');
+    }
     _loadPreferences();
   }
 
   @override
   void dispose() {
+    if (_gecko) {
+      GeckoEngineInfo.stopListening();
+      for (final tab in _tabs) {
+        tab.disposeGecko();
+      }
+    }
     _address.dispose();
     _addressFocus.dispose();
     super.dispose();
   }
 
   Future<void> _loadPreferences() async {
-    final youtubeScript = PrivacyProtection.youtubeProtectionScript;
+    var showProtectionNotice = false;
     try {
       final preferences = await SharedPreferences.getInstance();
       if (!mounted) return;
@@ -94,19 +121,34 @@ class _BrowserShellState extends State<BrowserShell> {
           ..clear()
           ..addAll(preferences.getStringList('unprotectedHosts') ?? const []);
       });
+      showProtectionNotice =
+          _gecko &&
+          _unprotectedHosts.isNotEmpty &&
+          preferences.getBool(_protectionNoticeKey) != true;
     } catch (_) {
       _showMessage('No pudimos leer los favoritos y el historial guardados.');
     }
-    try {
-      final source = await youtubeScript;
-      if (mounted) _youtubeDocumentStartSource = source;
-    } catch (_) {
-      if (mounted) {
-        _showMessage('No se pudo cargar la protección preventiva de YouTube.');
+    // Con GeckoView la protección la hace uBlock Origin: el script propio de
+    // YouTube queda solo para el motor WebView.
+    if (!_gecko) {
+      try {
+        final source = await PrivacyProtection.youtubeProtectionScript;
+        if (mounted) _youtubeDocumentStartSource = source;
+      } catch (_) {
+        if (mounted) {
+          _showMessage('No se pudo cargar la protección preventiva de YouTube.');
+        }
       }
     }
     if (mounted) setState(() => _preferencesReady = true);
+    if (showProtectionNotice && mounted) {
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => _showProtectionNotice(),
+      );
+    }
   }
+
+  static const _protectionNoticeKey = 'geckoProtectionNoticeShown';
 
   UnmodifiableListView<UserScript>? _initialProtectionScripts(_BrowserTab tab) {
     if (defaultTargetPlatform != TargetPlatform.android ||
@@ -184,6 +226,30 @@ class _BrowserShellState extends State<BrowserShell> {
     _addressFocus.unfocus();
     _address.text = uri.toString();
 
+    if (_gecko) {
+      final controller = tab.gecko;
+      final hadView = tab.url != null || tab.windowId != null;
+      final rebuild = tab.renderProcessGone;
+      setState(() {
+        tab.errorMessage = null;
+        if (rebuild) {
+          // La pestaña se cerró sola: se arma una vista nueva con esta dirección.
+          tab.disposeGecko();
+          tab.generation++;
+          tab.renderProcessGone = false;
+          tab.windowId = null;
+          tab.url = uri;
+        } else if (controller == null) {
+          tab.url = uri;
+          if (hadView) tab.pendingLoad = uri;
+        }
+      });
+      if (!rebuild && controller != null && _isLive(tab)) {
+        await controller.load(uri.toString());
+      }
+      return;
+    }
+
     if (tab.controller == null) {
       setState(() {
         if (tab.renderProcessGone) tab.generation++;
@@ -208,7 +274,9 @@ class _BrowserShellState extends State<BrowserShell> {
   }
 
   void _openHome() {
+    if (_current.fullScreen) _setImmersive(false);
     setState(() {
+      _current.disposeGecko();
       _current.generation++;
       _current.windowId = null;
       _current.renderProcessGone = false;
@@ -224,17 +292,20 @@ class _BrowserShellState extends State<BrowserShell> {
     });
   }
 
-  void _addTab({Uri? url, int? windowId}) {
+  void _addTab({Uri? url, int? windowId, String? title}) {
     setState(() {
       _tabs.add(
         _BrowserTab(id: _nextTabId++, url: url, windowId: windowId)
           ..protectionEnabled =
+              _gecko ||
               url == null ||
               !_unprotectedHosts.contains(url.host.toLowerCase()),
       );
+      if (title != null) _tabs.last.title = title;
       _currentIndex = _tabs.length - 1;
       _syncAddress();
     });
+    _syncActiveTab();
   }
 
   void _selectTab(int index) {
@@ -243,11 +314,32 @@ class _BrowserShellState extends State<BrowserShell> {
       _currentIndex = index;
       _syncAddress();
     });
+    _syncActiveTab();
+  }
+
+  /// Solo la pestaña que se ve queda activa en Gecko: las demás no gastan batería,
+  /// y uBlock Origin sabe de qué sitio mostrar su panel.
+  void _syncActiveTab() {
+    if (!_gecko) return;
+    for (final tab in _tabs) {
+      tab.gecko?.setActive(identical(tab, _current));
+    }
+    _setImmersive(_current.fullScreen);
+  }
+
+  void _setImmersive(bool enabled) {
+    if (_immersive == enabled) return;
+    _immersive = enabled;
+    SystemChrome.setEnabledSystemUIMode(
+      enabled ? SystemUiMode.immersiveSticky : SystemUiMode.manual,
+      overlays: enabled ? null : SystemUiOverlay.values,
+    );
   }
 
   void _closeTabAt(int index) {
     if (index < 0 || index >= _tabs.length) return;
     setState(() {
+      _tabs[index].disposeGecko();
       _tabs[index].generation++;
       _tabs[index].controller = null;
       _tabs.removeAt(index);
@@ -261,15 +353,28 @@ class _BrowserShellState extends State<BrowserShell> {
       }
       _syncAddress();
     });
+    _syncActiveTab();
   }
 
-  Future<void> _goBack() => _withController(_current, (controller) async {
-    if (await controller.canGoBack()) await controller.goBack();
-  });
+  Future<void> _goBack() async {
+    if (_gecko) {
+      if (_current.canGoBack) await _current.gecko?.back();
+      return;
+    }
+    await _withController(_current, (controller) async {
+      if (await controller.canGoBack()) await controller.goBack();
+    });
+  }
 
-  Future<void> _goForward() => _withController(_current, (controller) async {
-    if (await controller.canGoForward()) await controller.goForward();
-  });
+  Future<void> _goForward() async {
+    if (_gecko) {
+      if (_current.canGoForward) await _current.gecko?.forward();
+      return;
+    }
+    await _withController(_current, (controller) async {
+      if (await controller.canGoForward()) await controller.goForward();
+    });
+  }
 
   Future<void> _handleSystemBack() async {
     if (_handlingBack) return;
@@ -277,6 +382,17 @@ class _BrowserShellState extends State<BrowserShell> {
     final tab = _current;
     var navigated = false;
     try {
+      final gecko = tab.gecko;
+      if (_gecko && gecko != null) {
+        if (tab.fullScreen) {
+          await gecko.exitFullScreen();
+          return;
+        }
+        if (tab.canGoBack) {
+          await gecko.back();
+          return;
+        }
+      }
       await _withController(tab, (controller) async {
         if (await controller.canGoBack()) {
           if (_isLive(tab) && identical(tab, _current)) {
@@ -299,7 +415,7 @@ class _BrowserShellState extends State<BrowserShell> {
   }
 
   Future<void> _prepareNavigation(_BrowserTab tab, Uri? url) async {
-    if (!_isLive(tab) || !NavigationInput.isWebUri(url)) return;
+    if (_gecko || !_isLive(tab) || !NavigationInput.isWebUri(url)) return;
     final enabled = !_unprotectedHosts.contains(url!.host.toLowerCase());
     if (tab.protectionEnabled != enabled) {
       setState(() => tab.protectionEnabled = enabled);
@@ -341,7 +457,8 @@ class _BrowserShellState extends State<BrowserShell> {
   }
 
   Future<void> _injectPageProtection(_BrowserTab tab, Uri? url) async {
-    if (defaultTargetPlatform != TargetPlatform.android ||
+    if (_gecko ||
+        defaultTargetPlatform != TargetPlatform.android ||
         !_isLive(tab) ||
         !tab.protectionEnabled ||
         !NavigationInput.isWebUri(url)) {
@@ -429,6 +546,19 @@ class _BrowserShellState extends State<BrowserShell> {
 
   Future<AssistantPageContext> _readAssistantContext() async {
     final tab = _current;
+    if (_gecko) {
+      final gecko = tab.gecko;
+      if (tab.url == null || gecko == null) {
+        return const AssistantPageContext(title: '', url: '', text: '');
+      }
+      // La extensión "Patagonia Lector" lee el texto dentro del teléfono.
+      final page = await gecko.readPage();
+      return AssistantPageContext(
+        title: page == null || page.title.isEmpty ? tab.title : page.title,
+        url: page == null || page.url.isEmpty ? tab.url.toString() : page.url,
+        text: page?.text ?? '',
+      );
+    }
     final controller = tab.controller;
     if (tab.url == null || controller == null) {
       return const AssistantPageContext(title: '', url: '', text: '');
@@ -510,6 +640,10 @@ class _BrowserShellState extends State<BrowserShell> {
   Future<void> _setDesktopMode(bool enabled) async {
     final tab = _current;
     setState(() => tab.desktopMode = enabled);
+    if (_gecko) {
+      await tab.gecko?.setDesktop(enabled);
+      return;
+    }
     await _withController(tab, (controller) async {
       await controller.setSettings(settings: _webSettings(tab));
       if (_isLive(tab) && identical(controller, tab.controller)) {
@@ -555,6 +689,7 @@ class _BrowserShellState extends State<BrowserShell> {
     if (!_preferencesReady) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
+    final fullScreen = _gecko && _current.fullScreen;
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
@@ -562,10 +697,14 @@ class _BrowserShellState extends State<BrowserShell> {
       },
       child: Scaffold(
         body: SafeArea(
+          top: !fullScreen,
+          bottom: !fullScreen,
           child: Column(
             children: [
-              _buildHeader(),
-              if (_current.progress > 0 && _current.progress < 1)
+              if (!fullScreen) _buildHeader(),
+              if (!fullScreen &&
+                  _current.progress > 0 &&
+                  _current.progress < 1)
                 LinearProgressIndicator(
                   value: _current.progress,
                   minHeight: 2,
@@ -573,11 +712,16 @@ class _BrowserShellState extends State<BrowserShell> {
                   backgroundColor: _surface,
                 ),
               Expanded(
+                // Con clave: al entrar o salir de pantalla completa la página
+                // no se vuelve a crear (no se corta el video).
+                key: const ValueKey('pages'),
                 child: IndexedStack(
                   index: _currentIndex,
                   children: _tabs
                       .map(
-                        (tab) => _TabContent(
+                        (tab) => _gecko
+                            ? _buildGeckoTab(tab)
+                            : _TabContent(
                           key: ValueKey('${tab.id}:${tab.generation}'),
                           isActive: identical(tab, _current),
                           tab: tab,
@@ -641,7 +785,7 @@ class _BrowserShellState extends State<BrowserShell> {
                       .toList(),
                 ),
               ),
-              _buildBottomBar(),
+              if (!fullScreen) _buildBottomBar(),
             ],
           ),
         ),
@@ -692,7 +836,9 @@ class _BrowserShellState extends State<BrowserShell> {
                   onPressed: _showPrivacyCenter,
                   icon: Icon(
                     Icons.shield_outlined,
-                    color: _current.protectionEnabled ? _green : _muted,
+                    color: _gecko || _current.protectionEnabled
+                        ? _green
+                        : _muted,
                   ),
                 ),
                 Semantics(
@@ -830,6 +976,19 @@ class _BrowserShellState extends State<BrowserShell> {
                 ? 'Detener'
                 : 'Recargar',
             onPressed: () {
+              final tab = _current;
+              final gecko = tab.gecko;
+              if (_gecko) {
+                if (gecko == null) return;
+                if (tab.progress > 0 && tab.progress < 1) {
+                  gecko.stop();
+                  setState(() => tab.progress = 1);
+                } else {
+                  setState(() => tab.errorMessage = null);
+                  gecko.reload();
+                }
+                return;
+              }
               final controller = _current.controller;
               if (controller == null) return;
               if (_current.progress > 0 && _current.progress < 1) {
@@ -890,7 +1049,8 @@ class _BrowserShellState extends State<BrowserShell> {
                   ],
                 ),
                 const SizedBox(height: 18),
-                Material(
+                if (_gecko) ..._geckoPrivacyRows(sheetContext, tab),
+                if (!_gecko) Material(
                   color: _surface,
                   borderRadius: BorderRadius.circular(14),
                   child: Padding(
@@ -921,8 +1081,8 @@ class _BrowserShellState extends State<BrowserShell> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 18),
-                _PrivacyRow(
+                if (!_gecko) const SizedBox(height: 18),
+                if (!_gecko) _PrivacyRow(
                   icon: Icons.block,
                   color: const Color(0xFFFF5353),
                   label: 'Anuncios bloqueados',
@@ -930,7 +1090,7 @@ class _BrowserShellState extends State<BrowserShell> {
                       ? tab.blockedAds
                       : null,
                 ),
-                _PrivacyRow(
+                if (!_gecko) _PrivacyRow(
                   icon: Icons.visibility_outlined,
                   color: _green,
                   label: 'Rastreadores bloqueados',
@@ -939,15 +1099,17 @@ class _BrowserShellState extends State<BrowserShell> {
                       : null,
                 ),
                 const Divider(height: 28, color: Color(0x336F8DA5)),
-                if (defaultTargetPlatform != TargetPlatform.android)
+                if (!_gecko && defaultTargetPlatform != TargetPlatform.android)
                   const Text(
                     'El motor de iPhone no informa el número de bloqueos.',
                     style: TextStyle(color: _muted),
                   ),
                 const SizedBox(height: 18),
-                const Text(
-                  'Patagonia bloquea redes publicitarias y rastreadores conocidos antes de que carguen. Los permisos de cámara, micrófono y ubicación se preguntan por separado.',
-                  style: TextStyle(color: _muted, height: 1.4),
+                Text(
+                  _gecko
+                      ? 'Patagonia usa uBlock Origin para bloquear anuncios y rastreadores antes de que carguen. Los permisos de cámara, micrófono y ubicación se preguntan por separado.'
+                      : 'Patagonia bloquea redes publicitarias y rastreadores conocidos antes de que carguen. Los permisos de cámara, micrófono y ubicación se preguntan por separado.',
+                  style: const TextStyle(color: _muted, height: 1.4),
                 ),
               ],
             ),
@@ -1131,7 +1293,475 @@ class _BrowserShellState extends State<BrowserShell> {
                   _navigate(_privacyPolicyUrl);
                 },
               ),
+              _MenuTile(
+                icon: Icons.info_outline,
+                label: 'Acerca de y licencias',
+                onTap: () {
+                  Navigator.pop(sheetContext);
+                  _showAbout();
+                },
+              ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Motor Gecko (Android): pestañas, permisos, uBlock Origin y licencias.
+  // ---------------------------------------------------------------------------
+
+  Widget _buildGeckoTab(_BrowserTab tab) {
+    final key = ValueKey('${tab.id}:${tab.generation}');
+    if (tab.url == null && tab.windowId == null) {
+      return KeyedSubtree(key: key, child: _StartPage(onNavigate: _navigate));
+    }
+    final generation = tab.generation;
+    return Stack(
+      key: key,
+      children: [
+        if (!tab.renderProcessGone)
+          GeckoBrowserView(
+            initialUrl: tab.windowId == null ? tab.url?.toString() : null,
+            windowId: tab.windowId,
+            desktop: tab.desktopMode,
+            active: identical(tab, _current),
+            events: _geckoEvents(tab, generation),
+            onCreated: (controller) {
+              if (!_isLive(tab) || tab.generation != generation) {
+                controller.dispose();
+                return;
+              }
+              tab.gecko = controller;
+              controller.setActive(identical(tab, _current));
+              final pending = tab.pendingLoad;
+              tab.pendingLoad = null;
+              if (pending != null) controller.load(pending.toString());
+            },
+          ),
+        if (tab.errorMessage != null)
+          _PageError(tab: tab, onNavigate: _navigate),
+      ],
+    );
+  }
+
+  GeckoEvents _geckoEvents(_BrowserTab tab, int generation) {
+    bool alive() => _isLive(tab) && tab.generation == generation;
+    return GeckoEvents(
+      onLocation: (value) {
+        if (!alive()) return;
+        final url = Uri.tryParse(value);
+        if (!NavigationInput.isWebUri(url)) return;
+        setState(() {
+          tab.url = url;
+          if (identical(tab, _current) && !_addressFocus.hasFocus) {
+            _address.text = url.toString();
+          }
+        });
+      },
+      onTitle: (title) {
+        if (alive()) _onTitleChanged(tab, title);
+      },
+      onProgress: (value) {
+        if (alive() && value > 0 && value < 100) _onProgressChanged(tab, value);
+      },
+      onCanGoBack: (value) {
+        if (alive()) setState(() => tab.canGoBack = value);
+      },
+      onCanGoForward: (value) {
+        if (alive()) setState(() => tab.canGoForward = value);
+      },
+      onPageStart: (value) {
+        if (!alive()) return;
+        tab.navigation++;
+        final url = Uri.tryParse(value);
+        setState(() {
+          // La página de error vacía que pone Gecko no borra el aviso de Patagonia.
+          if (NavigationInput.isWebUri(url)) tab.errorMessage = null;
+          tab.progress = .05;
+        });
+      },
+      onPageStop: (success) {
+        if (!alive()) return;
+        if (success) {
+          _onPageFinished(tab, tab.url);
+        } else {
+          setState(() => tab.progress = 1);
+        }
+      },
+      onLoadError: (_) {
+        if (!alive()) return;
+        setState(() {
+          tab.errorMessage =
+              'No pudimos abrir esta página. Revisá la conexión e intentá otra vez.';
+          tab.progress = 1;
+        });
+      },
+      onFullScreen: (full) {
+        if (!alive()) return;
+        setState(() => tab.fullScreen = full);
+        if (identical(tab, _current)) _setImmersive(full);
+      },
+      onCrash: () {
+        if (!alive()) return;
+        if (tab.fullScreen && identical(tab, _current)) _setImmersive(false);
+        setState(() {
+          tab.disposeGecko();
+          tab.renderProcessGone = true;
+          tab.windowId = null;
+          tab.errorMessage =
+              'La página se cerró. Tocá Volver a intentar para abrirla.';
+          tab.progress = 1;
+        });
+      },
+      onCloseRequest: () {
+        if (alive()) _closeTabAt(_tabs.indexOf(tab));
+      },
+      onNewWindow: (id, value) async {
+        if (!alive() || !identical(tab, _current)) return false;
+        final url = Uri.tryParse(value);
+        final web = NavigationInput.isWebUri(url);
+        if (value.isNotEmpty && value != 'about:blank' && !web) return false;
+        _addTab(url: web ? url : null, windowId: id);
+        return true;
+      },
+      onPermission: (origin, kinds) async =>
+          alive() && await _askGeckoPermission(tab, origin, kinds),
+      onDownload: (status, name) {
+        if (!alive()) return;
+        _showMessage(switch (status) {
+          'start' => 'Descargando $name…',
+          'done' => 'Descarga lista: $name (carpeta Descargas).',
+          _ => 'No se pudo descargar $name.',
+        });
+      },
+    );
+  }
+
+  bool _canGrant(_BrowserTab tab, String origin, int navigation) =>
+      _isLive(tab) &&
+      identical(tab, _current) &&
+      tab.navigation == navigation &&
+      WebPermissions.sameSecureOrigin(origin, tab.url);
+
+  /// Mismo cuidado que con WebView: solo la pestaña que se ve, en https, y si la
+  /// página cambia mientras se pregunta, se niega.
+  Future<bool> _askGeckoPermission(
+    _BrowserTab tab,
+    String origin,
+    List<String> kinds,
+  ) async {
+    const names = {
+      'camera': 'cámara',
+      'microphone': 'micrófono',
+      'location': 'tu ubicación',
+    };
+    if (kinds.isEmpty || kinds.any((kind) => !names.containsKey(kind))) {
+      return false;
+    }
+    final navigation = tab.navigation;
+    if (_askingPermission || !_canGrant(tab, origin, navigation)) return false;
+    final description = kinds.map((kind) => names[kind]!).join(' y ');
+    final site = Uri.tryParse(origin)?.host ?? origin;
+    _askingPermission = true;
+    try {
+      final allowed =
+          await showDialog<bool>(
+            context: context,
+            builder: (dialogContext) => AlertDialog(
+              icon: const Icon(Icons.privacy_tip_outlined, color: _blue),
+              title: Text('Permitir $description'),
+              content: Text(
+                '$site solicita acceso a $description. ¿Querés permitirlo?',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogContext, false),
+                  child: const Text('Bloquear'),
+                ),
+                FilledButton(
+                  onPressed: () => Navigator.pop(dialogContext, true),
+                  child: const Text('Permitir'),
+                ),
+              ],
+            ),
+          ) ??
+          false;
+      if (!allowed || !_canGrant(tab, origin, navigation)) return false;
+      final granted = await WebPermissions.requestDevice(kinds);
+      return granted && _canGrant(tab, origin, navigation);
+    } finally {
+      _askingPermission = false;
+    }
+  }
+
+  List<Widget> _geckoPrivacyRows(BuildContext sheetContext, _BrowserTab tab) {
+    return [
+      Material(
+        color: _surface,
+        borderRadius: BorderRadius.circular(14),
+        child: ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+          leading: const Icon(Icons.verified_user_outlined, color: _green),
+          title: const Text('Protección en este sitio'),
+          subtitle: Text(
+            tab.url == null
+                ? 'Abrí una página para ver qué se bloqueó.'
+                : 'La hace uBlock Origin. Tocá para ver qué bloqueó y apagarla o prenderla en ${tab.url!.host}.',
+            style: const TextStyle(color: _muted),
+          ),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: tab.url == null
+              ? null
+              : () {
+                  Navigator.pop(sheetContext);
+                  _openUBlockPanel();
+                },
+        ),
+      ),
+    ];
+  }
+
+  Future<void> _openUBlockPanel() async {
+    if (!await GeckoEngineInfo.openUBlockPanel()) {
+      _showMessage(
+        'uBlock Origin todavía se está preparando. Probá de nuevo en unos segundos.',
+      );
+    }
+  }
+
+  /// El panel de uBlock Origin, tal cual lo dibuja uBO, en una hoja de Patagonia.
+  Future<void> _showUBlockPanel(int id) async {
+    if (!mounted) {
+      await GeckoEngineInfo.dropPending(id);
+      return;
+    }
+    GeckoController? panel;
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      enableDrag: false,
+      backgroundColor: _navy,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (sheetContext) => SafeArea(
+        child: SizedBox(
+          height: MediaQuery.sizeOf(sheetContext).height * .8,
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(18, 10, 6, 6),
+                child: Row(
+                  children: [
+                    const Icon(Icons.shield_outlined, color: _green),
+                    const SizedBox(width: 10),
+                    const Expanded(
+                      child: Text(
+                        'uBlock Origin',
+                        style: TextStyle(
+                          fontSize: 19,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    TextButton.icon(
+                      onPressed: () {
+                        Navigator.pop(sheetContext);
+                        _current.gecko?.reload();
+                      },
+                      icon: const Icon(Icons.refresh),
+                      label: const Text('Recargar página'),
+                    ),
+                    IconButton(
+                      tooltip: 'Cerrar',
+                      onPressed: () => Navigator.pop(sheetContext),
+                      icon: const Icon(Icons.close),
+                    ),
+                  ],
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.fromLTRB(18, 0, 18, 8),
+                child: Text(
+                  'El botón grande prende o apaga la protección en este sitio. Después tocá Recargar página.',
+                  style: TextStyle(color: _muted, fontSize: 13),
+                ),
+              ),
+              Expanded(
+                child: GeckoBrowserView(
+                  windowId: id,
+                  popup: true,
+                  events: GeckoEvents(
+                    onCloseRequest: () {
+                      if (sheetContext.mounted) Navigator.pop(sheetContext);
+                    },
+                  ),
+                  onCreated: (controller) => panel = controller,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    panel?.dispose();
+    await GeckoEngineInfo.dropPending(id);
+  }
+
+  /// uBO abre su configuración o el registro en una pestaña nueva.
+  Future<bool> _openExtensionTab(int id, String url) async {
+    if (!mounted || !_preferencesReady) return false;
+    _addTab(windowId: id, title: 'uBlock Origin');
+    return true;
+  }
+
+  /// Aviso único: la lista vieja de sitios sin protección no pasa sola a uBlock Origin.
+  Future<void> _showProtectionNotice() async {
+    if (!mounted) return;
+    final hosts = _unprotectedHosts.toList()..sort();
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        icon: const Icon(Icons.shield_outlined, color: _green),
+        title: const Text('Nueva protección'),
+        content: SingleChildScrollView(
+          child: Text(
+            'Patagonia ahora bloquea anuncios con uBlock Origin.\n\n'
+            'Antes tenías la protección apagada en:\n'
+            '${hosts.map((host) => '• $host').join('\n')}\n\n'
+            'Si la necesitás apagada otra vez, abrí ese sitio, tocá el escudo '
+            'y usá el botón grande de uBlock Origin.',
+          ),
+        ),
+        actions: [
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Entendido'),
+          ),
+        ],
+      ),
+    );
+    try {
+      final preferences = await SharedPreferences.getInstance();
+      await preferences.setBool(_protectionNoticeKey, true);
+    } catch (_) {
+      // Si no se pudo guardar, el aviso vuelve a salir la próxima vez.
+    }
+  }
+
+  void _showAbout() {
+    void open(String url) {
+      Navigator.pop(context);
+      _addTab(url: Uri.parse(url));
+    }
+
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: _navy,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (sheetContext) => SafeArea(
+        child: SizedBox(
+          height: MediaQuery.sizeOf(sheetContext).height * .8,
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
+            children: [
+              const Text(
+                'Acerca de Patagonia Browser',
+                style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                'Patagonia Browser es software libre con licencia MIT.',
+                style: TextStyle(color: _muted, height: 1.4),
+              ),
+              if (_gecko) ...[
+                const Divider(height: 32, color: Color(0x336F8DA5)),
+                const Text(
+                  'uBlock Origin ${_LicenseInfo.uboVersion}',
+                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 6),
+                const Text(
+                  'Bloqueador de anuncios y rastreadores de Raymond Hill y colaboradores. '
+                  'Se incluye sin modificar. Licencia GNU GPL versión 3. '
+                  'Las listas de filtros que usa (EasyList, EasyPrivacy y otras) tienen sus propios autores y licencias.',
+                  style: TextStyle(color: _muted, height: 1.4),
+                ),
+                Wrap(
+                  spacing: 8,
+                  children: [
+                    TextButton(
+                      onPressed: () => _showLicenseText(sheetContext),
+                      child: const Text('Ver licencia (GPLv3)'),
+                    ),
+                    TextButton(
+                      onPressed: () => open(_LicenseInfo.uboSource),
+                      child: const Text('Código fuente'),
+                    ),
+                  ],
+                ),
+                const Divider(height: 32, color: Color(0x336F8DA5)),
+                const Text(
+                  'GeckoView ${_LicenseInfo.geckoVersion}',
+                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 6),
+                const Text(
+                  'Patagonia usa el motor GeckoView de Mozilla para mostrar las páginas. '
+                  'Licencia Mozilla Public License 2.0.',
+                  style: TextStyle(color: _muted, height: 1.4),
+                ),
+                Wrap(
+                  spacing: 8,
+                  children: [
+                    TextButton(
+                      onPressed: () => open(_LicenseInfo.mplText),
+                      child: const Text('Ver licencia (MPL 2.0)'),
+                    ),
+                    TextButton(
+                      onPressed: () => open(_LicenseInfo.geckoSource),
+                      child: const Text('Código fuente'),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  'Patagonia no es un producto de Mozilla ni de Raymond Hill, y ellos no lo respaldan.',
+                  style: TextStyle(color: _muted, fontSize: 13, height: 1.4),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _showLicenseText(BuildContext sheetContext) async {
+    String text;
+    try {
+      text = await rootBundle.loadString(_LicenseInfo.uboLicenseAsset);
+    } catch (_) {
+      text = 'No se pudo abrir el texto. Está en ${_LicenseInfo.uboSource}';
+    }
+    if (!sheetContext.mounted) return;
+    await Navigator.of(sheetContext).push(
+      MaterialPageRoute<void>(
+        builder: (context) => Scaffold(
+          appBar: AppBar(title: const Text('Licencia de uBlock Origin')),
+          body: SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: SelectableText(
+                text,
+                style: const TextStyle(fontSize: 12.5, height: 1.35),
+              ),
+            ),
           ),
         ),
       ),
@@ -1448,42 +2078,51 @@ class _TabContentState extends State<_TabContent> {
             },
           ),
         if (widget.tab.errorMessage != null)
-          Positioned.fill(
-            child: ColoredBox(
-              color: _navy,
-              child: Center(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(28),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(
-                        Icons.cloud_off_outlined,
-                        size: 56,
-                        color: _muted,
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        widget.tab.errorMessage!,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(fontSize: 17, height: 1.4),
-                      ),
-                      const SizedBox(height: 18),
-                      FilledButton.icon(
-                        onPressed: () {
-                          final url = widget.tab.url;
-                          if (url != null) widget.onNavigate(url.toString());
-                        },
-                        icon: const Icon(Icons.refresh),
-                        label: const Text('Volver a intentar'),
-                      ),
-                    ],
-                  ),
+          _PageError(tab: widget.tab, onNavigate: widget.onNavigate),
+      ],
+    );
+  }
+}
+
+/// Pantalla de Patagonia cuando una página no abre o se cerró sola.
+class _PageError extends StatelessWidget {
+  const _PageError({required this.tab, required this.onNavigate});
+
+  final _BrowserTab tab;
+  final ValueChanged<String> onNavigate;
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned.fill(
+      child: ColoredBox(
+        color: _navy,
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(28),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.cloud_off_outlined, size: 56, color: _muted),
+                const SizedBox(height: 16),
+                Text(
+                  tab.errorMessage!,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 17, height: 1.4),
                 ),
-              ),
+                const SizedBox(height: 18),
+                FilledButton.icon(
+                  onPressed: () {
+                    final url = tab.url;
+                    if (url != null) onNavigate(url.toString());
+                  },
+                  icon: const Icon(Icons.refresh),
+                  label: const Text('Volver a intentar'),
+                ),
+              ],
             ),
           ),
-      ],
+        ),
+      ),
     );
   }
 }
@@ -1977,6 +2616,24 @@ class _BrowserTab {
   Uri? url;
   String title = 'Nueva pestaña';
   InAppWebViewController? controller;
+
+  // Motor Gecko (Android).
+  GeckoController? gecko;
+  bool canGoBack = false;
+  bool canGoForward = false;
+  bool fullScreen = false;
+  int navigation = 0;
+  Uri? pendingLoad;
+
+  void disposeGecko() {
+    gecko?.dispose();
+    gecko = null;
+    canGoBack = false;
+    canGoForward = false;
+    fullScreen = false;
+    pendingLoad = null;
+  }
+
   double progress = 0;
   int blockedAds = 0;
   int blockedTrackers = 0;
@@ -1999,4 +2656,16 @@ class _SavedPage {
   );
 
   Map<String, String> toJson() => {'title': title, 'url': url};
+}
+
+/// Datos de los programas de terceros que trae Patagonia en Android.
+class _LicenseInfo {
+  const _LicenseInfo._();
+
+  static const uboVersion = '1.75.0';
+  static const uboSource = 'https://github.com/gorhill/uBlock/tree/1.75.0';
+  static const uboLicenseAsset = 'assets/licenses/ublock-origin-LICENSE.txt';
+  static const geckoVersion = '159';
+  static const geckoSource = 'https://github.com/mozilla-firefox/firefox';
+  static const mplText = 'https://www.mozilla.org/MPL/2.0/';
 }
