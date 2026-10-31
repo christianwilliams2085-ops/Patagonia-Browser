@@ -1,23 +1,58 @@
-﻿node_modules/
+﻿# --- Dependencias y cachés -------------------------------------------------
+node_modules/
 .npm-cache/
 .electron-cache/
 .installer-profile/
 .installer-tools/
+
+# --- Salidas de compilación --------------------------------------------------
 dist/
 build/
 out/
 out-oficial/
 
+# --- Instaladores y paquetes (se publican en GitHub Releases, no en Git) ----
+*.exe
+*.msi
+*.msix
+*.appx
+*.nupkg
+*.apk
+*.aab
+*.ipa
+*.zip
+# Excepción: los ZIP de prueba que usan las pruebas automáticas.
+!tests/fixtures/*.zip
+
+# --- Claves y secretos: NUNCA al repositorio --------------------------------
+*.jks
+*.keystore
+*.pfx
+*.p12
+key.properties
+.env
+.env.*
+.signing/
+
+# --- Entregas y respaldos locales --------------------------------------------
+entrega-android/
+/respaldo-patagonia-*/
+respaldo-youtube-*/
+
+# --- Herramientas personales (rutas y datos de esta PC) ---------------------
+AGENTS.md
+.codex/
+graphify-out/
+.graphifyignore
+
+# --- Registros ----------------------------------------------------------------
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# --- Editores y sistema -------------------------------------------------------
 .vscode/
 *.code-workspace
-
 .DS_Store
 Thumbs.db
-
-/patagonia-*.zip
-/respaldo-patagonia-*/

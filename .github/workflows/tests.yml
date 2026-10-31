@@ -10,10 +10,14 @@ on:
       - 'tests/**'
       - 'services/**'
       - 'ui/**'
+      - 'scripts/**'
+      - 'bootstrap.js'
       - 'main.js'
       - 'preload.js'
       - 'renderer.js'
       - 'index.html'
+      - 'mobile/assets/youtube-protection.js'
+      - 'mobile/vendor/**'
       - '.github/workflows/tests.yml'
   pull_request:
     paths:
@@ -23,10 +27,14 @@ on:
       - 'tests/**'
       - 'services/**'
       - 'ui/**'
+      - 'scripts/**'
+      - 'bootstrap.js'
       - 'main.js'
       - 'preload.js'
       - 'renderer.js'
       - 'index.html'
+      - 'mobile/assets/youtube-protection.js'
+      - 'mobile/vendor/**'
       - '.github/workflows/tests.yml'
 
 permissions:

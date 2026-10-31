@@ -1,7 +1,7 @@
 {
   "name": "patagonia-browser",
   "productName": "Patagonia Browser",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Navegador de escritorio rápido, privado y sencillo.",
   "main": "bootstrap.js",
   "scripts": {
@@ -17,7 +17,7 @@
   },
   "keywords": [],
   "author": "Patagonia Browser Project",
-  "license": "ISC",
+  "license": "MIT",
   "type": "commonjs",
   "devDependencies": {
     "@electron-forge/cli": "^7.11.2",
