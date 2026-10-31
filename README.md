@@ -23,7 +23,7 @@ Para armar el instalador de Windows o los APK, seguí **[COMO-ARMAR.md](COMO-ARM
 | Android: navegación, pestañas, favoritos, historial, privacidad por sitio | ✅ Anda (probado con pruebas automáticas; falta más prueba en teléfono) |
 | Android: bloqueo de anuncios en sitios comunes | ✅ Anda (lista de dominios + limpieza visual) |
 | **Android: anuncios de YouTube** | ❌ **No resuelto.** El script actual es conservador: no rompe el video, pero los anuncios siguen apareciendo |
-| iPhone | ⚠️ El proyecto compila en el simulador (GitHub, Mac); no hay app publicada |
+| iPhone | ⚠️ Proyecto listo para compilar en una Mac; el chequeo automático todavía no corrió y no hay app publicada |
 
 **Qué sigue:** probar en Android un motor alternativo, **GeckoView (Firefox) con uBlock Origin**, para ver si resuelve YouTube. Ver [PROJECT_STATUS.md](PROJECT_STATUS.md).
 

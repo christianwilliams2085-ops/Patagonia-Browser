@@ -10,7 +10,7 @@ Prototipo funcional en desarrollo, con dos ediciones en el mismo repositorio: es
 
 - **Windows**: navegación con pestañas, favoritos, historial, descargas, sesiones, permisos y bloqueo de anuncios y rastreadores (detalle abajo). El instalador 1.0.5 y la versión portátil se arman desde el código ([COMO-ARMAR.md](COMO-ARMAR.md)).
 - **Android**: navegación con pestañas, favoritos, historial, modo de escritorio, protección configurable por sitio y bloqueo por lista de dominios de anuncios y rastreadores. El APK de prueba 1.0.5 se arma desde el código.
-- **iPhone**: el proyecto compila para el simulador en GitHub Actions (Mac). No hay app publicada.
+- **iPhone**: el proyecto está en `mobile/ios`, con iconos y configuración de privacidad. Solo se puede compilar y firmar en una Mac con Xcode y una cuenta Apple. El chequeo automático para el simulador (`ios-validate.yml`) se agregó en esta versión y todavía no corrió en GitHub. No hay app publicada.
 
 ### Qué no anda
 
@@ -50,7 +50,6 @@ El registro histórico de la edición móvil describe:
 
 - Edición móvil compartida para Android y iPhone, con identidad visual oficial, pestañas, navegación, favoritos, historial, modo de escritorio, Centro de Privacidad y Patagonia AI local.
 - APK Android 1.0.0 optimizado y firmado para pruebas familiares, compatible con Android 7 o posterior y verificado con los esquemas de firma APK v2 y v3.
-- Proyecto iPhone generado con iconos completos y configuración de privacidad validada. La compilación y firma final requieren macOS, Xcode y una cuenta Apple.
 
 ## Implementado en escritorio
 
