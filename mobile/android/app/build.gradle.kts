@@ -7,9 +7,6 @@ plugins {
 }
 
 val previewBuild = System.getenv("PATAGONIA_PREVIEW") == "1"
-// Prueba de fuego de GeckoView: app aparte ("Patagonia Gecko Prueba"), firmada con la
-// clave de debug. Nunca reemplaza a la app de la familia.
-val geckoSpikeBuild = System.getenv("PATAGONIA_GECKO_SPIKE") == "1"
 val signingProperties = Properties()
 val signingFile = rootProject.file("key.properties")
 if (signingFile.exists()) {
@@ -43,22 +40,15 @@ android {
         // flag during build.
         versionCode = flutter.versionCode
         versionName = flutter.versionName
-        manifestPlaceholders["appLabel"] = when {
-            geckoSpikeBuild -> "Patagonia Gecko Prueba"
-            previewBuild -> "Patagonia Pruebas"
-            else -> "Patagonia Browser"
-        }
-        if (geckoSpikeBuild) {
-            applicationIdSuffix = ".geckoprueba"
-            versionNameSuffix = "-gecko-prueba"
-        } else if (previewBuild) {
+        manifestPlaceholders["appLabel"] = if (previewBuild) "Patagonia Pruebas" else "Patagonia Browser"
+        if (previewBuild) {
             applicationIdSuffix = ".preview"
             versionNameSuffix = "-prueba"
         }
     }
 
     signingConfigs {
-        if (signingFile.exists() && !previewBuild && !geckoSpikeBuild) {
+        if (signingFile.exists() && !previewBuild) {
             create("patagoniaRelease") {
                 storeFile = rootProject.file(requireNotNull(signingProperties.getProperty("storeFile")))
                 storePassword = signingProperties.getProperty("storePassword")
@@ -72,7 +62,7 @@ android {
         release {
             // Preview installs separately. Official updates use the original
             // local key, or remain unsigned for the existing external signer.
-            if (previewBuild || geckoSpikeBuild) {
+            if (previewBuild) {
                 signingConfig = signingConfigs.getByName("debug")
             } else if (signingFile.exists()) {
                 signingConfig = signingConfigs.getByName("patagoniaRelease")
