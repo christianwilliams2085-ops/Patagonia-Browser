@@ -43,4 +43,3 @@
       "extract-zip": "npm:@electron-internal/extract-zip@1.0.5"
     }
   }
-}

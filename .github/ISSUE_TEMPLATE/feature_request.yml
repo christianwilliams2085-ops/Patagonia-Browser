@@ -1,0 +1,42 @@
+name: Proponer una mejora
+description: Sugerí una mejora concreta para Patagonia Browser.
+title: "[Mejora]: "
+labels:
+  - enhancement
+body:
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Plataforma
+      options:
+        - Windows
+        - Android
+        - iPhone / iOS
+        - Todas
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problema que resolvería
+      description: Contá qué necesidad real existe antes de describir la solución.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Propuesta
+      description: Explicá cómo debería funcionar para el usuario.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternativas consideradas
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Comprobación
+      options:
+        - label: Busqué y no encontré una propuesta abierta equivalente.
+          required: true
