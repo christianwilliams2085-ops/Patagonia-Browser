@@ -2,9 +2,32 @@
 
 > Navegá libre. Navegá seguro.
 
-Proyecto de navegador de escritorio enfocado en una experiencia sencilla y en el control del usuario. Actualmente es un prototipo funcional en desarrollo; los objetivos de privacidad y seguridad todavía requieren implementación y validación adicionales.
+Navegador para **Windows** (Electron) y **Android/iPhone** (Flutter), enfocado en una experiencia sencilla y en el control del usuario. Es un prototipo funcional en desarrollo, no una versión estable; los objetivos de privacidad y seguridad todavía requieren implementación y validación adicionales.
 
-## Disponible
+Todo el código está en este repositorio:
+
+| Carpeta | Qué es | Versión |
+|---|---|---|
+| raíz (`main.js`, `src/`, `ui/`…) | Navegador de escritorio para Windows | 1.0.5 |
+| `mobile/` | App de Android e iPhone | 1.0.5+8 |
+
+Para armar el instalador de Windows o los APK, seguí **[COMO-ARMAR.md](COMO-ARMAR.md)**.
+
+## En resumen: qué anda y qué no
+
+| | Estado |
+|---|---|
+| Windows: navegación, pestañas, favoritos, historial, descargas, sesiones | ✅ Anda |
+| Windows: bloqueo de anuncios y rastreadores (motor Ghostery) | ✅ Anda |
+| Windows: instalador | ⚠️ Anda, pero **sin firma**: Windows avisa al instalarlo |
+| Android: navegación, pestañas, favoritos, historial, privacidad por sitio | ✅ Anda (probado con pruebas automáticas; falta más prueba en teléfono) |
+| Android: bloqueo de anuncios en sitios comunes | ✅ Anda (lista de dominios + limpieza visual) |
+| **Android: anuncios de YouTube** | ❌ **No resuelto.** El script actual es conservador: no rompe el video, pero los anuncios siguen apareciendo |
+| iPhone | ⚠️ El proyecto compila en el simulador (GitHub, Mac); no hay app publicada |
+
+**Qué sigue:** probar en Android un motor alternativo, **GeckoView (Firefox) con uBlock Origin**, para ver si resuelve YouTube. Ver [PROJECT_STATUS.md](PROJECT_STATUS.md).
+
+## Disponible en Windows
 
 - Navegación por pestañas, búsqueda y controles de navegación.
 - Nueva pestaña propia con paisaje patagónico, buscador, accesos rápidos incorporados y accesos personalizados guardados en el equipo.
@@ -44,15 +67,11 @@ npm run build:portable
 
 ## Compartir con la familia
 
-La versión vigente para Windows x64 es **1.0.4**, publicada el 7 de septiembre de 2026. Descargá `Patagonia-Browser-Setup.exe` desde la [página de descargas](DOWNLOADS.md).
+La última versión **publicada** para Windows x64 es **1.0.4** (7 de septiembre de 2026). Descargá `Patagonia-Browser-Setup.exe` desde la [página de descargas](DOWNLOADS.md). El código de este repositorio ya está en **1.0.5**, que todavía no se publicó.
 
 El instalador está **sin firma de un proveedor reconocido** y Windows puede mostrar una advertencia o bloquear su ejecución. La publicación 1.0.4 sólo incluye el instalador; no publica un ZIP portátil ni un archivo de hashes separado. La versión portátil puede generarse desde el código con el comando indicado arriba.
 
-Para regenerar el instalador:
-
-```sh
-npm run make:windows
-```
+Para regenerar el instalador, ver [COMO-ARMAR.md](COMO-ARMAR.md) (`npm run make:windows`).
 
 ## Code signing policy
 
@@ -62,11 +81,15 @@ La [política de firma](CODE_SIGNING.md) describe el responsable, la compilació
 
 ## Android y iPhone
 
-El código fuente de `mobile/` todavía **no está publicado en `main`**. Por lo tanto, clonar esta rama no proporciona `mobile/ios` ni `mobile/IOS_RELEASE_CHECKLIST.md`.
+El código de la app móvil está en [`mobile/`](mobile/README.md) (Flutter 3.47.7). Con él se arman:
 
-Los artefactos móviles 1.0.0 para pruebas familiares están disponibles en la [publicación v1.0.3](https://github.com/christianwilliams2085-ops/Patagonia-Browser/releases/tag/v1.0.3): APK Android y ZIP del proyecto para iPhone. Esa etiqueta corresponde a la publicación que los contiene; la versión vigente de Windows es 1.0.4.
+- **APK de prueba** ("Patagonia Pruebas"): se instala aparte de la app oficial, no necesita contraseña.
+- **APK oficial firmado** ("Patagonia Browser"): actualiza la app instalada; necesita la clave original, que **no** está en Git.
+- **iPhone**: proyecto para compilar en una Mac con Xcode y una cuenta Apple.
 
-El APK Android se describe en esa publicación como firmado y compatible con Android 7 o posterior. Esa firma de Android es independiente de la firma de Windows y de SignPath. El ZIP de iPhone es un proyecto para compilar y firmar en una Mac con Xcode y una cuenta Apple; no es una app instalable directamente. Consultá la [política de privacidad móvil](PRIVACY.md).
+Los pasos están en [COMO-ARMAR.md](COMO-ARMAR.md). Los artefactos móviles 1.0.0 viejos siguen en la [publicación v1.0.3](https://github.com/christianwilliams2085-ops/Patagonia-Browser/releases/tag/v1.0.3). La firma de Android es independiente de la firma de Windows y de SignPath. Consultá la [política de privacidad móvil](PRIVACY.md).
+
+**YouTube en Android no está resuelto**: ver [mobile/README.md](mobile/README.md).
 
 ## Ejecutar
 
@@ -80,10 +103,11 @@ npm start
 ## Pruebas
 
 ```sh
-npm test
+npm test                                   # escritorio + motor Android + script de YouTube
+cd mobile && flutter analyze && flutter test   # app móvil
 ```
 
-La revisión del 3 de septiembre de 2026 pasa 101 pruebas automatizadas. Incluyen comprobaciones del motor integrado contra publicidad y seguimiento conocidos, además de las pruebas de navegación, interfaz, guardado y seguridad. Las pruebas automatizadas de interfaz utilizan un DOM simulado. También se comprobó en Electron sobre Windows el reinicio, la restauración de pestañas, el menú, la búsqueda, la nueva página de inicio y el Centro de privacidad.
+Al 31 de octubre de 2026: `npm test` pasa **171 de 171** pruebas y `flutter test` pasa **36 de 36**, con `flutter analyze` sin problemas. La prueba del motor Android compila código Java: necesita `java` en el PATH o la variable `JAVA_HOME`. Las pruebas de interfaz usan un DOM simulado; no reemplazan probar la app en una PC o un teléfono reales.
 
 Para buscar texto en una página, usá Ctrl+F. Enter o F3 avanza a la siguiente coincidencia; Mayús+Enter o Mayús+F3 retrocede. Escape cierra la barra. La búsqueda se cierra al cambiar de pestaña o navegar a otra página.
 
@@ -105,4 +129,4 @@ Ver [CONTRIBUTING.md](CONTRIBUTING.md). Las correcciones deben incluir las compr
 
 ## Licencia
 
-Consultar [LICENSE](LICENSE).
+[MIT](LICENSE). Excepción: `mobile/vendor/flutter_inappwebview_android` es una copia modificada de un plugin de terceros y conserva su propia licencia (Apache 2.0, ver su archivo `LICENSE`).

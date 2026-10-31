@@ -1,14 +1,42 @@
 # Patagonia Browser — estado del proyecto
 
-Actualización documental: 30 de septiembre de 2026. Las comprobaciones históricas conservan su alcance; esta actualización no incorpora nuevas pruebas del navegador.
+Actualización: 31 de octubre de 2026 (unificación de escritorio y móvil en un solo repositorio).
 
 ## Estado actual
 
-Prototipo funcional de escritorio en desarrollo. La base de navegación de Alpha 0.1 está implementada y hay funciones de Alpha 0.2. No se considera una versión estable ni una auditoría de seguridad completa.
+Prototipo funcional en desarrollo, con dos ediciones en el mismo repositorio: escritorio (Windows, Electron) y móvil (Android/iPhone, Flutter, carpeta `mobile/`). No se considera una versión estable ni una auditoría de seguridad completa.
+
+### Qué anda
+
+- **Windows**: navegación con pestañas, favoritos, historial, descargas, sesiones, permisos y bloqueo de anuncios y rastreadores (detalle abajo). El instalador 1.0.5 y la versión portátil se arman desde el código ([COMO-ARMAR.md](COMO-ARMAR.md)).
+- **Android**: navegación con pestañas, favoritos, historial, modo de escritorio, protección configurable por sitio y bloqueo por lista de dominios de anuncios y rastreadores. El APK de prueba 1.0.5 se arma desde el código.
+- **iPhone**: el proyecto compila para el simulador en GitHub Actions (Mac). No hay app publicada.
+
+### Qué no anda
+
+- **Anuncios de YouTube en Android: no resuelto.** Se usa el script conservador del PR #16, que quita datos publicitarios del reproductor y pulsa "Saltar" cuando está habilitado, sin silenciar ni adelantar el video. La limpieza CSS genérica se desactivó en YouTube porque podía ocultar el reproductor. Los anuncios siguen apareciendo (issue #12).
+- El instalador de Windows **no tiene firma** reconocida (ver "Versiones y firma").
+- La app de Android 1.0.5 no se probó todavía en un teléfono físico; solo con pruebas automáticas.
+
+### Qué sigue
+
+1. **Prueba de GeckoView + uBlock Origin en Android**: armar un prototipo con el motor de Firefox (GeckoView) y la extensión uBlock Origin, y comparar con YouTube en un teléfono real. Si funciona, evaluar migrar la app móvil a ese motor.
+2. Probar el APK 1.0.5 de prueba en el teléfono y, si está bien, firmar y publicar el oficial.
+3. Publicar la versión 1.0.5 de Windows en GitHub Releases.
+
+### Pruebas al 31 de octubre de 2026
+
+| Comando | Resultado |
+|---|---|
+| `npm test` | 171 de 171 aprobadas (incluye el motor Java de Android y el script de YouTube) |
+| `flutter analyze` | Sin problemas |
+| `flutter test` | 36 de 36 aprobadas |
+| `npm run make:windows` | Instalador 1.0.5 generado |
+| APK de prueba (`PATAGONIA_PREVIEW=1`) | Generado: `com.patagoniabrowser.patagonia_browser.preview`, versión 1.0.5-prueba (código 8) |
 
 ## Versiones y firma
 
-La versión publicada vigente para Windows x64 es **1.0.4**, del 7 de septiembre de 2026. La [página de descargas](DOWNLOADS.md) enlaza el instalador `Patagonia-Browser-Setup.exe`, sin firma de un proveedor reconocido. Esa publicación no incluye un ZIP portátil ni un archivo de hashes separado.
+El código está en **1.0.5** (escritorio) y **1.0.5+8** (móvil). La última versión **publicada** para Windows x64 es **1.0.4**, del 7 de septiembre de 2026. La [página de descargas](DOWNLOADS.md) enlaza el instalador `Patagonia-Browser-Setup.exe`, sin firma de un proveedor reconocido. Esa publicación no incluye un ZIP portátil ni un archivo de hashes separado.
 
 La solicitud inicial a SignPath Foundation, enviada el 8 de septiembre de 2026, no fue aprobada por falta de suficientes señales públicas de adopción y colaboración, según el [issue #10](https://github.com/christianwilliams2085-ops/Patagonia-Browser/issues/10). Actualmente no existe un certificado activo ni un servicio de firma de SignPath para Patagonia Browser. No hay fechas ni aprobación futura garantizadas.
 
@@ -16,7 +44,7 @@ Consultá la [política de firma](CODE_SIGNING.md) y el [registro de la solicitu
 
 ## Artefactos móviles publicados
 
-El código fuente de `mobile/` todavía **no está publicado en `main`**. Los artefactos Android 1.0.0 y el proyecto iPhone 1.0.0 están en la [publicación v1.0.3](https://github.com/christianwilliams2085-ops/Patagonia-Browser/releases/tag/v1.0.3); su disponibilidad no implica que puedan compilarse desde esta rama. La firma APK es independiente del certificado de Windows y de SignPath.
+El código fuente de la app móvil está en `mobile/` y se compila desde este repositorio. Los artefactos viejos Android 1.0.0 y el proyecto iPhone 1.0.0 siguen en la [publicación v1.0.3](https://github.com/christianwilliams2085-ops/Patagonia-Browser/releases/tag/v1.0.3). La firma APK es independiente del certificado de Windows y de SignPath; la clave original se guarda fuera de Git.
 
 El registro histórico de la edición móvil describe:
 
@@ -61,7 +89,7 @@ Electron, JavaScript, HTML/CSS, Node.js, Ghostery Adblocker, Mozilla Readability
 
 ## Verificaciones históricas
 
-Los resultados siguientes corresponden al registro previo de desarrollo, no a pruebas ejecutadas con esta actualización documental. Las comprobaciones móviles no se pueden reproducir desde `main` mientras no esté publicado su código fuente.
+Los resultados siguientes corresponden al registro previo de desarrollo (versiones anteriores a 1.0.5). Las pruebas actuales están en "Pruebas al 31 de octubre de 2026", arriba.
 
 Como evidencia posterior de escritorio, la [compilación Windows en GitHub Actions](https://github.com/christianwilliams2085-ops/Patagonia-Browser/actions/runs/34228558369) generó un candidato sin firma. El flujo de CI no implica que exista un certificado activo.
 
@@ -110,7 +138,7 @@ Como antecedente histórico, la versión 1.0.3 incorporó el bloqueador real y c
 - Auditoría del aislamiento, la navegación y todos los canales IPC.
 - Integración opcional de IA: elegir proveedor, consentimiento para enviar contenido y gestión segura de credenciales.
 - Obtener firma digital reconocida para Windows y desarrollar las actualizaciones de la aplicación. Ya existen flujos de pruebas y compilación de candidatos sin firma en CI.
-- Publicar el código fuente móvil en `main` para permitir su revisión y compilación desde el repositorio.
+- Resolver los anuncios de YouTube en Android (probar GeckoView + uBlock Origin).
 - Reconciliar los documentos de arquitectura y planificación con la implementación actual.
 
 Los porcentajes históricos de implementación y las afirmaciones de seguridad de los documentos de planificación no son evidencia del estado del producto.
