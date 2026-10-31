@@ -6,7 +6,24 @@ Proyecto Flutter para Android y iPhone. Esta revisión se centra en Android.
 
 Inicio y búsqueda; pestañas durante la sesión; atrás, adelante y recarga; favoritos e historial locales; asistente local para extraer un resumen, título o dirección; modo de escritorio; protección configurable por sitio.
 
-## Protección preventiva de YouTube 1.0.4+7
+## Estado de YouTube en 1.0.5+8 (no resuelto)
+
+**YouTube sigue mostrando anuncios en Android.** Esta revisión no lo soluciona: deja una base
+prudente que no rompe la reproducción, a la espera de probar otro motor (GeckoView con uBlock Origin).
+
+- Se usa el script **conservador** del PR #16 (`assets/youtube-protection.js`): quita
+  `playerAds`, `adPlacements` y `adSlots` de las respuestas del reproductor y pulsa solo botones
+  de "Saltar" habilitados. **No** silencia, **no** adelanta el video y **no** cambia la velocidad.
+- La limpieza CSS genérica de anuncios **no se aplica en YouTube** (podía ocultar el contenedor
+  del video). En el resto de los sitios sigue activa.
+- El motor nativo evalúa todas las reglas aunque una no coincida (arreglo del PR #16 en
+  `ContentBlockerHandler.java`).
+- El script agresivo de la revisión 1.0.4 (descripto abajo) se retiró del proyecto.
+
+Pruebas: `flutter test` (desde `mobile/`) y, desde la raíz del repositorio,
+`node --test tests/youtube-mobile.test.cjs tests/android-content-blocker.test.cjs`.
+
+## Historial: protección preventiva de YouTube 1.0.4+7 (retirada)
 
 La revisión 1.0.3 actuaba después de que YouTube ya había iniciado el anuncio. La prueba real del teléfono confirmó que eso no alcanzaba. En 1.0.4, el filtro se registra como `AT_DOCUMENT_START` en el mundo JavaScript principal del WebView, antes de que YouTube construya su reproductor.
 
@@ -62,7 +79,7 @@ Flutter 3.47.2 y Dart 3.13.2 (misma revisión de Flutter que figura en el proyec
 
 Además: 14 pruebas DOM de YouTube con Node.js y jsdom 29.1.1. Verifican limpieza preventiva del valor inicial, `JSON.parse`, `fetch`, clones y XHR; respuesta SSAP sin botón; anuncios del feed; etiquetas en español/inglés/portugués; Shadow DOM; restauración del medio; idempotencia; aislamiento de dominios y reversión de APIs.
 
-Para las pruebas DOM, con jsdom instalado en el entorno de desarrollo: `node --test test/youtube-protection.test.cjs`. jsdom no forma parte de la aplicación Android.
+Esas pruebas DOM eran del script agresivo, que se retiró. Las del script actual están en `tests/youtube-mobile.test.cjs` (raíz del repositorio) y se corren con `npm test`. jsdom no forma parte de la aplicación Android.
 
 La versión 1.0.3+6 se compiló e instaló en Android, pero su reacción tardía no bloqueó el formato mostrado en la prueba real. La nueva 1.0.4+7 todavía requiere generar el APK con el lanzador incluido y comprobar exactamente ese anuncio previo en el teléfono.
 
