@@ -25,7 +25,7 @@ Para armar el instalador de Windows o los APK, seguí **[COMO-ARMAR.md](COMO-ARM
 | **Android: anuncios de YouTube** | ❌ **No resuelto.** El script actual es conservador: no rompe el video, pero los anuncios siguen apareciendo |
 | iPhone | ⚠️ Proyecto listo para compilar en una Mac; el chequeo automático todavía no corrió y no hay app publicada |
 
-**Qué sigue:** probar en Android un motor alternativo, **GeckoView (Firefox) con uBlock Origin**, para ver si resuelve YouTube. Ver [PROJECT_STATUS.md](PROJECT_STATUS.md).
+**Qué sigue:** probar en Android un motor alternativo, **GeckoView (Firefox) con uBlock Origin**, para ver si resuelve YouTube. Ver [PROJECT_STATUS.md](docs/desarrollo/PROJECT_STATUS.md).
 
 ## Disponible en Windows
 
@@ -121,7 +121,7 @@ Electron/Chromium, JavaScript, HTML/CSS, Node.js, Ghostery Adblocker, Mozilla Re
 
 Configuración avanzada, panel para revisar o revocar permisos, modo privado, integración opcional de IA, instalador firmado y actualizaciones de la aplicación. Estas capacidades no deben considerarse disponibles todavía.
 
-Consultá [PROJECT_STATUS.md](PROJECT_STATUS.md) para conocer el estado real y sus limitaciones. Los demás documentos de arquitectura y roadmap incluyen objetivos futuros.
+Consultá [PROJECT_STATUS.md](docs/desarrollo/PROJECT_STATUS.md) para conocer el estado real y sus limitaciones. Los demás documentos de arquitectura y roadmap incluyen objetivos futuros.
 
 ## Contribuir
 
