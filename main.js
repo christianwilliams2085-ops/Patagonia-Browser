@@ -608,7 +608,8 @@ function crearVentana() {
                 "preload.js"
             ),
             contextIsolation: true,
-            nodeIntegration: false
+            nodeIntegration: false,
+            sandbox: true
         }
     });
 
