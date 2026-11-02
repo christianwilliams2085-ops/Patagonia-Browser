@@ -20,7 +20,7 @@ El motor de bloqueo integrado utiliza la biblioteca de Ghostery para descargar y
 
 La excepción de protección para un sitio cambia el bloqueo de ese sitio; no debe interpretarse como un control que impida las descargas de listas. Las actualizaciones de listas no equivalen a actualizar el programa completo.
 
-Google está configurado como página de inicio predeterminada; se puede consultar su [política de privacidad](https://policies.google.com/privacy). Cada sitio visitado aplica sus propias condiciones.
+Google está configurado como página de inicio predeterminada; se puede consultar su [política de privacidad](https://policies.google.com/privacy). Lo que se escribe en la barra de direcciones o en el buscador de la nueva pestaña y no es una dirección web se envía a DuckDuckGo para realizar la búsqueda; se puede consultar su [política de privacidad](https://duckduckgo.com/privacy). Cada sitio visitado aplica sus propias condiciones.
 
 La biblioteca de bloqueo define listas alojadas en GitHub. Las descargas desde ese servicio y el uso del repositorio o de sus páginas de publicaciones se rigen por la [declaración de privacidad de GitHub](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement). La definición de los proveedores de listas se encuentra en el [código de Ghostery Adblocker](https://github.com/ghostery/adblocker/blob/master/packages/adblocker/src/fetch.ts).
 

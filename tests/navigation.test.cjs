@@ -81,6 +81,6 @@ test("preserves ordinary domains and searches without confusing local-looking te
     assert.equal(prepararDireccion("example.com/ruta"), "https://example.com/ruta");
     assert.equal(prepararDireccion("localhost.example.com"), "https://localhost.example.com");
     for (const texto of ["buscar noticias", "localhost tutorial", "localhost:3000 buscar"]) {
-        assert.equal(prepararDireccion(texto), `https://www.google.com/search?q=${encodeURIComponent(texto)}`);
+        assert.equal(prepararDireccion(texto), `https://duckduckgo.com/?q=${encodeURIComponent(texto)}`);
     }
 });

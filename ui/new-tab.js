@@ -12,7 +12,7 @@
             return `http://${texto}`;
         }
         if (texto.includes(" ") || !texto.includes(".")) {
-            return `https://www.google.com/search?q=${encodeURIComponent(texto)}`;
+            return `https://duckduckgo.com/?q=${encodeURIComponent(texto)}`;
         }
         return `https://${texto}`;
     }
