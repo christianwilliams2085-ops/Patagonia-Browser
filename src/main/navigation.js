@@ -27,7 +27,7 @@ function prepararDireccion(direccion) {
         !texto.includes(".")
     ) {
         return (
-            "https://www.google.com/search?q=" +
+            "https://duckduckgo.com/?q=" +
             encodeURIComponent(texto)
         );
     }

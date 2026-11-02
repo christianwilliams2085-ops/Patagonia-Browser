@@ -13,7 +13,7 @@ test("new tab prepares searches, web addresses and safe custom shortcuts", () =>
         window.HTMLDialogElement.prototype.close = function () { this.removeAttribute("open"); };
         window.eval(fs.readFileSync(path.join(__dirname, "../ui/new-tab.js"), "utf8"));
         const api = window.PatagoniaNewTab;
-        assert.equal(api.prepararDireccion("montañas de la patagonia"), "https://www.google.com/search?q=monta%C3%B1as%20de%20la%20patagonia");
+        assert.equal(api.prepararDireccion("montañas de la patagonia"), "https://duckduckgo.com/?q=monta%C3%B1as%20de%20la%20patagonia");
         assert.equal(api.prepararDireccion("example.com"), "https://example.com");
         assert.equal(api.prepararDireccion("localhost:3000"), "http://localhost:3000");
         assert.deepEqual(
