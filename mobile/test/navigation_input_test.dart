@@ -25,7 +25,7 @@ void main() {
           'https://user:secret@example.com',
           '999.1.1.1',
         ]) {
-          expect(NavigationInput.resolve(input).host, 'www.google.com');
+          expect(NavigationInput.resolve(input).host, 'duckduckgo.com');
         }
       },
     );
@@ -53,8 +53,8 @@ void main() {
 
     test('convierte texto en una búsqueda segura', () {
       final uri = NavigationInput.resolve('clima en Bariloche');
-      expect(uri.host, 'www.google.com');
-      expect(uri.path, '/search');
+      expect(uri.host, 'duckduckgo.com');
+      expect(uri.path, '/');
       expect(uri.queryParameters['q'], 'clima en Bariloche');
     });
   });

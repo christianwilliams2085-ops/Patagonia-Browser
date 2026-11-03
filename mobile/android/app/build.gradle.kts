@@ -15,7 +15,10 @@ if (signingFile.exists()) {
 
 android {
     namespace = "com.patagoniabrowser.patagonia_browser"
-    compileSdk = flutter.compileSdkVersion
+    // GeckoView 159 pide compilar contra Android 37.2.
+    compileSdk {
+        version = release(37) { minorApiLevel = 2 }
+    }
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
@@ -28,7 +31,8 @@ android {
         applicationId = "com.patagoniabrowser.patagonia_browser"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = 24
+        // GeckoView necesita Android 8.0 (API 26) como mínimo.
+        minSdk = 26
         targetSdk = flutter.targetSdkVersion
         // Uses the version code from pubspec.yaml. When using split APKs, 1000 * ABI_VERSION
         // is added automatically by Flutter. (https://developer.android.com/studio/build/configure-apk-splits#configure-APK-versions)
@@ -65,6 +69,25 @@ android {
             }
         }
     }
+
+    packaging {
+        // Comprime las bibliotecas nativas (libxul.so de GeckoView) dentro del APK.
+        jniLibs {
+            useLegacyPackaging = true
+            // Todos los celulares de la familia son de 64 bits: solo arm64. GeckoView pesa
+            // ~65 MB por arquitectura y Flutter ignora ndk.abiFilters, por eso se excluye acá.
+            excludes += listOf("lib/armeabi-v7a/**", "lib/x86_64/**", "lib/x86/**")
+        }
+    }
+
+    androidResources {
+        // El .xpi de uBlock Origin ya es un zip: se guarda tal cual.
+        noCompress += "xpi"
+    }
+}
+
+dependencies {
+    implementation("org.mozilla.geckoview:geckoview:159.0.20261022150525")
 }
 
 kotlin {

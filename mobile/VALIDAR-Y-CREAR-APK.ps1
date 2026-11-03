@@ -22,10 +22,12 @@ try {
     Invoke-Flutter -Arguments @('analyze', '--no-pub')
     Invoke-Flutter -Arguments @('test', '--no-pub', 'test/packaged_assets_test.dart')
     Invoke-Flutter -Arguments @('test', '--no-pub')
-    Invoke-Flutter -Arguments @('build', 'apk', '--release', '--no-pub')
+    # Solo arm64: GeckoView pesa ~65 MB por arquitectura y todos los celulares de la familia son de 64 bits.
+    Invoke-Flutter -Arguments @('build', 'apk', '--release', '--no-pub', '--target-platform', 'android-arm64')
     $output = Join-Path $PSScriptRoot 'entrega-android'
     New-Item -ItemType Directory -Path $output -Force | Out-Null
-    $apk = Join-Path $output "Patagonia-Android-1.0.5-$Modo.apk"
+    $version = (Select-String -LiteralPath 'pubspec.yaml' -Pattern '^version:\s*([0-9.]+)').Matches[0].Groups[1].Value
+    $apk = Join-Path $output "Patagonia-Android-$version-$Modo.apk"
     Copy-Item -LiteralPath 'build\app\outputs\flutter-apk\app-release.apk' -Destination $apk -Force
     Write-Host "APK creado: $apk"
     if ($Modo -eq 'Prueba') { Write-Host 'Se instala como Patagonia Pruebas, separado de la versión anterior.' }
