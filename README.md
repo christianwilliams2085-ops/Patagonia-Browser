@@ -67,9 +67,9 @@ npm run build:portable
 
 ## Compartir con la familia
 
-La última versión **publicada** para Windows x64 es **1.0.4** (7 de septiembre de 2026). Descargá `Patagonia-Browser-Setup.exe` desde la [página de descargas](DOWNLOADS.md). El código de este repositorio ya está en **1.0.5**, que todavía no se publicó.
+La última versión **publicada** para Windows x64 es **1.0.5** (3 de noviembre de 2026). Descargá `Patagonia-Browser-Setup.exe` desde la [página de descargas](DOWNLOADS.md).
 
-El instalador está **sin firma de un proveedor reconocido** y Windows puede mostrar una advertencia o bloquear su ejecución. La publicación 1.0.4 sólo incluye el instalador; no publica un ZIP portátil ni un archivo de hashes separado. La versión portátil puede generarse desde el código con el comando indicado arriba.
+El instalador está **sin firma de un proveedor reconocido** y Windows puede mostrar una advertencia o bloquear su ejecución. La publicación 1.0.5 sólo incluye el instalador; no publica un ZIP portátil ni un archivo de hashes separado. La versión portátil puede generarse desde el código con el comando indicado arriba.
 
 Para regenerar el instalador, ver [COMO-ARMAR.md](COMO-ARMAR.md) (`npm run make:windows`).
 

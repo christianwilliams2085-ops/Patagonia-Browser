@@ -36,7 +36,7 @@ Prototipo funcional en desarrollo, con dos ediciones en el mismo repositorio: es
 
 ## Versiones y firma
 
-El código está en **1.0.5** (escritorio) y **1.0.5+8** (móvil). La última versión **publicada** para Windows x64 es **1.0.4**, del 7 de septiembre de 2026. La [página de descargas](../../DOWNLOADS.md) enlaza el instalador `Patagonia-Browser-Setup.exe`, sin firma de un proveedor reconocido. Esa publicación no incluye un ZIP portátil ni un archivo de hashes separado.
+El código está en **1.0.5** (escritorio) y **1.0.5+8** (móvil). La última versión **publicada** para Windows x64 es **1.0.5**, del 3 de noviembre de 2026. La [página de descargas](../../DOWNLOADS.md) enlaza el instalador `Patagonia-Browser-Setup.exe`, sin firma de un proveedor reconocido. Esa publicación no incluye un ZIP portátil ni un archivo de hashes separado.
 
 La solicitud inicial a SignPath Foundation, enviada el 8 de septiembre de 2026, no fue aprobada por falta de suficientes señales públicas de adopción y colaboración, según el [issue #10](https://github.com/christianwilliams2085-ops/Patagonia-Browser/issues/10). Actualmente no existe un certificado activo ni un servicio de firma de SignPath para Patagonia Browser. No hay fechas ni aprobación futura garantizadas.
 
@@ -114,7 +114,7 @@ También se construyó y ejecutó `Patagonia-Browser-Setup-1.0.0-Windows-x64.exe
 
 Después se incorporó el icono oficial elegido por Roma. Se extrajo el icono incrustado del nuevo ejecutable y del nuevo instalador y se confirmó visualmente que ambos contienen el diseño correcto.
 
-Como antecedente histórico, la versión 1.0.3 incorporó el bloqueador real y corrigió el cierre de pestañas y del navegador cuando el contenido ya fue destruido. El motor integrado se comprobó contra solicitudes conocidas de publicidad y seguimiento. Ese registro corresponde a una entrega anterior. Para la versión vigente de Windows 1.0.4, consultá [DOWNLOADS.md](../../DOWNLOADS.md).
+Como antecedente histórico, la versión 1.0.3 incorporó el bloqueador real y corrigió el cierre de pestañas y del navegador cuando el contenido ya fue destruido. El motor integrado se comprobó contra solicitudes conocidas de publicidad y seguimiento. Ese registro corresponde a una entrega anterior. Para la versión vigente de Windows 1.0.5, consultá [DOWNLOADS.md](../../DOWNLOADS.md).
 
 ## Correcciones registradas en la revisión histórica
 
