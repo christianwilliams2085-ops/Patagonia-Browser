@@ -167,7 +167,7 @@ cd ..
 ```
 
 GitHub corre las mismas pruebas solo en cada Pull Request
-(`.github/workflows/tests.yml`, `mobile-tests.yml` e `ios-validate.yml`).
+(`.github/workflows/tests.yml` y `mobile-tests.yml`).
 
 ## iPhone
 
