@@ -6,7 +6,17 @@ El formato está inspirado en "Keep a Changelog" y el proyecto seguirá Versiona
 
 ---
 
-## [Sin publicar] - 2026-09-03
+## [1.0.5] - 2026-11-03
+
+### Seguridad y privacidad
+
+- La ventana principal ahora usa `sandbox: true`, lo que aísla mejor el proceso de la interfaz.
+- El buscador por defecto cuando se escribe texto en la barra de direcciones y en la pestaña nueva pasó a ser DuckDuckGo.
+
+### Cambiado
+
+- Ícono de la aplicación rehecho desde el SVG vectorial: centrado, nítido y con fondo transparente (el anterior salía de una foto pequeña estirada).
+- La documentación se reorganizó en `docs/producto`, `docs/arquitectura` y `docs/desarrollo`; se eliminaron archivos duplicados u obsoletos.
 
 ### Corregido
 
@@ -74,7 +84,6 @@ El formato está inspirado en "Keep a Changelog" y el proyecto seguirá Versiona
 - Reinicio verificado en Windows desde un acceso directo, restauración de cinco pestañas y comprobación real del menú, búsqueda con coincidencias y cambio de pestañas por teclado.
 - Estado real de navegación, favoritos, historial, descargas, sesiones y asistente local.
 - 101 pruebas aprobadas; validación manual de diálogos de permisos y fallo del guardado, validación en otras plataformas y conexión a un modelo de IA pendientes.
- c
 ## [0.1.0] - En desarrollo
 
 ### Agregado

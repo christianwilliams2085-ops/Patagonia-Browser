@@ -4,19 +4,23 @@ Patagonia es un navegador de escritorio en desarrollo con navegación por pesta�
 
 ## Windows x64
 
-- [Descargar el instalador de Patagonia Browser 1.0.4](https://github.com/christianwilliams2085-ops/Patagonia-Browser/releases/download/v1.0.4/Patagonia-Browser-Setup.exe).
-- [Ver la publicación 1.0.4](https://github.com/christianwilliams2085-ops/Patagonia-Browser/releases/tag/v1.0.4).
+- [Descargar el instalador de Patagonia Browser 1.0.5](https://github.com/christianwilliams2085-ops/Patagonia-Browser/releases/download/v1.0.5/Patagonia-Browser-Setup.exe).
+- [Ver la publicación 1.0.5](https://github.com/christianwilliams2085-ops/Patagonia-Browser/releases/tag/v1.0.5).
 - [Consultar todas las versiones publicadas](https://github.com/christianwilliams2085-ops/Patagonia-Browser/releases).
 
-La versión 1.0.4 fue publicada el 7 de septiembre de 2026. El instalador actual está **sin firma de un proveedor reconocido** y Windows puede bloquear su ejecución.
+La versión 1.0.5 fue publicada el 3 de noviembre de 2026. El instalador actual está **sin firma de un proveedor reconocido** y Windows puede bloquear su ejecución.
 
-La publicación 1.0.4 sólo incluye `Patagonia-Browser-Setup.exe`; no contiene un ZIP portátil ni un archivo de hashes separado. Los artefactos de versiones anteriores no deben presentarse como Windows 1.0.4.
+La publicación 1.0.5 sólo incluye `Patagonia-Browser-Setup.exe`; no contiene un ZIP portátil ni un archivo de hashes separado. Para verificar la descarga, su huella SHA-256 es:
+
+`166416e088e31d07e743bf62f209c113094c81c6515ca7296dab6c1fd913cc3f`
+
+En PowerShell: `Get-FileHash .\Patagonia-Browser-Setup.exe -Algorithm SHA256`.
 
 ## Code signing policy
 
 La solicitud inicial a SignPath Foundation, enviada el 8 de septiembre de 2026, no fue aprobada por falta de suficientes señales públicas de adopción y colaboración, según el [issue #10](https://github.com/christianwilliams2085-ops/Patagonia-Browser/issues/10). Actualmente no existe un certificado activo ni un servicio de firma de SignPath para Patagonia Browser. No hay fechas ni aprobación futura garantizadas.
 
-El instalador de Windows 1.0.4 no está firmado por SignPath.
+El instalador de Windows 1.0.5 no está firmado por SignPath.
 
 La [Code signing policy](CODE_SIGNING.md) identifica al mantenedor, las responsabilidades de firma, el origen verificable de las compilaciones y las condiciones pendientes. La atribución del proveedor sólo correspondería si se obtuviera aprobación y el servicio estuviera activo.
 
