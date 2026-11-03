@@ -23,7 +23,7 @@ class NavigationInput {
             : address;
       }
     }
-    return Uri.https('www.google.com', '/search', {'q': input});
+    return Uri.https('duckduckgo.com', '/', {'q': input});
   }
 
   static bool _looksLikeHost(String host) {
