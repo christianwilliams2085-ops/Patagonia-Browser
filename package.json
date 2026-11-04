@@ -15,7 +15,7 @@
     "make:windows": "node scripts/make-windows.cjs"
   },
   "keywords": [],
-  "author": "Patagonia Browser Project",
+  "author": "Roma.69",
   "license": "MIT",
   "type": "commonjs",
   "devDependencies": {
