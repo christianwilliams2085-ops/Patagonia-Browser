@@ -9,20 +9,19 @@ Prototipo funcional en desarrollo, con dos ediciones en el mismo repositorio: es
 ### Qué anda
 
 - **Windows**: navegación con pestañas, favoritos, historial, descargas, sesiones, permisos y bloqueo de anuncios y rastreadores (detalle abajo). El instalador 1.0.5 y la versión portátil se arman desde el código ([COMO-ARMAR.md](../../COMO-ARMAR.md)).
-- **Android**: navegación con pestañas, favoritos, historial, modo de escritorio, protección configurable por sitio y bloqueo por lista de dominios de anuncios y rastreadores. El APK de prueba 1.0.5 se arma desde el código.
-- **iPhone**: el proyecto está en `mobile/ios`, con iconos y configuración de privacidad. Solo se puede compilar y firmar en una Mac con Xcode y una cuenta Apple. El chequeo automático para el simulador (`ios-validate.yml`) se agregó en esta versión y todavía no corrió en GitHub. No hay app publicada.
+- **Android**: navegación con pestañas, favoritos, historial, modo de escritorio, protección configurable por sitio y bloqueo de anuncios con uBlock Origin sobre el motor GeckoView (Firefox). La versión 1.1.0 está publicada y probada en un Motorola.
+- **iPhone**: el proyecto está en `mobile/ios`, con iconos y configuración de privacidad. Solo se puede compilar y firmar en una Mac con Xcode y una cuenta Apple. No hay chequeo automático de iPhone en GitHub (se quitó) ni app publicada.
 
 ### Qué no anda
 
-- **Anuncios de YouTube en Android: no resuelto.** Se usa el script conservador del PR #16, que quita datos publicitarios del reproductor y pulsa "Saltar" cuando está habilitado, sin silenciar ni adelantar el video. La limpieza CSS genérica se desactivó en YouTube porque podía ocultar el reproductor. Los anuncios siguen apareciendo (issue #12).
+- **Android: el video de YouTube se pausa al cambiar de pestaña** y hay que darle play. Los anuncios de YouTube ya no aparecen en las pruebas (issue #12).
 - El instalador de Windows **no tiene firma** reconocida (ver "Versiones y firma").
-- La app de Android 1.0.5 no se probó todavía en un teléfono físico; solo con pruebas automáticas.
 
 ### Qué sigue
 
-1. **Prueba de GeckoView + uBlock Origin en Android**: armar un prototipo con el motor de Firefox (GeckoView) y la extensión uBlock Origin, y comparar con YouTube en un teléfono real. Si funciona, evaluar migrar la app móvil a ese motor.
-2. Probar el APK 1.0.5 de prueba en el teléfono y, si está bien, firmar y publicar el oficial.
-3. Publicar la versión 1.0.5 de Windows en GitHub Releases.
+1. Revisar que el video de YouTube siga sonando o no se pause al cambiar de pestaña en Android.
+2. Seguir probando Android 1.1.0 en otros teléfonos de la familia.
+3. Microsoft Store (Windows): pendiente.
 
 ### Pruebas al 31 de octubre de 2026
 
@@ -36,7 +35,7 @@ Prototipo funcional en desarrollo, con dos ediciones en el mismo repositorio: es
 
 ## Versiones y firma
 
-El código está en **1.0.5** (escritorio) y **1.0.5+8** (móvil). La última versión **publicada** para Windows x64 es **1.0.5**, del 3 de noviembre de 2026. La [página de descargas](../../DOWNLOADS.md) enlaza el instalador `Patagonia-Browser-Setup.exe`, sin firma de un proveedor reconocido. Esa publicación no incluye un ZIP portátil ni un archivo de hashes separado.
+El código está en **1.0.5** (escritorio) y **1.1.0+9** (móvil). La última versión **publicada** para Windows x64 es **1.0.5**, del 3 de noviembre de 2026; para Android, **1.1.0**, del 4 de noviembre de 2026. La [página de descargas](../../DOWNLOADS.md) enlaza el instalador `Patagonia-Browser-Setup.exe`, sin firma de un proveedor reconocido. Esa publicación no incluye un ZIP portátil ni un archivo de hashes separado.
 
 La solicitud inicial a SignPath Foundation, enviada el 8 de septiembre de 2026, no fue aprobada por falta de suficientes señales públicas de adopción y colaboración, según el [issue #10](https://github.com/christianwilliams2085-ops/Patagonia-Browser/issues/10). Actualmente no existe un certificado activo ni un servicio de firma de SignPath para Patagonia Browser. No hay fechas ni aprobación futura garantizadas.
 

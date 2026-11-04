@@ -6,6 +6,19 @@ El formato está inspirado en "Keep a Changelog" y el proyecto seguirá Versiona
 
 ---
 
+## [Android 1.1.0] - 2026-11-04
+
+### Cambiado
+
+- La app de Android pasa del WebView al motor **GeckoView (Firefox)** con **uBlock Origin** integrado. Con este motor los anuncios de YouTube no aparecen en las pruebas.
+- Las búsquedas escritas en la barra de la app móvil usan DuckDuckGo.
+- APK solo para arm64 (celulares de 2020 en adelante).
+- Se quitó el chequeo automático de iPhone de GitHub Actions: no hay app de iPhone publicada.
+
+### Conocido
+
+- Al cambiar de pestaña, un video de YouTube queda en pausa y hay que darle play.
+
 ## [1.0.5] - 2026-11-03
 
 ### Seguridad y privacidad

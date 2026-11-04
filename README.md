@@ -9,7 +9,7 @@ Todo el código está en este repositorio:
 | Carpeta | Qué es | Versión |
 |---|---|---|
 | raíz (`main.js`, `src/`, `ui/`…) | Navegador de escritorio para Windows | 1.0.5 |
-| `mobile/` | App de Android e iPhone | 1.0.5+8 |
+| `mobile/` | App de Android e iPhone | 1.1.0+9 |
 
 Para armar el instalador de Windows o los APK, seguí **[COMO-ARMAR.md](COMO-ARMAR.md)**.
 
@@ -20,12 +20,12 @@ Para armar el instalador de Windows o los APK, seguí **[COMO-ARMAR.md](COMO-ARM
 | Windows: navegación, pestañas, favoritos, historial, descargas, sesiones | ✅ Anda |
 | Windows: bloqueo de anuncios y rastreadores (motor Ghostery) | ✅ Anda |
 | Windows: instalador | ⚠️ Anda, pero **sin firma**: Windows avisa al instalarlo |
-| Android: navegación, pestañas, favoritos, historial, privacidad por sitio | ✅ Anda (probado con pruebas automáticas; falta más prueba en teléfono) |
-| Android: bloqueo de anuncios en sitios comunes | ✅ Anda (lista de dominios + limpieza visual) |
-| **Android: anuncios de YouTube** | ❌ **No resuelto.** El script actual es conservador: no rompe el video, pero los anuncios siguen apareciendo |
-| iPhone | ⚠️ Proyecto listo para compilar en una Mac; el chequeo automático todavía no corrió y no hay app publicada |
+| Android: navegación, pestañas, favoritos, historial, privacidad por sitio | ✅ Anda (pruebas automáticas y prueba en un Motorola) |
+| Android: bloqueo de anuncios en sitios comunes | ✅ Anda (uBlock Origin sobre el motor GeckoView) |
+| **Android: anuncios de YouTube** | ✅ Sin anuncios en las pruebas (GeckoView + uBlock Origin). Limitación conocida: el video se pausa al cambiar de pestaña |
+| iPhone | ⚠️ Proyecto sin app publicada; se compila solo en una Mac con Xcode |
 
-**Qué sigue:** probar en Android un motor alternativo, **GeckoView (Firefox) con uBlock Origin**, para ver si resuelve YouTube. Ver [PROJECT_STATUS.md](docs/desarrollo/PROJECT_STATUS.md).
+**Qué sigue:** ver [PROJECT_STATUS.md](docs/desarrollo/PROJECT_STATUS.md).
 
 ## Disponible en Windows
 
@@ -89,7 +89,7 @@ El código de la app móvil está en [`mobile/`](mobile/README.md) (Flutter 3.47
 
 Los pasos están en [COMO-ARMAR.md](COMO-ARMAR.md). Los artefactos móviles 1.0.0 viejos siguen en la [publicación v1.0.3](https://github.com/christianwilliams2085-ops/Patagonia-Browser/releases/tag/v1.0.3). La firma de Android es independiente de la firma de Windows y de SignPath. Consultá la [política de privacidad móvil](PRIVACY.md).
 
-**YouTube en Android no está resuelto**: ver [mobile/README.md](mobile/README.md).
+**Android 1.1.0** usa el motor GeckoView (Firefox) con uBlock Origin. Descarga: [DOWNLOADS.md](DOWNLOADS.md). Detalles en [mobile/README.md](mobile/README.md).
 
 ## Ejecutar
 
