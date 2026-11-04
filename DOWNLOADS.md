@@ -16,6 +16,17 @@ La publicación 1.0.5 sólo incluye `Patagonia-Browser-Setup.exe`; no contiene u
 
 En PowerShell: `Get-FileHash .\Patagonia-Browser-Setup.exe -Algorithm SHA256`.
 
+## Android
+
+- [Descargar Patagonia Browser para Android 1.1.0 (APK)](https://github.com/christianwilliams2085-ops/Patagonia-Browser/releases/download/movil-v1.1.0/Patagonia-Android-1.1.0-Publicacion.apk).
+- [Ver la publicación](https://github.com/christianwilliams2085-ops/Patagonia-Browser/releases/tag/movil-v1.1.0).
+
+Requiere Android 8 o posterior en un teléfono de 64 bits (arm64). Si ya tenés Patagonia Browser instalado, este APK lo actualiza y conserva tus favoritos. Para instalarlo, Android puede pedirte permiso para "instalar apps de esta fuente".
+
+SHA-256: `22bc9716829d06f5ec8a50cd54abd7919aff843355816e36aadaa22eff1aad28`
+
+En PowerShell: `Get-FileHash .\Patagonia-Android-1.1.0-Publicacion.apk -Algorithm SHA256`
+
 ## Code signing policy
 
 La solicitud inicial a SignPath Foundation, enviada el 8 de septiembre de 2026, no fue aprobada por falta de suficientes señales públicas de adopción y colaboración, según el [issue #10](https://github.com/christianwilliams2085-ops/Patagonia-Browser/issues/10). Actualmente no existe un certificado activo ni un servicio de firma de SignPath para Patagonia Browser. No hay fechas ni aprobación futura garantizadas.
