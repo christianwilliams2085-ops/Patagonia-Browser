@@ -2,13 +2,13 @@
 
 ## Estado
 
-La solicitud inicial a SignPath Foundation, enviada el 8 de septiembre de 2026, no fue aprobada por falta de suficientes señales públicas de adopción y colaboración, según el [issue #10](https://github.com/christianwilliams2085-ops/Patagonia-Browser/issues/10). Actualmente no existe un certificado activo ni un servicio de firma de SignPath para Patagonia Browser. No hay fechas ni aprobación futura garantizadas.
+La solicitud inicial a SignPath Foundation, enviada el 8 de septiembre de 2026, no fue aprobada por falta de suficientes señales públicas de adopción y colaboración, según el [issue #10](https://github.com/Roma-69/Patagonia-Browser/issues/10). Actualmente no existe un certificado activo ni un servicio de firma de SignPath para Patagonia Browser. No hay fechas ni aprobación futura garantizadas.
 
 Los instaladores actuales de Windows siguen sin firma de un proveedor reconocido. Esta política y la compilación de candidatos no cambian esa situación por sí solas.
 
 ## Responsable propuesto
 
-Christian Williams, propietario del repositorio [christianwilliams2085-ops/Patagonia-Browser](https://github.com/christianwilliams2085-ops/Patagonia-Browser), será el autor, revisor y aprobador de las solicitudes de firma. Las contribuciones de terceros deberán ser revisadas por el mantenedor antes de incorporarse a una versión firmada.
+Roma.69, propietario del repositorio [Roma-69/Patagonia-Browser](https://github.com/Roma-69/Patagonia-Browser), será el autor, revisor y aprobador de las solicitudes de firma. Las contribuciones de terceros deberán ser revisadas por el mantenedor antes de incorporarse a una versión firmada.
 
 Antes de habilitar firmas se deberá verificar la autenticación multifactor del responsable en GitHub y SignPath. Este documento no acredita que ese requisito ya esté configurado.
 

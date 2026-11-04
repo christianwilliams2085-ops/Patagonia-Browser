@@ -22,4 +22,4 @@ Patagonia Browser usa el motor WebKit incluido en iOS. La aplicación no adminis
 
 ## Cambios y contacto
 
-Las actualizaciones de esta política se publicarán en este mismo repositorio. Las consultas o reportes se pueden enviar mediante [GitHub Issues](https://github.com/christianwilliams2085-ops/Patagonia-Browser/issues).
+Las actualizaciones de esta política se publicarán en este mismo repositorio. Las consultas o reportes se pueden enviar mediante [GitHub Issues](https://github.com/Roma-69/Patagonia-Browser/issues).

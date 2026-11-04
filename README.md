@@ -75,7 +75,7 @@ Para regenerar el instalador, ver [COMO-ARMAR.md](COMO-ARMAR.md) (`npm run make:
 
 ## Code signing policy
 
-La solicitud inicial a SignPath Foundation, enviada el 8 de septiembre de 2026, no fue aprobada por falta de suficientes señales públicas de adopción y colaboración, según el [issue #10](https://github.com/christianwilliams2085-ops/Patagonia-Browser/issues/10). Actualmente no existe un certificado activo ni un servicio de firma de SignPath para Patagonia Browser. No hay fechas ni aprobación futura garantizadas.
+La solicitud inicial a SignPath Foundation, enviada el 8 de septiembre de 2026, no fue aprobada por falta de suficientes señales públicas de adopción y colaboración, según el [issue #10](https://github.com/Roma-69/Patagonia-Browser/issues/10). Actualmente no existe un certificado activo ni un servicio de firma de SignPath para Patagonia Browser. No hay fechas ni aprobación futura garantizadas.
 
 La [política de firma](CODE_SIGNING.md) describe el responsable, la compilación verificable y las comprobaciones requeridas antes de publicar una versión firmada. El [registro de la solicitud](docs/SIGNPATH_APPLICATION.md) contiene los datos del proyecto, los textos enviados y los requisitos pendientes. La edición de Windows tiene una [política de privacidad específica](PRIVACY_WINDOWS.md).
 
@@ -87,7 +87,7 @@ El código de la app móvil está en [`mobile/`](mobile/README.md) (Flutter 3.47
 - **APK oficial firmado** ("Patagonia Browser"): actualiza la app instalada; necesita la clave original, que **no** está en Git.
 - **iPhone**: proyecto para compilar en una Mac con Xcode y una cuenta Apple.
 
-Los pasos están en [COMO-ARMAR.md](COMO-ARMAR.md). Los artefactos móviles 1.0.0 viejos siguen en la [publicación v1.0.3](https://github.com/christianwilliams2085-ops/Patagonia-Browser/releases/tag/v1.0.3). La firma de Android es independiente de la firma de Windows y de SignPath. Consultá la [política de privacidad móvil](PRIVACY.md).
+Los pasos están en [COMO-ARMAR.md](COMO-ARMAR.md). Los artefactos móviles 1.0.0 viejos siguen en la [publicación v1.0.3](https://github.com/Roma-69/Patagonia-Browser/releases/tag/v1.0.3). La firma de Android es independiente de la firma de Windows y de SignPath. Consultá la [política de privacidad móvil](PRIVACY.md).
 
 **Android 1.1.0** usa el motor GeckoView (Firefox) con uBlock Origin. Descarga: [DOWNLOADS.md](DOWNLOADS.md). Detalles en [mobile/README.md](mobile/README.md).
 

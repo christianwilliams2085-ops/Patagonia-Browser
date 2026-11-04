@@ -21,7 +21,7 @@ const _blue = Color(0xFF50A7D8);
 const _green = Color(0xFF35D35B);
 const _muted = Color(0xFFAEC0CF);
 const _privacyPolicyUrl =
-    'https://github.com/christianwilliams2085-ops/Patagonia-Browser/blob/main/PRIVACY.md';
+    'https://github.com/Roma-69/Patagonia-Browser/blob/main/PRIVACY.md';
 
 class BrowserShell extends StatefulWidget {
   const BrowserShell({super.key});

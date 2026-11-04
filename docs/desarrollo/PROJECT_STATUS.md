@@ -37,13 +37,13 @@ Prototipo funcional en desarrollo, con dos ediciones en el mismo repositorio: es
 
 El código está en **1.0.5** (escritorio) y **1.1.0+9** (móvil). La última versión **publicada** para Windows x64 es **1.0.5**, del 3 de noviembre de 2026; para Android, **1.1.0**, del 4 de noviembre de 2026. La [página de descargas](../../DOWNLOADS.md) enlaza el instalador `Patagonia-Browser-Setup.exe`, sin firma de un proveedor reconocido. Esa publicación no incluye un ZIP portátil ni un archivo de hashes separado.
 
-La solicitud inicial a SignPath Foundation, enviada el 8 de septiembre de 2026, no fue aprobada por falta de suficientes señales públicas de adopción y colaboración, según el [issue #10](https://github.com/christianwilliams2085-ops/Patagonia-Browser/issues/10). Actualmente no existe un certificado activo ni un servicio de firma de SignPath para Patagonia Browser. No hay fechas ni aprobación futura garantizadas.
+La solicitud inicial a SignPath Foundation, enviada el 8 de septiembre de 2026, no fue aprobada por falta de suficientes señales públicas de adopción y colaboración, según el [issue #10](https://github.com/Roma-69/Patagonia-Browser/issues/10). Actualmente no existe un certificado activo ni un servicio de firma de SignPath para Patagonia Browser. No hay fechas ni aprobación futura garantizadas.
 
 Consultá la [política de firma](../../CODE_SIGNING.md) y el [registro de la solicitud](../SIGNPATH_APPLICATION.md).
 
 ## Artefactos móviles publicados
 
-El código fuente de la app móvil está en `mobile/` y se compila desde este repositorio. Los artefactos viejos Android 1.0.0 y el proyecto iPhone 1.0.0 siguen en la [publicación v1.0.3](https://github.com/christianwilliams2085-ops/Patagonia-Browser/releases/tag/v1.0.3). La firma APK es independiente del certificado de Windows y de SignPath; la clave original se guarda fuera de Git.
+El código fuente de la app móvil está en `mobile/` y se compila desde este repositorio. Los artefactos viejos Android 1.0.0 y el proyecto iPhone 1.0.0 siguen en la [publicación v1.0.3](https://github.com/Roma-69/Patagonia-Browser/releases/tag/v1.0.3). La firma APK es independiente del certificado de Windows y de SignPath; la clave original se guarda fuera de Git.
 
 El registro histórico de la edición móvil describe:
 
@@ -89,7 +89,7 @@ Electron, JavaScript, HTML/CSS, Node.js, Ghostery Adblocker, Mozilla Readability
 
 Los resultados siguientes corresponden al registro previo de desarrollo (versiones anteriores a 1.0.5). Las pruebas actuales están en "Pruebas al 31 de octubre de 2026", arriba.
 
-Como evidencia posterior de escritorio, la [compilación Windows en GitHub Actions](https://github.com/christianwilliams2085-ops/Patagonia-Browser/actions/runs/34228558369) generó un candidato sin firma. El flujo de CI no implica que exista un certificado activo.
+Como evidencia posterior de escritorio, la [compilación Windows en GitHub Actions](https://github.com/Roma-69/Patagonia-Browser/actions/runs/34228558369) generó un candidato sin firma. El flujo de CI no implica que exista un certificado activo.
 
 La edición móvil pasa el análisis estático sin problemas y 14 pruebas automatizadas de navegación, privacidad, interfaz y Patagonia AI. El APK Android fue compilado con SDK 36, firmado con una clave familiar RSA de 4096 bits y validado con las herramientas oficiales de Android. Android reconoce el nombre `Patagonia Browser`, la versión 1.0.0, el icono y Android mínimo 7. Todavía falta probar la instalación y navegación en un teléfono físico. iPhone no puede compilarse en Windows; su proyecto e iconos quedaron preparados para abrirse en Xcode sobre una Mac.
 

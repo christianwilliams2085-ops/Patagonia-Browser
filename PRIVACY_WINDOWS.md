@@ -40,6 +40,6 @@ Desinstalar el programa puede conservar el perfil del usuario. Para eliminarlo c
 
 ## Consultas
 
-Los reportes pueden enviarse por [GitHub Issues](https://github.com/christianwilliams2085-ops/Patagonia-Browser/issues). Ese espacio es público; no se deben publicar contraseñas, cookies ni historiales personales.
+Los reportes pueden enviarse por [GitHub Issues](https://github.com/Roma-69/Patagonia-Browser/issues). Ese espacio es público; no se deben publicar contraseñas, cookies ni historiales personales.
 
 Esta documentación describe el comportamiento del código disponible, no una auditoría independiente ni una garantía de anonimato.

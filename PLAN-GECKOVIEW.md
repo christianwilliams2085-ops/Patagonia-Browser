@@ -185,7 +185,7 @@ Como GeckoView necesita actualizarse más o menos una vez por mes por seguridad,
 sola cuando hay versión nueva.
 
 - **Qué revisa:** los Releases públicos del repo en GitHub
-  (`api.github.com/repos/christianwilliams2085-ops/Patagonia-Browser/releases`). No necesita cuenta ni
+  (`api.github.com/repos/Roma-69/Patagonia-Browser/releases`). No necesita cuenta ni
   contraseña, y no manda ningún dato de la persona (GitHub solo ve la conexión, como cualquier página).
 - **Cómo distingue móvil de escritorio:** el repo tiene versiones de las dos cosas. Los Releases de
   Android usan etiquetas que empiezan con **`mobile-v`** (como la `mobile-v1.0.0` que ya existe), por
@@ -200,7 +200,7 @@ sola cuando hay versión nueva.
 - **Qué NO hace (a propósito):** no descarga ni instala sola. Instalar sola pide un permiso especial de
   Android y es más riesgoso; la persona baja el APK desde la página oficial y Android le pide confirmar.
   Como el APK nuevo tiene la misma firma, actualiza encima sin perder nada.
-- **Seguridad:** solo abre direcciones de `github.com/christianwilliams2085-ops/Patagonia-Browser`.
+- **Seguridad:** solo abre direcciones de `github.com/Roma-69/Patagonia-Browser`.
   En cada Release se publica también la huella SHA-256 del APK.
 - **Privacidad:** se puede apagar en el Centro de Privacidad ("Buscar actualizaciones"), y ahí se
   explica qué consulta hace.

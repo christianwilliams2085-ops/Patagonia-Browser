@@ -1,13 +1,13 @@
 # Solicitud de SignPath para Patagonia Browser
 
-La solicitud inicial a SignPath Foundation, enviada el 8 de septiembre de 2026, no fue aprobada por falta de suficientes señales públicas de adopción y colaboración, según el [issue #10](https://github.com/christianwilliams2085-ops/Patagonia-Browser/issues/10). Actualmente no existe un certificado activo ni un servicio de firma de SignPath para Patagonia Browser. No hay fechas ni aprobación futura garantizadas.
+La solicitud inicial a SignPath Foundation, enviada el 8 de septiembre de 2026, no fue aprobada por falta de suficientes señales públicas de adopción y colaboración, según el [issue #10](https://github.com/Roma-69/Patagonia-Browser/issues/10). Actualmente no existe un certificado activo ni un servicio de firma de SignPath para Patagonia Browser. No hay fechas ni aprobación futura garantizadas.
 
 Formulario oficial: https://signpath.org/apply
 
 ## Estado y requisitos pendientes
 
 - Las políticas de firma y privacidad de Windows ya se incorporaron a la rama principal mediante la solicitud de cambios #8.
-- Compilación Windows verificada: [ejecución satisfactoria](https://github.com/christianwilliams2085-ops/Patagonia-Browser/actions/runs/34228558369), con 148 pruebas aprobadas y el instalador generado.
+- Compilación Windows verificada: [ejecución satisfactoria](https://github.com/Roma-69/Patagonia-Browser/actions/runs/34228558369), con 148 pruebas aprobadas y el instalador generado.
 - Antes de habilitar firmas, verificar la autenticación multifactor del mantenedor en GitHub y SignPath conforme a las [condiciones del programa](https://signpath.org/terms). La recepción de la solicitud no acredita ese requisito.
 - El correo de contacto se completó en el formulario de SignPath y no se reproduce en este documento. No publicar correo privado, claves ni tokens en este registro.
 - La aprobación no está garantizada: SignPath también evalúa reputación verificable. Patagonia es un proyecto reciente con uso inicial limitado; no atribuirle usuarios, reseñas ni avales que no tenga.
@@ -22,15 +22,15 @@ Los campos y textos en inglés siguientes documentan el envío original del 8 de
 | Campo | Respuesta |
 |---|---|
 | Project Name | Patagonia Browser |
-| Repository URL | https://github.com/christianwilliams2085-ops/Patagonia-Browser |
-| Homepage URL | https://github.com/christianwilliams2085-ops/Patagonia-Browser |
-| Download URL | https://github.com/christianwilliams2085-ops/Patagonia-Browser/blob/main/DOWNLOADS.md |
-| Privacy Policy URL | https://github.com/christianwilliams2085-ops/Patagonia-Browser/blob/main/PRIVACY_WINDOWS.md |
+| Repository URL | https://github.com/Roma-69/Patagonia-Browser |
+| Homepage URL | https://github.com/Roma-69/Patagonia-Browser |
+| Download URL | https://github.com/Roma-69/Patagonia-Browser/blob/main/DOWNLOADS.md |
+| Privacy Policy URL | https://github.com/Roma-69/Patagonia-Browser/blob/main/PRIVACY_WINDOWS.md |
 | Wikipedia URL (optional) | Dejar vacío |
 | Maintainer Type | Individual maintainer(s) |
 | Build System | GitHub Actions; flujo incorporado y compilación Windows verificada. |
-| First Name | Christian |
-| Last Name | Williams |
+| First Name | Dato del mantenedor, omitido de este registro público |
+| Last Name | Dato del mantenedor, omitido de este registro público |
 | Email | Correo elegido por el mantenedor, incluido en el formulario y omitido de este registro público |
 | Company Name | Dejar vacío si la solicitud se hace como proyecto personal |
 | Primary Discovery Channel | AI / LLM tools |
@@ -48,7 +48,7 @@ Patagonia Browser is an open-source desktop browser focused on straightforward e
 
 ## Reputation
 
-Patagonia Browser is an early-stage project and does not yet have established widespread adoption. The public source code, commit history, issue tracker, and downloadable releases are available at https://github.com/christianwilliams2085-ops/Patagonia-Browser. The initial releases have been shared with family testers. A Windows GitHub Actions build completed with 148 passing tests and produced the installer: https://github.com/christianwilliams2085-ops/Patagonia-Browser/actions/runs/34228558369. We are providing this public release and build history as the current evidence of the project's activity and understand that acceptance depends on the Foundation's review.
+Patagonia Browser is an early-stage project and does not yet have established widespread adoption. The public source code, commit history, issue tracker, and downloadable releases are available at https://github.com/Roma-69/Patagonia-Browser. The initial releases have been shared with family testers. A Windows GitHub Actions build completed with 148 passing tests and produced the installer: https://github.com/Roma-69/Patagonia-Browser/actions/runs/34228558369. We are providing this public release and build history as the current evidence of the project's activity and understand that acceptance depends on the Foundation's review.
 
 No afirmar que existe difusión amplia ni copiar las cifras de descargas como si fueran usuarios únicos. Al revisar GitHub el 8 de septiembre de 2026, los tres artefactos de Windows publicados sumaban cuatro descargas; es una medida limitada del uso inicial.
 

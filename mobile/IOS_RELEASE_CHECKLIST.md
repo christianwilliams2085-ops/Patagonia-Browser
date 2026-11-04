@@ -40,7 +40,7 @@ Cada nueva carga debe incrementar el número situado después del signo `+` en `
 - **SKU sugerido:** `PATAGONIA-BROWSER-IOS-001`
 - **Categoría principal sugerida:** Utilidades
 - **Acceso web sin restricciones:** Sí
-- **URL de soporte:** `https://github.com/christianwilliams2085-ops/Patagonia-Browser/issues`
-- **Política de privacidad:** `https://github.com/christianwilliams2085-ops/Patagonia-Browser/blob/main/PRIVACY.md`
+- **URL de soporte:** `https://github.com/Roma-69/Patagonia-Browser/issues`
+- **Política de privacidad:** `https://github.com/Roma-69/Patagonia-Browser/blob/main/PRIVACY.md`
 
 Apple exige revisar y completar en App Store Connect los datos de contacto, la clasificación por edades, las capturas y la información de privacidad antes de enviar la aplicación.

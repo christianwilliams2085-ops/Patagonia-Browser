@@ -4,9 +4,9 @@ Patagonia es un navegador de escritorio en desarrollo con navegación por pesta�
 
 ## Windows x64
 
-- [Descargar el instalador de Patagonia Browser 1.0.5](https://github.com/christianwilliams2085-ops/Patagonia-Browser/releases/download/v1.0.5/Patagonia-Browser-Setup.exe).
-- [Ver la publicación 1.0.5](https://github.com/christianwilliams2085-ops/Patagonia-Browser/releases/tag/v1.0.5).
-- [Consultar todas las versiones publicadas](https://github.com/christianwilliams2085-ops/Patagonia-Browser/releases).
+- [Descargar el instalador de Patagonia Browser 1.0.5](https://github.com/Roma-69/Patagonia-Browser/releases/download/v1.0.5/Patagonia-Browser-Setup.exe).
+- [Ver la publicación 1.0.5](https://github.com/Roma-69/Patagonia-Browser/releases/tag/v1.0.5).
+- [Consultar todas las versiones publicadas](https://github.com/Roma-69/Patagonia-Browser/releases).
 
 La versión 1.0.5 fue publicada el 3 de noviembre de 2026. El instalador actual está **sin firma de un proveedor reconocido** y Windows puede bloquear su ejecución.
 
@@ -18,8 +18,8 @@ En PowerShell: `Get-FileHash .\Patagonia-Browser-Setup.exe -Algorithm SHA256`.
 
 ## Android
 
-- [Descargar Patagonia Browser para Android 1.1.0 (APK)](https://github.com/christianwilliams2085-ops/Patagonia-Browser/releases/download/movil-v1.1.0/Patagonia-Android-1.1.0-Publicacion.apk).
-- [Ver la publicación](https://github.com/christianwilliams2085-ops/Patagonia-Browser/releases/tag/movil-v1.1.0).
+- [Descargar Patagonia Browser para Android 1.1.0 (APK)](https://github.com/Roma-69/Patagonia-Browser/releases/download/movil-v1.1.0/Patagonia-Android-1.1.0-Publicacion.apk).
+- [Ver la publicación](https://github.com/Roma-69/Patagonia-Browser/releases/tag/movil-v1.1.0).
 
 Requiere Android 8 o posterior en un teléfono de 64 bits (arm64). Si ya tenés Patagonia Browser instalado, este APK lo actualiza y conserva tus favoritos. Para instalarlo, Android puede pedirte permiso para "instalar apps de esta fuente".
 
@@ -29,7 +29,7 @@ En PowerShell: `Get-FileHash .\Patagonia-Android-1.1.0-Publicacion.apk -Algorith
 
 ## Code signing policy
 
-La solicitud inicial a SignPath Foundation, enviada el 8 de septiembre de 2026, no fue aprobada por falta de suficientes señales públicas de adopción y colaboración, según el [issue #10](https://github.com/christianwilliams2085-ops/Patagonia-Browser/issues/10). Actualmente no existe un certificado activo ni un servicio de firma de SignPath para Patagonia Browser. No hay fechas ni aprobación futura garantizadas.
+La solicitud inicial a SignPath Foundation, enviada el 8 de septiembre de 2026, no fue aprobada por falta de suficientes señales públicas de adopción y colaboración, según el [issue #10](https://github.com/Roma-69/Patagonia-Browser/issues/10). Actualmente no existe un certificado activo ni un servicio de firma de SignPath para Patagonia Browser. No hay fechas ni aprobación futura garantizadas.
 
 El instalador de Windows 1.0.5 no está firmado por SignPath.
 
