@@ -4,6 +4,7 @@ const fs = require("node:fs/promises");
 const fsSync = require("node:fs");
 const path = require("node:path");
 const { createHash } = require("node:crypto");
+const zoom = require("./zoom");
 
 const ARGUMENTO_APP = "--patagonia-app=";
 const MAX_ICONO = 256;
@@ -145,8 +146,16 @@ function crearVentanaApp({ BrowserWindow, url, icono, preferencias, abrirEnNaveg
             }
         } catch { evento.preventDefault(); }
     });
+    contenido.on("zoom-changed", (_evento, sentido) => zoom.cambiarZoom(contenido, sentido === "in" ? 1 : -1));
     contenido.on("before-input-event", (evento, tecla) => {
         if (tecla.type !== "keyDown") return;
+        const accionPagina = zoom.accionTeclado(tecla);
+        if (accionPagina) {
+            evento.preventDefault();
+            if (accionPagina === "imprimir") zoom.imprimir(contenido);
+            else zoom.cambiarZoom(contenido, { zoomMas: 1, zoomMenos: -1, zoomNormal: 0 }[accionPagina]);
+            return;
+        }
         const control = tecla.control || tecla.meta;
         const clave = String(tecla.key || "").toLowerCase();
         if (clave === "f5" || (control && clave === "r")) { evento.preventDefault(); contenido.reload(); }

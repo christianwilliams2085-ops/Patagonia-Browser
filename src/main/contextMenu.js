@@ -17,7 +17,7 @@ function resumir(texto, maximo = 30) {
     return limpio.length > maximo ? `${limpio.slice(0, maximo - 1)}…` : limpio;
 }
 
-function crearPlantillaMenu(params, { contenido, clipboard, abrirEnPestana }) {
+function crearPlantillaMenu(params, { contenido, clipboard, abrirEnPestana, zoom, imprimir }) {
     const grupos = [];
     const flags = params.editFlags || {};
     const historial = contenido.navigationHistory;
@@ -73,16 +73,26 @@ function crearPlantillaMenu(params, { contenido, clipboard, abrirEnPestana }) {
             { label: "Recargar", click: () => contenido.reload() }
         ]);
         grupos.push([{ label: "Seleccionar todo", role: "selectAll" }]);
+        if (zoom) {
+            grupos.push([
+                { label: "Acercar", accelerator: "CmdOrCtrl+Plus", registerAccelerator: false, click: () => zoom(1) },
+                { label: "Alejar", accelerator: "CmdOrCtrl+-", registerAccelerator: false, click: () => zoom(-1) },
+                { label: "Tamaño normal", accelerator: "CmdOrCtrl+0", registerAccelerator: false, click: () => zoom(0) }
+            ]);
+        }
+        if (imprimir) {
+            grupos.push([{ label: "Imprimir…", accelerator: "CmdOrCtrl+P", registerAccelerator: false, click: imprimir }]);
+        }
     }
 
     return grupos.flatMap((grupo, indice) => (indice ? [{ type: "separator" }, ...grupo] : grupo));
 }
 
-function registrarMenuContextual({ contenido, Menu, clipboard, obtenerVentana, abrirEnPestana }) {
+function registrarMenuContextual({ contenido, Menu, clipboard, obtenerVentana, abrirEnPestana, zoom, imprimir }) {
     contenido.on("context-menu", (_evento, params) => {
         const ventana = obtenerVentana();
         if (!ventana || ventana.isDestroyed() || contenido.isDestroyed()) return;
-        const plantilla = crearPlantillaMenu(params, { contenido, clipboard, abrirEnPestana });
+        const plantilla = crearPlantillaMenu(params, { contenido, clipboard, abrirEnPestana, zoom, imprimir });
         if (plantilla.length) Menu.buildFromTemplate(plantilla).popup({ window: ventana });
     });
 }

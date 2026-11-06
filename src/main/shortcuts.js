@@ -1,6 +1,14 @@
+const { accionTeclado } = require("./zoom");
+
 function registrarAtajos(contenido, acciones) {
     contenido.on("before-input-event", (evento, entrada) => {
         if (entrada.type !== "keyDown" || entrada.isComposing) return;
+        const accionPagina = accionTeclado(entrada);
+        if (accionPagina && acciones[accionPagina]) {
+            evento.preventDefault();
+            acciones[accionPagina]();
+            return;
+        }
         const tecla = entrada.key.toLowerCase();
         const modificador = entrada.control || entrada.meta;
         if (tecla === "escape" && !modificador && !entrada.alt && !entrada.shift && acciones.cerrarBusqueda?.()) {

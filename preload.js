@@ -37,6 +37,10 @@ contextBridge.exposeInMainWorld("patagonia", {
     abrirFavorito: (id) => ipcRenderer.invoke("abrir-favorito", id),
     crearAppPagina: () => ipcRenderer.invoke("crear-app-pagina"),
     usarComoPredeterminado: () => ipcRenderer.invoke("usar-como-predeterminado"),
+    zoomNormal: () => ipcRenderer.send("zoom-normal"),
+    recibirZoom: callback => suscribir("zoom-actualizado", callback),
+    recibirActualizacion: callback => suscribir("estado-actualizacion", callback),
+    reiniciarParaActualizar: () => ipcRenderer.invoke("reiniciar-para-actualizar"),
 
     navegar: (url) => ipcRenderer.send("navegar", url),
 

@@ -1,0 +1,90 @@
+name: Windows - publicar versión
+
+# Se ejecuta a mano desde Actions → "Windows - publicar versión" → Run workflow.
+# Toma la versión de package.json, compila el instalador y crea un release
+# en BORRADOR con todo lo que necesita la actualización automática.
+# Nada llega a los usuarios hasta que el borrador se publica.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: windows-release
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    name: Compilar y crear borrador del release
+    runs-on: windows-2025
+    timeout-minutes: 40
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Obtener el código
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Preparar Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Leer la versión
+        id: version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Comprobar que la versión no esté publicada
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            echo "::error::Ya existe un release $TAG. Subí la versión en package.json antes de publicar."
+            exit 1
+          fi
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Ejecutar las pruebas
+        run: npm test
+
+      - name: Generar el instalador
+        run: npm run make:windows
+
+      - name: Preparar las notas desde el CHANGELOG
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          awk -v v="$VERSION" '
+            $0 ~ "^## \\[" v "\\]" { dentro = 1; next }
+            dentro && /^## \[/ { exit }
+            dentro { print }
+          ' CHANGELOG.md > notas.md
+          printf '\n---\nInstalador sin firma: Windows puede mostrar una advertencia. Tocá "Más información" y "Ejecutar de todas formas".\n' >> notas.md
+
+      - name: Crear el borrador del release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.version.outputs.tag }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          CARPETA=out-oficial/make/squirrel.windows/x64
+          ls -la "$CARPETA"
+          gh release create "$TAG" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --draft \
+            --title "Patagonia Browser $VERSION" \
+            --notes-file notas.md \
+            "$CARPETA/Patagonia-Browser-Setup.exe" \
+            "$CARPETA/RELEASES" \
+            "$CARPETA"/*-full.nupkg
