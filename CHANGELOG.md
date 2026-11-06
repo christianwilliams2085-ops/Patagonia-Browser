@@ -6,6 +6,18 @@ El formato está inspirado en "Keep a Changelog" y el proyecto seguirá Versiona
 
 ---
 
+## [1.0.7] - Sin publicar
+
+### Agregado
+
+- **Traducir páginas al español** con el botón **A文** de la barra o con clic derecho → "Traducir al español". La traducción la hace Google Translate; la primera vez Patagonia avisa que la página se envía a Google y deja elegir "No volver a preguntar" (se puede cambiar en Configuración).
+- En una página traducida, el mismo botón (en azul) o el clic derecho → "Ver página original" vuelve a la original.
+- Las páginas de la red local (como el router), las que incluyen usuario y contraseña en la dirección y las que no son web nunca se envían a Google.
+
+### Conocido
+
+- Las páginas donde iniciaste sesión se traducen como si no hubieras entrado, porque Google las descarga por su cuenta. La traducción privada en la PC queda para una próxima versión.
+
 ## [1.0.6] - 2026-11-06
 
 ### Agregado

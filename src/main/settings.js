@@ -14,11 +14,12 @@ function validarConfiguracion(valor) {
     }
     // Los archivos de versiones anteriores no tienen esta opción: queda activada.
     const actualizar = typeof valor.actualizar === "boolean" ? valor.actualizar : true;
-    return { inicio: url.href, restaurar: valor.restaurar, actualizar };
+    const traducirSinPreguntar = valor.traducirSinPreguntar === true;
+    return { inicio: url.href, restaurar: valor.restaurar, actualizar, traducirSinPreguntar };
 }
 
 function crearConfiguracion(archivo) {
-    let datos = { inicio: PAGINA_INICIO, restaurar: true, actualizar: true };
+    let datos = { inicio: PAGINA_INICIO, restaurar: true, actualizar: true, traducirSinPreguntar: false };
     let errorLectura = "";
     let cola = Promise.resolve();
     const estado = () => ({ ...datos, error: errorLectura });

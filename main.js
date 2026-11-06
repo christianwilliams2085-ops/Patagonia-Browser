@@ -75,6 +75,7 @@ const { registrarMenuContextual } = require("./src/main/contextMenu");
 const navegadorPredeterminado = require("./src/main/defaultBrowser");
 const zoom = require("./src/main/zoom");
 const { crearActualizador, instaladoConSquirrel } = require("./src/main/updater");
+const traduccion = require("./src/main/translate");
 const {
     Readability
 } = require("@mozilla/readability");
@@ -426,7 +427,8 @@ function crearPestana(
             zoom.cambiarZoom(vista.webContents, direccion);
             if (pestana.id === idPestanaActiva) enviarZoom();
         },
-        imprimir: () => zoom.imprimir(vista.webContents)
+        imprimir: () => zoom.imprimir(vista.webContents),
+        traducir: () => opcionTraduccion(pestana)
     });
     vista.webContents.on("zoom-changed", (_evento, sentido) => {
         zoom.cambiarZoom(vista.webContents, sentido === "in" ? 1 : -1);
@@ -935,6 +937,59 @@ ipcInterfaz.handle("usar-como-predeterminado", async () => {
     }
 });
 
+async function traducirPestana(pestana) {
+    const contenido = obtenerContenido(pestana);
+    const actual = contenido?.getURL() || pestana?.url || "";
+    if (!pestana || !contenido) return { correcto: false, error: "Abrí una página web para traducirla." };
+    if (traduccion.esTraducida(actual)) {
+        const original = traduccion.urlOriginal(actual);
+        if (!original) return { correcto: false, error: "No se pudo recuperar la dirección original." };
+        navegar(pestana, original);
+        return { correcto: true, accion: "original" };
+    }
+    const { url, error } = traduccion.urlTraduccion(actual);
+    if (error) return { correcto: false, error };
+    const configuracion = gestorConfiguracion.estado();
+    if (!configuracion.traducirSinPreguntar) {
+        const { response, checkboxChecked } = await dialog.showMessageBox(ventanaPrincipal, {
+            type: "question",
+            title: "Traducir con Google",
+            message: "¿Traducir esta página al español con Google?",
+            detail: "Para traducirla, Patagonia le pasa la dirección de esta página a Google Translate. " +
+                "Google la descarga y te la muestra traducida, así que Google sabe qué página traducís.\n\n" +
+                "Las páginas donde iniciaste sesión (correo, banco) se ven como si no hubieras entrado, " +
+                "y las de tu red local (como el router) no se pueden traducir.",
+            buttons: ["Traducir con Google", "Cancelar"],
+            defaultId: 0,
+            cancelId: 1,
+            noLink: true,
+            checkboxLabel: "No volver a preguntar",
+            checkboxChecked: false
+        });
+        if (response !== 0) return { correcto: false, cancelado: true };
+        if (checkboxChecked) {
+            const { error: _error, ...actualizada } = gestorConfiguracion.estado();
+            await gestorConfiguracion.guardar({ ...actualizada, traducirSinPreguntar: true }).catch(() => {});
+        }
+    }
+    // Mientras el diálogo estaba abierto, la pestaña pudo navegar o cerrarse.
+    if (obtenerContenido(pestana)?.getURL() !== actual) {
+        return { correcto: false, error: "La página cambió mientras confirmabas. Volvé a intentarlo." };
+    }
+    navegar(pestana, url);
+    return { correcto: true, accion: "traducir" };
+}
+
+function opcionTraduccion(pestana) {
+    const actual = obtenerContenido(pestana)?.getURL() || "";
+    if (traduccion.esTraducida(actual)) {
+        return { etiqueta: "Ver página original", accion: () => void traducirPestana(pestana) };
+    }
+    if (traduccion.urlTraduccion(actual).error) return null;
+    return { etiqueta: "Traducir al español", accion: () => void traducirPestana(pestana) };
+}
+
+ipcInterfaz.handle("traducir-pagina", () => traducirPestana(obtenerPestanaActiva()));
 ipcInterfaz.on("zoom-normal", () => zoomActiva(0));
 ipcInterfaz.handle("reiniciar-para-actualizar", () => {
     if (!actualizador?.reiniciar()) return { correcto: false, error: "Todavía no hay una actualización lista." };

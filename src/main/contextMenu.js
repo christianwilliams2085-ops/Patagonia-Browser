@@ -17,7 +17,7 @@ function resumir(texto, maximo = 30) {
     return limpio.length > maximo ? `${limpio.slice(0, maximo - 1)}…` : limpio;
 }
 
-function crearPlantillaMenu(params, { contenido, clipboard, abrirEnPestana, zoom, imprimir }) {
+function crearPlantillaMenu(params, { contenido, clipboard, abrirEnPestana, zoom, imprimir, traducir }) {
     const grupos = [];
     const flags = params.editFlags || {};
     const historial = contenido.navigationHistory;
@@ -73,6 +73,8 @@ function crearPlantillaMenu(params, { contenido, clipboard, abrirEnPestana, zoom
             { label: "Recargar", click: () => contenido.reload() }
         ]);
         grupos.push([{ label: "Seleccionar todo", role: "selectAll" }]);
+        const opcion = typeof traducir === "function" ? traducir() : null;
+        if (opcion) grupos.push([{ label: opcion.etiqueta, click: opcion.accion }]);
         if (zoom) {
             grupos.push([
                 { label: "Acercar", accelerator: "CmdOrCtrl+Plus", registerAccelerator: false, click: () => zoom(1) },
@@ -88,11 +90,11 @@ function crearPlantillaMenu(params, { contenido, clipboard, abrirEnPestana, zoom
     return grupos.flatMap((grupo, indice) => (indice ? [{ type: "separator" }, ...grupo] : grupo));
 }
 
-function registrarMenuContextual({ contenido, Menu, clipboard, obtenerVentana, abrirEnPestana, zoom, imprimir }) {
+function registrarMenuContextual({ contenido, Menu, clipboard, obtenerVentana, abrirEnPestana, zoom, imprimir, traducir }) {
     contenido.on("context-menu", (_evento, params) => {
         const ventana = obtenerVentana();
         if (!ventana || ventana.isDestroyed() || contenido.isDestroyed()) return;
-        const plantilla = crearPlantillaMenu(params, { contenido, clipboard, abrirEnPestana, zoom, imprimir });
+        const plantilla = crearPlantillaMenu(params, { contenido, clipboard, abrirEnPestana, zoom, imprimir, traducir });
         if (plantilla.length) Menu.buildFromTemplate(plantilla).popup({ window: ventana });
     });
 }

@@ -16,6 +16,8 @@ Al abrir una página o realizar una búsqueda, el navegador se comunica con los 
 
 La restauración de pestañas o de la página de inicio también puede abrir conexiones al iniciar el navegador.
 
+El botón para traducir páginas usa Google Translate: al usarlo, Patagonia le pasa a Google la dirección de la página, Google la descarga y la muestra traducida desde su servicio translate.goog. Antes de la primera traducción, Patagonia lo avisa y pide confirmación. Nunca se envían a Google las páginas de la red local ni las direcciones con usuario y contraseña. Se aplica la [política de privacidad de Google](https://policies.google.com/privacy).
+
 La actualización automática (activada por defecto, se puede desactivar en Configuración) consulta cada 6 horas la lista pública de publicaciones del repositorio en la API de GitHub y, si hay una versión nueva, la descarga desde las publicaciones de GitHub. Esas consultas no incluyen el historial, los favoritos ni el contenido de las páginas; GitHub recibe los datos técnicos de la conexión, incluida la IP.
 
 El motor de bloqueo integrado utiliza la biblioteca de Ghostery para descargar y actualizar las listas de anuncios y rastreadores. Estas consultas pueden ocurrir automáticamente al iniciar la aplicación. Los servidores que entregan las listas reciben los datos técnicos necesarios para la conexión, incluida la IP; el código de actualización de Patagonia no adjunta el historial, los favoritos ni el contenido de las páginas a esas consultas.
