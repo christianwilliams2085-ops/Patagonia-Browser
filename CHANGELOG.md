@@ -26,6 +26,14 @@ El formato está inspirado en "Keep a Changelog" y el proyecto seguirá Versiona
   - Nuevo botón en Configuración: **"Usar Patagonia como navegador predeterminado"**, que abre directamente la pantalla de Windows para elegirlo.
   - Los enlaces que abren otros programas (correo, WhatsApp, Claude…) llegan como pestaña nueva, aunque Patagonia ya esté abierto.
 - La página de inicio por defecto pasa de Google a **DuckDuckGo**, igual que el buscador de la barra.
+- **Zoom:** Ctrl + / Ctrl − / Ctrl 0, Ctrl + rueda del mouse y opciones en el clic derecho. Cuando la página no está al 100 %, aparece el porcentaje en la barra; tocándolo vuelve al tamaño normal. Funciona también en las apps.
+- **Imprimir:** Ctrl+P o clic derecho → "Imprimir…", con el diálogo de impresión de Windows.
+- **Actualización automática:** Patagonia consulta GitHub cada 6 horas. Si hay una versión nueva, la baja en segundo plano y aparece el botón verde **"⟳ Actualizar a X"**. Si no lo tocás, la versión nueva se usa la próxima vez que abras Patagonia. Se puede desactivar en Configuración.
+- Nuevo flujo **"Windows - publicar versión"** en GitHub Actions: compila y crea el release en borrador con el instalador y los paquetes que usa la actualización automática.
+
+### Importante
+
+- La actualización automática empieza a funcionar **desde la 1.0.6**. Quien tenga la 1.0.5 tiene que instalar la 1.0.6 a mano una sola vez.
 
 ---
 

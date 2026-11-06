@@ -16,11 +16,13 @@ Al abrir una página o realizar una búsqueda, el navegador se comunica con los 
 
 La restauración de pestañas o de la página de inicio también puede abrir conexiones al iniciar el navegador.
 
+La actualización automática (activada por defecto, se puede desactivar en Configuración) consulta cada 6 horas la lista pública de publicaciones del repositorio en la API de GitHub y, si hay una versión nueva, la descarga desde las publicaciones de GitHub. Esas consultas no incluyen el historial, los favoritos ni el contenido de las páginas; GitHub recibe los datos técnicos de la conexión, incluida la IP.
+
 El motor de bloqueo integrado utiliza la biblioteca de Ghostery para descargar y actualizar las listas de anuncios y rastreadores. Estas consultas pueden ocurrir automáticamente al iniciar la aplicación. Los servidores que entregan las listas reciben los datos técnicos necesarios para la conexión, incluida la IP; el código de actualización de Patagonia no adjunta el historial, los favoritos ni el contenido de las páginas a esas consultas.
 
 La excepción de protección para un sitio cambia el bloqueo de ese sitio; no debe interpretarse como un control que impida las descargas de listas. Las actualizaciones de listas no equivalen a actualizar el programa completo.
 
-Google está configurado como página de inicio predeterminada; se puede consultar su [política de privacidad](https://policies.google.com/privacy). Lo que se escribe en la barra de direcciones o en el buscador de la nueva pestaña y no es una dirección web se envía a DuckDuckGo para realizar la búsqueda; se puede consultar su [política de privacidad](https://duckduckgo.com/privacy). Cada sitio visitado aplica sus propias condiciones.
+DuckDuckGo está configurado como página de inicio predeterminada. Lo que se escribe en la barra de direcciones o en el buscador de la nueva pestaña y no es una dirección web se envía a DuckDuckGo para realizar la búsqueda; se puede consultar su [política de privacidad](https://duckduckgo.com/privacy). Cada sitio visitado aplica sus propias condiciones.
 
 La biblioteca de bloqueo define listas alojadas en GitHub. Las descargas desde ese servicio y el uso del repositorio o de sus páginas de publicaciones se rigen por la [declaración de privacidad de GitHub](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement). La definición de los proveedores de listas se encuentra en el [código de Ghostery Adblocker](https://github.com/ghostery/adblocker/blob/master/packages/adblocker/src/fetch.ts).
 

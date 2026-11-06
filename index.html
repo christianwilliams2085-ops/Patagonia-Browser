@@ -733,6 +733,8 @@ button{
             aria-label="Buscar o escribir una dirección"
         >
 
+        <button id="indicadorZoom" type="button" hidden
+            title="Volver al tamaño normal (Ctrl+0)" aria-label="Zoom de la página. Volver al tamaño normal">100%</button>
         <button id="guardarFavorito" class="boton-navegacion" type="button"
             title="Guardar en favoritos" aria-label="Guardar en favoritos" aria-pressed="false" disabled>☆</button>
     </div>
@@ -745,6 +747,9 @@ button{
     <button id="ir" title="Ir a la dirección" aria-label="Ir a la dirección">
         →
     </button>
+
+    <button id="botonActualizacion" type="button" hidden
+        title="Hay una versión nueva de Patagonia lista. Tocá para reiniciar y actualizar.">⟳ Actualizar</button>
 
     <button id="accesoDescargas" type="button" title="Abrir descargas"
         aria-controls="panelDescargas"><span aria-hidden="true">⇩</span><span class="etiqueta-descargas">Descargas</span></button>
@@ -1006,6 +1011,11 @@ button{
                     Recuperar pestañas al abrir Patagonia
                 </label>
                 <p>Si desactivás esta opción, el próximo inicio abre tu página de inicio. Las direcciones de la sesión siguen guardándose en este dispositivo.</p>
+                <label class="configuracion-casilla">
+                    <input id="actualizarAutomatico" type="checkbox">
+                    Buscar e instalar actualizaciones automáticamente
+                </label>
+                <p>Patagonia consulta GitHub cada 6 horas. Si hay una versión nueva, la baja en segundo plano y se instala la próxima vez que lo abras.</p>
                 <button id="guardarConfiguracion" class="historial-accion" type="submit">Guardar cambios</button>
             </form>
             <p id="estadoConfiguracion" role="status" aria-live="polite"></p>
@@ -1069,6 +1079,12 @@ button{
     #avisoFavoritos { font-size:12px; max-width:150px; color:#c4cbd8; }
     #avisoFavoritos:empty { display:none; }
     #crearApp { font-size:20px; }
+    #indicadorZoom { border:1px solid #3a4453; border-radius:12px; background:transparent; color:#c4cbd8;
+        font-size:12px; padding:2px 8px; margin-right:4px; cursor:pointer; white-space:nowrap; }
+    #botonActualizacion { border:0; border-radius:14px; background:#2f8f5b; color:#fff; font-size:13px;
+        padding:6px 12px; margin:0 4px; cursor:pointer; white-space:nowrap; }
+    #botonActualizacion:hover { background:#38a76b; }
+    #indicadorZoom:hover { background:#3a4453; color:#fff; }
     #crearApp:disabled { opacity:.45; cursor:default; }
     #avisoApp { font-size:12px; max-width:190px; color:#c4cbd8; }
     #avisoApp:empty { display:none; }
@@ -1144,6 +1160,8 @@ button{
 <script src="ui/modules/history.js"></script>
 <script src="ui/modules/bookmarks.js"></script>
 <script src="ui/modules/webApps.js"></script>
+<script src="ui/modules/zoom.js"></script>
+<script src="ui/modules/updates.js"></script>
 <script src="ui/modules/assistant.js"></script>
 <script src="renderer.js"></script>
 

@@ -269,6 +269,8 @@ for (const restaurar of [true, false]) test(`main startup respects restore=${res
         if (nombre.endsWith("/webApps")) return require("../src/main/webApps");
         if (nombre.endsWith("/contextMenu")) return require("../src/main/contextMenu");
         if (nombre.endsWith("/defaultBrowser")) return require("../src/main/defaultBrowser");
+        if (nombre.endsWith("/zoom")) return require("../src/main/zoom");
+        if (nombre.endsWith("/updater")) return require("../src/main/updater");
         return {};
     };
     require("node:vm").runInNewContext("(function () {\n" + await fs.readFile(path.join(__dirname, "../main.js"), "utf8") + "\n})();", {

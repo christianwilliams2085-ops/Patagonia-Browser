@@ -8,7 +8,9 @@ const {
     dialog,
     Menu,
     nativeImage,
-    clipboard
+    clipboard,
+    autoUpdater,
+    net
 } = require("electron");
 
 const eventoInstalador = typeof process !== "undefined" ? (process.argv || [])[1] : undefined;
@@ -71,6 +73,8 @@ const {
 } = require("./src/main/webApps");
 const { registrarMenuContextual } = require("./src/main/contextMenu");
 const navegadorPredeterminado = require("./src/main/defaultBrowser");
+const zoom = require("./src/main/zoom");
+const { crearActualizador, instaladoConSquirrel } = require("./src/main/updater");
 const {
     Readability
 } = require("@mozilla/readability");
@@ -102,6 +106,7 @@ let gestorDescargas;
 let gestorPermisos;
 let gestorFavoritos;
 let gestorProteccion;
+let actualizador;
 const enlacesPendientes = [];
 const ventanasApp = new Set();
 const pestañasCerradas = crearPestanasCerradas();
@@ -181,8 +186,29 @@ function accionesNavegacion() {
         },
         cerrarVentana: () => ventanaPrincipal.close(),
         siguiente: () => cambiarPestana(1),
-        anterior: () => cambiarPestana(-1)
+        anterior: () => cambiarPestana(-1),
+        zoomMas: () => zoomActiva(1),
+        zoomMenos: () => zoomActiva(-1),
+        zoomNormal: () => zoomActiva(0),
+        imprimir: () => zoom.imprimir(obtenerContenido(obtenerPestanaActiva()))
     };
+}
+
+function enviarActualizacion(estado = actualizador?.estado()) {
+    if (!estado || !ventanaPrincipal || ventanaPrincipal.isDestroyed()) return;
+    ventanaPrincipal.webContents.send("estado-actualizacion", estado);
+}
+
+function enviarZoom() {
+    if (!ventanaPrincipal || ventanaPrincipal.isDestroyed()) return;
+    const contenido = obtenerContenido(obtenerPestanaActiva());
+    const factor = typeof contenido?.getZoomFactor === "function" ? contenido.getZoomFactor() : 1;
+    ventanaPrincipal.webContents.send("zoom-actualizado", zoom.porcentaje(factor));
+}
+
+function zoomActiva(direccion) {
+    zoom.cambiarZoom(obtenerContenido(obtenerPestanaActiva()), direccion);
+    enviarZoom();
 }
 
 function conectarAtajos(contenido) {
@@ -395,7 +421,16 @@ function crearPestana(
         Menu,
         clipboard,
         obtenerVentana: () => ventanaPrincipal,
-        abrirEnPestana: destinoNuevo => crearPestana(destinoNuevo)
+        abrirEnPestana: destinoNuevo => crearPestana(destinoNuevo),
+        zoom: direccion => {
+            zoom.cambiarZoom(vista.webContents, direccion);
+            if (pestana.id === idPestanaActiva) enviarZoom();
+        },
+        imprimir: () => zoom.imprimir(vista.webContents)
+    });
+    vista.webContents.on("zoom-changed", (_evento, sentido) => {
+        zoom.cambiarZoom(vista.webContents, sentido === "in" ? 1 : -1);
+        if (pestana.id === idPestanaActiva) enviarZoom();
     });
     observarVisitas(vista.webContents);
     gestorBusqueda.observar(vista.webContents);
@@ -453,6 +488,7 @@ function crearPestana(
             ) {
                 enviarURLActual();
                 enviarEstadoProteccion();
+                enviarZoom();
             }
 
             enviarPestanas();
@@ -547,6 +583,7 @@ function activarPestana(id) {
     enviarURLActual();
     enviarPestanas();
     enviarEstadoProteccion();
+    enviarZoom();
 }
 
 function cerrarPestana(id) {
@@ -657,6 +694,7 @@ function crearVentana() {
                 enviarPestanas();
                 enviarEstadoBarraLateral();
                 enviarEstadoProteccion();
+                enviarActualizacion();
                 gestorBusqueda.reenviar();
                 return;
             }
@@ -676,6 +714,7 @@ function crearVentana() {
             for (const enlace of enlacesPendientes.splice(0)) crearPestana(enlace);
             restaurandoSesion = false;
             recordarSesion();
+            enviarActualizacion();
             enviarEstadoBarraLateral();
             enviarEstadoProteccion();
         }
@@ -808,7 +847,9 @@ function abrirVentanaApp(url) {
         Menu,
         clipboard,
         obtenerVentana: () => ventana,
-        abrirEnPestana: abrirEnNavegador
+        abrirEnPestana: abrirEnNavegador,
+        zoom: direccion => zoom.cambiarZoom(ventana.webContents, direccion),
+        imprimir: () => zoom.imprimir(ventana.webContents)
     });
     ventanasApp.add(ventana);
     ventana.on("closed", () => ventanasApp.delete(ventana));
@@ -894,6 +935,11 @@ ipcInterfaz.handle("usar-como-predeterminado", async () => {
     }
 });
 
+ipcInterfaz.on("zoom-normal", () => zoomActiva(0));
+ipcInterfaz.handle("reiniciar-para-actualizar", () => {
+    if (!actualizador?.reiniciar()) return { correcto: false, error: "Todavía no hay una actualización lista." };
+    return { correcto: true };
+});
 ipcInterfaz.on("abrir-busqueda", () => gestorBusqueda.abrir());
 ipcInterfaz.on("detener-carga", detenerCargaActiva);
 ipcInterfaz.on("buscar-en-pagina", (_evento, datos) => {
@@ -1161,6 +1207,16 @@ if (registrarInstanciaUnica(app, () => ventanaPrincipal, atenderLanzamiento)) ap
         else {
             enlacesPendientes.push(...navegadorPredeterminado.extraerEnlaces(argv));
             crearVentana();
+        }
+        if (process.platform === "win32" && app.isPackaged && instaladoConSquirrel(process.execPath)) {
+            actualizador = crearActualizador({
+                autoUpdater,
+                fetch: (...args) => net.fetch(...args),
+                versionActual: app.getVersion(),
+                habilitado: () => gestorConfiguracion.estado().actualizar !== false,
+                notificar: enviarActualizacion
+            });
+            actualizador.iniciar();
         }
         if (process.platform === "win32" && app.isPackaged) {
             // Mantiene el registro al día aunque cambie la carpeta de instalación.

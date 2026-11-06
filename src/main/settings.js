@@ -12,11 +12,13 @@ function validarConfiguracion(valor) {
     if (!["https:", "http:"].includes(url.protocol) || url.username || url.password) {
         throw new Error("Usá una dirección HTTP o HTTPS sin usuario ni contraseña.");
     }
-    return { inicio: url.href, restaurar: valor.restaurar };
+    // Los archivos de versiones anteriores no tienen esta opción: queda activada.
+    const actualizar = typeof valor.actualizar === "boolean" ? valor.actualizar : true;
+    return { inicio: url.href, restaurar: valor.restaurar, actualizar };
 }
 
 function crearConfiguracion(archivo) {
-    let datos = { inicio: PAGINA_INICIO, restaurar: true };
+    let datos = { inicio: PAGINA_INICIO, restaurar: true, actualizar: true };
     let errorLectura = "";
     let cola = Promise.resolve();
     const estado = () => ({ ...datos, error: errorLectura });

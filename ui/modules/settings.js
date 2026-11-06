@@ -4,12 +4,13 @@
     const formulario = document.getElementById("formularioConfiguracion");
     const inicio = document.getElementById("paginaInicio");
     const restaurar = document.getElementById("restaurarPestanas");
+    const actualizar = document.getElementById("actualizarAutomatico");
     const guardar = document.getElementById("guardarConfiguracion");
     const estado = document.getElementById("estadoConfiguracion");
     let ocupado = false;
     let bloqueada = false;
     function habilitar() {
-        for (const elemento of [inicio, restaurar, guardar]) elemento.disabled = ocupado || bloqueada;
+        for (const elemento of [inicio, restaurar, actualizar, guardar]) elemento.disabled = ocupado || bloqueada;
     }
     async function ejecutar(accion, guardando = false) {
         if (ocupado) return;
@@ -22,6 +23,7 @@
             const configuracion = respuesta.configuracion;
             inicio.value = configuracion.inicio;
             restaurar.checked = configuracion.restaurar;
+            actualizar.checked = configuracion.actualizar !== false;
             bloqueada = Boolean(configuracion.error);
             estado.textContent = configuracion.error || (guardando ? "Configuración guardada." : "");
         } catch (error) { estado.textContent = error.message || "No se pudo completar la operación."; }
@@ -52,6 +54,6 @@
     });
     formulario.addEventListener("submit", evento => {
         evento.preventDefault();
-        ejecutar(() => window.patagonia.guardarConfiguracion({ inicio: inicio.value.trim(), restaurar: restaurar.checked }), true);
+        ejecutar(() => window.patagonia.guardarConfiguracion({ inicio: inicio.value.trim(), restaurar: restaurar.checked, actualizar: actualizar.checked }), true);
     });
 })();
