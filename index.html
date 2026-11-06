@@ -738,6 +738,10 @@ button{
     </div>
     <span id="avisoFavoritos" role="status"></span>
 
+    <button id="crearApp" class="boton-navegacion" type="button"
+        title="Crear app de esta página" aria-label="Crear app de esta página" disabled>⧉</button>
+    <span id="avisoApp" role="status"></span>
+
     <button id="ir" title="Ir a la dirección" aria-label="Ir a la dirección">
         →
     </button>
@@ -1060,6 +1064,10 @@ button{
     #guardarFavorito:disabled { opacity:.45; cursor:default; }
     #avisoFavoritos { font-size:12px; max-width:150px; color:#c4cbd8; }
     #avisoFavoritos:empty { display:none; }
+    #crearApp { font-size:20px; }
+    #crearApp:disabled { opacity:.45; cursor:default; }
+    #avisoApp { font-size:12px; max-width:190px; color:#c4cbd8; }
+    #avisoApp:empty { display:none; }
     #panelFavoritos { padding:4px 8px 16px; }
     #panelFavoritos p { color:#c4cbd8; font-size:13px; line-height:1.5; }
     #listaFavoritos { list-style:none; padding:0; margin:0; }
@@ -1131,6 +1139,7 @@ button{
 <script src="ui/modules/downloads.js"></script>
 <script src="ui/modules/history.js"></script>
 <script src="ui/modules/bookmarks.js"></script>
+<script src="ui/modules/webApps.js"></script>
 <script src="ui/modules/assistant.js"></script>
 <script src="renderer.js"></script>
 
