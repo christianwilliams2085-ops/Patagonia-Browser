@@ -744,6 +744,12 @@ button{
         title="Crear app de esta página" aria-label="Crear app de esta página" disabled>⧉</button>
     <span id="avisoApp" role="status"></span>
 
+    <button id="traducirPagina" class="boton-navegacion" type="button" aria-pressed="false"
+        title="Traducir página al español" aria-label="Traducir página al español" disabled>
+        <span class="icono-traducir" aria-hidden="true">A<small>文</small></span>
+    </button>
+    <span id="avisoTraduccion" role="status"></span>
+
     <button id="ir" title="Ir a la dirección" aria-label="Ir a la dirección">
         →
     </button>
@@ -1016,6 +1022,11 @@ button{
                     Buscar e instalar actualizaciones automáticamente
                 </label>
                 <p>Patagonia consulta GitHub cada 6 horas. Si hay una versión nueva, la baja en segundo plano y se instala la próxima vez que lo abras.</p>
+                <label class="configuracion-casilla">
+                    <input id="traducirSinPreguntar" type="checkbox">
+                    Traducir con Google sin preguntar
+                </label>
+                <p>Si la desactivás, Patagonia te avisa antes de mandar una página a Google para traducirla.</p>
                 <button id="guardarConfiguracion" class="historial-accion" type="submit">Guardar cambios</button>
             </form>
             <p id="estadoConfiguracion" role="status" aria-live="polite"></p>
@@ -1079,6 +1090,12 @@ button{
     #avisoFavoritos { font-size:12px; max-width:150px; color:#c4cbd8; }
     #avisoFavoritos:empty { display:none; }
     #crearApp { font-size:20px; }
+    #traducirPagina .icono-traducir { font-size:15px; font-weight:700; letter-spacing:-1px; }
+    #traducirPagina .icono-traducir small { font-size:11px; font-weight:400; }
+    #traducirPagina[aria-pressed="true"] { color:#6cc4ff; }
+    #traducirPagina:disabled { opacity:.45; cursor:default; }
+    #avisoTraduccion { font-size:12px; max-width:220px; color:#c4cbd8; }
+    #avisoTraduccion:empty { display:none; }
     #indicadorZoom { border:1px solid #3a4453; border-radius:12px; background:transparent; color:#c4cbd8;
         font-size:12px; padding:2px 8px; margin-right:4px; cursor:pointer; white-space:nowrap; }
     #botonActualizacion { border:0; border-radius:14px; background:#2f8f5b; color:#fff; font-size:13px;
@@ -1162,6 +1179,7 @@ button{
 <script src="ui/modules/webApps.js"></script>
 <script src="ui/modules/zoom.js"></script>
 <script src="ui/modules/updates.js"></script>
+<script src="ui/modules/translate.js"></script>
 <script src="ui/modules/assistant.js"></script>
 <script src="renderer.js"></script>
 

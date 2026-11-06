@@ -38,6 +38,7 @@ contextBridge.exposeInMainWorld("patagonia", {
     crearAppPagina: () => ipcRenderer.invoke("crear-app-pagina"),
     usarComoPredeterminado: () => ipcRenderer.invoke("usar-como-predeterminado"),
     zoomNormal: () => ipcRenderer.send("zoom-normal"),
+    traducirPagina: () => ipcRenderer.invoke("traducir-pagina"),
     recibirZoom: callback => suscribir("zoom-actualizado", callback),
     recibirActualizacion: callback => suscribir("estado-actualizacion", callback),
     reiniciarParaActualizar: () => ipcRenderer.invoke("reiniciar-para-actualizar"),

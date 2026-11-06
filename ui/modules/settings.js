@@ -5,12 +5,13 @@
     const inicio = document.getElementById("paginaInicio");
     const restaurar = document.getElementById("restaurarPestanas");
     const actualizar = document.getElementById("actualizarAutomatico");
+    const traducirSinPreguntar = document.getElementById("traducirSinPreguntar");
     const guardar = document.getElementById("guardarConfiguracion");
     const estado = document.getElementById("estadoConfiguracion");
     let ocupado = false;
     let bloqueada = false;
     function habilitar() {
-        for (const elemento of [inicio, restaurar, actualizar, guardar]) elemento.disabled = ocupado || bloqueada;
+        for (const elemento of [inicio, restaurar, actualizar, traducirSinPreguntar, guardar]) elemento.disabled = ocupado || bloqueada;
     }
     async function ejecutar(accion, guardando = false) {
         if (ocupado) return;
@@ -24,6 +25,7 @@
             inicio.value = configuracion.inicio;
             restaurar.checked = configuracion.restaurar;
             actualizar.checked = configuracion.actualizar !== false;
+            traducirSinPreguntar.checked = configuracion.traducirSinPreguntar === true;
             bloqueada = Boolean(configuracion.error);
             estado.textContent = configuracion.error || (guardando ? "Configuración guardada." : "");
         } catch (error) { estado.textContent = error.message || "No se pudo completar la operación."; }
@@ -54,6 +56,6 @@
     });
     formulario.addEventListener("submit", evento => {
         evento.preventDefault();
-        ejecutar(() => window.patagonia.guardarConfiguracion({ inicio: inicio.value.trim(), restaurar: restaurar.checked, actualizar: actualizar.checked }), true);
+        ejecutar(() => window.patagonia.guardarConfiguracion({ inicio: inicio.value.trim(), restaurar: restaurar.checked, actualizar: actualizar.checked, traducirSinPreguntar: traducirSinPreguntar.checked }), true);
     });
 })();

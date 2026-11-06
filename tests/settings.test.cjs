@@ -19,7 +19,7 @@ test("settings persist across restart; concurrent changes retain the latest succ
         gestor.guardar({ inicio: "https://example.com", restaurar: true }),
         gestor.guardar({ inicio: "http://localhost:3000", restaurar: false })
     ]);
-    assert.deepEqual(await crearConfiguracion(archivo).iniciar(), { inicio: "http://localhost:3000/", restaurar: false, actualizar: true, error: "" });
+    assert.deepEqual(await crearConfiguracion(archivo).iniciar(), { inicio: "http://localhost:3000/", restaurar: false, actualizar: true, traducirSinPreguntar: false, error: "" });
     await crearConfiguracion(archivo).guardar({ inicio: "https://example.com", restaurar: true, actualizar: false });
     assert.equal((await crearConfiguracion(archivo).iniciar()).actualizar, false);
 });

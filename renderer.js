@@ -216,6 +216,7 @@ function mostrarPestanas(pestanas) {
     botonRecargar.setAttribute("aria-label", botonRecargar.title);
     window.PatagoniaFavorites.actualizarPagina(activa);
     window.PatagoniaApps?.actualizarPagina(activa);
+    window.PatagoniaTraductor?.actualizarPagina(activa);
     const error = pestanas.find((pestana) => pestana.activa)?.errorCarga;
     avisoCarga.hidden = !error;
     mensajeCarga.textContent = error?.mensaje || "";
