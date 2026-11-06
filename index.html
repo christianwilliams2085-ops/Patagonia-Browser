@@ -999,7 +999,7 @@ button{
             <form id="formularioConfiguracion">
                 <label for="paginaInicio">Página de inicio</label>
                 <input id="paginaInicio" type="url" required maxlength="2048"
-                    placeholder="https://www.google.com" autocomplete="off">
+                    placeholder="https://duckduckgo.com/" autocomplete="off">
                 <p>Se usa al pulsar el botón Inicio. Las pestañas nuevas abren el inicio de Patagonia.</p>
                 <label class="configuracion-casilla">
                     <input id="restaurarPestanas" type="checkbox">
@@ -1009,6 +1009,10 @@ button{
                 <button id="guardarConfiguracion" class="historial-accion" type="submit">Guardar cambios</button>
             </form>
             <p id="estadoConfiguracion" role="status" aria-live="polite"></p>
+            <h3>Navegador predeterminado</h3>
+            <p>Hacé que los enlaces de otros programas (correo, WhatsApp, Claude…) se abran en Patagonia.</p>
+            <button id="usarPredeterminado" class="historial-accion" type="button">Usar Patagonia como navegador predeterminado</button>
+            <p id="estadoPredeterminado" role="status" aria-live="polite"></p>
             <p>Atajos: Ctrl+L dirección · Ctrl+T nueva pestaña · Ctrl+W cerrar · Ctrl+Tab cambiar pestaña · F5 recargar.</p>
         </section>
 

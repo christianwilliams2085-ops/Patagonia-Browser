@@ -21,6 +21,11 @@ El formato está inspirado en "Keep a Changelog" y el proyecto seguirá Versiona
   - Texto seleccionado: copiar y buscar en DuckDuckGo.
   - Campos de texto: deshacer, rehacer, cortar, copiar, pegar y seleccionar todo.
   - Resto de la página: atrás, adelante, recargar y seleccionar todo.
+- **Patagonia como navegador predeterminado de Windows:**
+  - Al instalarse, Patagonia aparece en Configuración → Aplicaciones → Aplicaciones predeterminadas (solo para tu usuario, sin pedir permisos de administrador). Al desinstalarlo, se borra de la lista.
+  - Nuevo botón en Configuración: **"Usar Patagonia como navegador predeterminado"**, que abre directamente la pantalla de Windows para elegirlo.
+  - Los enlaces que abren otros programas (correo, WhatsApp, Claude…) llegan como pestaña nueva, aunque Patagonia ya esté abierto.
+- La página de inicio por defecto pasa de Google a **DuckDuckGo**, igual que el buscador de la barra.
 
 ---
 
