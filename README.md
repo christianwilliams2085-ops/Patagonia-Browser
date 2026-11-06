@@ -8,7 +8,7 @@ Todo el código está en este repositorio:
 
 | Carpeta | Qué es | Versión |
 |---|---|---|
-| raíz (`main.js`, `src/`, `ui/`…) | Navegador de escritorio para Windows | 1.0.5 |
+| raíz (`main.js`, `src/`, `ui/`…) | Navegador de escritorio para Windows | 1.0.6 |
 | `mobile/` | App de Android e iPhone | 1.1.0+9 |
 
 Para armar el instalador de Windows o los APK, seguí **[COMO-ARMAR.md](COMO-ARMAR.md)**.
@@ -67,9 +67,9 @@ npm run build:portable
 
 ## Compartir con la familia
 
-La última versión **publicada** para Windows x64 es **1.0.5** (3 de noviembre de 2026). Descargá `Patagonia-Browser-Setup.exe` desde la [página de descargas](DOWNLOADS.md).
+La última versión **publicada** para Windows x64 es **1.0.6** (6 de noviembre de 2026). Desde esta versión Patagonia se actualiza solo. Descargá `Patagonia-Browser-Setup.exe` desde la [página de descargas](DOWNLOADS.md).
 
-El instalador está **sin firma de un proveedor reconocido** y Windows puede mostrar una advertencia o bloquear su ejecución. La publicación 1.0.5 sólo incluye el instalador; no publica un ZIP portátil ni un archivo de hashes separado. La versión portátil puede generarse desde el código con el comando indicado arriba.
+El instalador está **sin firma de un proveedor reconocido** y Windows puede mostrar una advertencia o bloquear su ejecución. La publicación 1.0.6 incluye el instalador y los paquetes de la actualización automática; no publica un ZIP portátil. La versión portátil puede generarse desde el código con el comando indicado arriba.
 
 Para regenerar el instalador, ver [COMO-ARMAR.md](COMO-ARMAR.md) (`npm run make:windows`).
 
