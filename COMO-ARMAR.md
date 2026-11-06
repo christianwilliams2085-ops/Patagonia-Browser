@@ -9,7 +9,7 @@ Guía paso a paso para generar los tres entregables desde este repositorio:
 Todos los comandos se escriben en **PowerShell**, parados en la carpeta del repositorio
 (`Patagonia-Browser-Git`), salvo que se indique otra cosa.
 
-> Versión actual: **1.0.5** en escritorio (`package.json`) y **1.0.5+8** en móvil
+> Versión actual: **1.0.6** en escritorio (`package.json`) y **1.0.5+8** en móvil
 > (`mobile/pubspec.yaml`). Si cambiás la versión, cambiala en los dos lugares.
 
 ---
@@ -45,8 +45,19 @@ Resultado:
 out-oficial\make\squirrel.windows\x64\Patagonia-Browser-Setup.exe
 ```
 
-Junto al `.exe` quedan `PatagoniaBrowser-1.0.5-full.nupkg` y `RELEASES`, que Squirrel usa
-para actualizaciones. Para compartir con la familia alcanza con el `.exe`.
+Junto al `.exe` quedan `PatagoniaBrowser-X.Y.Z-full.nupkg` y `RELEASES`, que usa la
+actualización automática.
+
+### Publicar una versión nueva (recomendado)
+
+No hace falta compilar en la PC ni subir archivos a mano:
+
+1. Cambiá la versión en `package.json` (por ejemplo, `1.0.7`) y anotá los cambios en `CHANGELOG.md`
+   bajo `## [1.0.7]`. Mergeá eso a `main`.
+2. En GitHub → **Actions** → **Windows - publicar versión** → **Run workflow**.
+3. Cuando termine, en **Releases** aparece el borrador "Patagonia Browser 1.0.7" con el `.exe`,
+   `RELEASES` y el `.nupkg`. Revisalo y tocá **Publish release**.
+4. Las instalaciones de 1.0.6 en adelante encuentran la versión nueva en unas horas y se actualizan solas.
 
 El instalador **no está firmado** por un proveedor reconocido: Windows puede mostrar
 "Windows protegió tu PC". Ver [CODE_SIGNING.md](CODE_SIGNING.md).

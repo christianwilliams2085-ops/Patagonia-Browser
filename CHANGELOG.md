@@ -6,7 +6,7 @@ El formato está inspirado en "Keep a Changelog" y el proyecto seguirá Versiona
 
 ---
 
-## [1.0.6] - Sin publicar
+## [1.0.6] - 2026-11-06
 
 ### Agregado
 
