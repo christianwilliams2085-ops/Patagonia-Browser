@@ -215,6 +215,7 @@ function mostrarPestanas(pestanas) {
     botonRecargar.title = cargandoActiva ? "Detener carga" : "Recargar";
     botonRecargar.setAttribute("aria-label", botonRecargar.title);
     window.PatagoniaFavorites.actualizarPagina(activa);
+    window.PatagoniaApps?.actualizarPagina(activa);
     const error = pestanas.find((pestana) => pestana.activa)?.errorCarga;
     avisoCarga.hidden = !error;
     mensajeCarga.textContent = error?.mensaje || "";

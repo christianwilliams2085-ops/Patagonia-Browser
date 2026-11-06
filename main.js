@@ -6,7 +6,8 @@ const {
     session,
     shell,
     dialog,
-    Menu
+    Menu,
+    nativeImage
 } = require("electron");
 
 if (require("electron-squirrel-startup")) {
@@ -51,6 +52,14 @@ const { registrarErroresCarga } = require("./src/main/loadErrors");
 const { crearProteccion } = require("./src/main/adblocker");
 const { obtenerHTMLPagina, MAX_ELEMENTOS } = require("./src/main/pageSnapshot");
 const {
+    extraerURLApp,
+    urlAppValida,
+    prepararIcono,
+    ejecutableEstable,
+    crearAccesoDirecto,
+    crearVentanaApp
+} = require("./src/main/webApps");
+const {
     Readability
 } = require("@mozilla/readability");
 
@@ -81,6 +90,8 @@ let gestorDescargas;
 let gestorPermisos;
 let gestorFavoritos;
 let gestorProteccion;
+let urlPendiente = null;
+const ventanasApp = new Set();
 const pestañasCerradas = crearPestanasCerradas();
 const cierresSolicitados = new Set();
 const ipcInterfaz = crearIPCInterfaz(ipcMain, () => ventanaPrincipal);
@@ -642,7 +653,11 @@ function crearVentana() {
             const anteriores = gestorConfiguracion.estado().restaurar ? (sesionInicial?.pestanas || []) : [];
             const ids = anteriores.map(pestana => crearPestana(pestana.url));
             if (ids.length) activarPestana(ids[sesionInicial.activa] || ids[0]);
-            else crearPestana();
+            else if (!urlPendiente) crearPestana();
+            if (urlPendiente) {
+                crearPestana(urlPendiente);
+                urlPendiente = null;
+            }
             restaurandoSesion = false;
             recordarSesion();
             enviarEstadoBarraLateral();
@@ -744,6 +759,98 @@ function crearVentana() {
         }
     );
 }
+
+function abrirPrincipal() {
+    if (ventanaPrincipal && !ventanaPrincipal.isDestroyed()) return;
+    cerrandoVentana = false;
+    restaurandoSesion = true;
+    crearVentana();
+}
+
+function abrirEnNavegador(url) {
+    if (ventanaPrincipal && !ventanaPrincipal.isDestroyed() && !restaurandoSesion) {
+        crearPestana(url);
+        if (ventanaPrincipal.isMinimized()) ventanaPrincipal.restore();
+        ventanaPrincipal.show();
+        ventanaPrincipal.focus();
+        return;
+    }
+    urlPendiente = url;
+    abrirPrincipal();
+}
+
+function abrirVentanaApp(url) {
+    const ventana = crearVentanaApp({
+        BrowserWindow,
+        url,
+        icono: RUTA_ICONO,
+        preferencias: PREFERENCIAS_WEB,
+        abrirEnNavegador
+    });
+    ventanasApp.add(ventana);
+    ventana.on("closed", () => ventanasApp.delete(ventana));
+    return ventana;
+}
+
+function atenderLanzamiento(argv) {
+    if (!observarVisitas) return false;
+    const urlApp = extraerURLApp(argv);
+    if (urlApp) {
+        abrirVentanaApp(urlApp);
+        return true;
+    }
+    if (!ventanaPrincipal || ventanaPrincipal.isDestroyed()) {
+        abrirPrincipal();
+        return true;
+    }
+    return false;
+}
+
+async function descargarIcono(direccion) {
+    if (/^data:/i.test(direccion)) {
+        const coma = direccion.indexOf(",");
+        const cabecera = direccion.slice(0, coma);
+        const datos = direccion.slice(coma + 1);
+        return /;base64$/i.test(cabecera)
+            ? Buffer.from(datos, "base64")
+            : Buffer.from(decodeURIComponent(datos));
+    }
+    const respuesta = await session.defaultSession.fetch(direccion, { signal: AbortSignal.timeout(8000) });
+    if (!respuesta.ok) throw new Error("Ícono no disponible");
+    return Buffer.from(await respuesta.arrayBuffer());
+}
+
+ipcInterfaz.handle("crear-app-pagina", async () => {
+    try {
+        if (process.platform !== "win32") {
+            throw new Error("Crear apps de páginas está disponible en Windows.");
+        }
+        const pestana = obtenerPestanaActiva();
+        const contenido = obtenerContenido(pestana);
+        const url = urlAppValida(contenido?.getURL() || pestana?.url);
+        if (!pestana || !url) throw new Error("Abrí una página web para crear su app.");
+        const icono = await prepararIcono({
+            favicon: pestana.favicon,
+            descargar: descargarIcono,
+            nativeImage,
+            carpeta: path.join(app.getPath("userData"), "apps"),
+            url,
+            iconoRespaldo: RUTA_ICONO
+        });
+        const { nombre } = await crearAccesoDirecto({
+            shell,
+            escritorio: app.getPath("desktop"),
+            ejecutable: ejecutableEstable(process.execPath),
+            argumentosBase: app.isPackaged ? "" : `"${app.getAppPath()}"`,
+            url,
+            titulo: pestana.titulo,
+            icono
+        });
+        return { correcto: true, nombre };
+    } catch (error) {
+        return { correcto: false, error: error.message || "No se pudo crear la app." };
+    }
+});
 
 ipcInterfaz.on("abrir-busqueda", () => gestorBusqueda.abrir());
 ipcInterfaz.on("detener-carga", detenerCargaActiva);
@@ -953,7 +1060,7 @@ process.on(
     }
 );
 
-if (registrarInstanciaUnica(app, () => ventanaPrincipal)) app.whenReady()
+if (registrarInstanciaUnica(app, () => ventanaPrincipal, atenderLanzamiento)) app.whenReady()
     .then(async () => {
         console.log("Electron listo.");
         gestorConfiguracion = registrarConfiguracion({
@@ -1006,7 +1113,9 @@ if (registrarInstanciaUnica(app, () => ventanaPrincipal)) app.whenReady()
             obtenerPestana: obtenerPestanaActiva,
             navegar
         });
-        crearVentana();
+        const urlApp = extraerURLApp(process.argv);
+        if (urlApp) abrirVentanaApp(urlApp);
+        else crearVentana();
         gestorProteccion.actualizarSiHaceFalta();
     })
     .catch((error) => {

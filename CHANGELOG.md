@@ -6,6 +6,18 @@ El formato está inspirado en "Keep a Changelog" y el proyecto seguirá Versiona
 
 ---
 
+## [1.0.6] - Sin publicar
+
+### Agregado
+
+- Botón **"Crear app de esta página"** (⧉) en la barra, al lado de la dirección. Crea un acceso directo en el escritorio con el ícono del sitio; al abrirlo, la página aparece en una ventana propia, sin pestañas ni barra (ideal para el panel del router, el correo o cualquier sitio que uses seguido).
+- Las ventanas de app usan la misma protección contra anuncios y la misma sesión que Patagonia, con `sandbox: true` y sin acceso a la interfaz privilegiada.
+- Los enlaces a otros sitios y las ventanas emergentes de una app se abren como pestaña en Patagonia.
+- Atajos dentro de una app: F5 / Ctrl+R recarga, Alt+← / Alt+→ navega, Ctrl+W cierra.
+- Los accesos directos apuntan al lanzador estable de la instalación, así siguen funcionando después de cada actualización.
+
+---
+
 ## [Android 1.1.0] - 2026-11-04
 
 ### Cambiado

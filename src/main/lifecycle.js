@@ -1,9 +1,11 @@
-function registrarInstanciaUnica(app, obtenerVentana) {
+function registrarInstanciaUnica(app, obtenerVentana, atenderLanzamiento = () => false) {
     if (!app.requestSingleInstanceLock()) {
         app.quit();
         return false;
     }
-    app.on("second-instance", () => {
+    app.on("second-instance", (_evento, argv = []) => {
+        // Un acceso directo de app o una ventana principal cerrada se resuelven aparte.
+        if (atenderLanzamiento(argv)) return;
         const ventana = obtenerVentana();
         if (!ventana || ventana.isDestroyed()) return;
         if (ventana.isMinimized()) ventana.restore();
