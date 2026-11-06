@@ -15,6 +15,12 @@ El formato está inspirado en "Keep a Changelog" y el proyecto seguirá Versiona
 - Los enlaces a otros sitios y las ventanas emergentes de una app se abren como pestaña en Patagonia.
 - Atajos dentro de una app: F5 / Ctrl+R recarga, Alt+← / Alt+→ navega, Ctrl+W cierra.
 - Los accesos directos apuntan al lanzador estable de la instalación, así siguen funcionando después de cada actualización.
+- **Menú de clic derecho** en las páginas y en las apps:
+  - Imágenes: abrir en pestaña nueva, **guardar imagen como…**, copiar imagen y copiar su dirección.
+  - Enlaces: abrir en pestaña nueva y copiar la dirección.
+  - Texto seleccionado: copiar y buscar en DuckDuckGo.
+  - Campos de texto: deshacer, rehacer, cortar, copiar, pegar y seleccionar todo.
+  - Resto de la página: atrás, adelante, recargar y seleccionar todo.
 
 ---
 

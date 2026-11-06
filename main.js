@@ -7,7 +7,8 @@ const {
     shell,
     dialog,
     Menu,
-    nativeImage
+    nativeImage,
+    clipboard
 } = require("electron");
 
 if (require("electron-squirrel-startup")) {
@@ -59,6 +60,7 @@ const {
     crearAccesoDirecto,
     crearVentanaApp
 } = require("./src/main/webApps");
+const { registrarMenuContextual } = require("./src/main/contextMenu");
 const {
     Readability
 } = require("@mozilla/readability");
@@ -378,6 +380,13 @@ function crearPestana(
     pestanas.push(pestana);
     gestorProteccion?.reiniciarPestana(idContenido);
     conectarAtajos(vista.webContents);
+    registrarMenuContextual({
+        contenido: vista.webContents,
+        Menu,
+        clipboard,
+        obtenerVentana: () => ventanaPrincipal,
+        abrirEnPestana: destinoNuevo => crearPestana(destinoNuevo)
+    });
     observarVisitas(vista.webContents);
     gestorBusqueda.observar(vista.webContents);
     registrarAperturas({
@@ -786,6 +795,13 @@ function abrirVentanaApp(url) {
         icono: RUTA_ICONO,
         preferencias: PREFERENCIAS_WEB,
         abrirEnNavegador
+    });
+    registrarMenuContextual({
+        contenido: ventana.webContents,
+        Menu,
+        clipboard,
+        obtenerVentana: () => ventana,
+        abrirEnPestana: abrirEnNavegador
     });
     ventanasApp.add(ventana);
     ventana.on("closed", () => ventanasApp.delete(ventana));
