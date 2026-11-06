@@ -267,6 +267,7 @@ for (const restaurar of [true, false]) test(`main startup respects restore=${res
         if (nombre.endsWith("/bookmarks")) return require("../src/main/bookmarks");
         if (nombre.endsWith("/loadErrors")) return { registrarErroresCarga: () => {} };
         if (nombre.endsWith("/webApps")) return require("../src/main/webApps");
+        if (nombre.endsWith("/contextMenu")) return require("../src/main/contextMenu");
         return {};
     };
     require("node:vm").runInNewContext("(function () {\n" + await fs.readFile(path.join(__dirname, "../main.js"), "utf8") + "\n})();", {
