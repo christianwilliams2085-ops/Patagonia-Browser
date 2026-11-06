@@ -11,6 +11,15 @@ const {
     clipboard
 } = require("electron");
 
+const eventoInstalador = typeof process !== "undefined" ? (process.argv || [])[1] : undefined;
+if (typeof eventoInstalador === "string" && eventoInstalador.startsWith("--squirrel-") && process.platform === "win32") {
+    // Registrar o quitar Patagonia de la lista de navegadores de Windows.
+    require("./src/main/defaultBrowser").atenderEventoInstalador(
+        process.argv,
+        require("./src/main/webApps").ejecutableEstable(process.execPath)
+    );
+}
+
 if (require("electron-squirrel-startup")) {
     app.quit();
     return;
@@ -61,6 +70,7 @@ const {
     crearVentanaApp
 } = require("./src/main/webApps");
 const { registrarMenuContextual } = require("./src/main/contextMenu");
+const navegadorPredeterminado = require("./src/main/defaultBrowser");
 const {
     Readability
 } = require("@mozilla/readability");
@@ -92,7 +102,7 @@ let gestorDescargas;
 let gestorPermisos;
 let gestorFavoritos;
 let gestorProteccion;
-let urlPendiente = null;
+const enlacesPendientes = [];
 const ventanasApp = new Set();
 const pestañasCerradas = crearPestanasCerradas();
 const cierresSolicitados = new Set();
@@ -662,11 +672,8 @@ function crearVentana() {
             const anteriores = gestorConfiguracion.estado().restaurar ? (sesionInicial?.pestanas || []) : [];
             const ids = anteriores.map(pestana => crearPestana(pestana.url));
             if (ids.length) activarPestana(ids[sesionInicial.activa] || ids[0]);
-            else if (!urlPendiente) crearPestana();
-            if (urlPendiente) {
-                crearPestana(urlPendiente);
-                urlPendiente = null;
-            }
+            else if (!enlacesPendientes.length) crearPestana();
+            for (const enlace of enlacesPendientes.splice(0)) crearPestana(enlace);
             restaurandoSesion = false;
             recordarSesion();
             enviarEstadoBarraLateral();
@@ -784,7 +791,7 @@ function abrirEnNavegador(url) {
         ventanaPrincipal.focus();
         return;
     }
-    urlPendiente = url;
+    enlacesPendientes.push(url);
     abrirPrincipal();
 }
 
@@ -813,6 +820,11 @@ function atenderLanzamiento(argv) {
     const urlApp = extraerURLApp(argv);
     if (urlApp) {
         abrirVentanaApp(urlApp);
+        return true;
+    }
+    const enlaces = navegadorPredeterminado.extraerEnlaces(argv);
+    if (enlaces.length) {
+        enlaces.forEach(abrirEnNavegador);
         return true;
     }
     if (!ventanaPrincipal || ventanaPrincipal.isDestroyed()) {
@@ -865,6 +877,20 @@ ipcInterfaz.handle("crear-app-pagina", async () => {
         return { correcto: true, nombre };
     } catch (error) {
         return { correcto: false, error: error.message || "No se pudo crear la app." };
+    }
+});
+
+ipcInterfaz.handle("usar-como-predeterminado", async () => {
+    try {
+        if (process.platform !== "win32") throw new Error("Esta opción está disponible en Windows.");
+        if (!app.isPackaged) throw new Error("Esta opción funciona en Patagonia instalado, no en modo desarrollo.");
+        await navegadorPredeterminado.ejecutarEnSegundoPlano(
+            navegadorPredeterminado.comandosRegistrar(ejecutableEstable(process.execPath))
+        );
+        await navegadorPredeterminado.abrirConfiguracionWindows(shell);
+        return { correcto: true };
+    } catch (error) {
+        return { correcto: false, error: error.message || "No se pudo abrir la configuración de Windows." };
     }
 });
 
@@ -1129,9 +1155,19 @@ if (registrarInstanciaUnica(app, () => ventanaPrincipal, atenderLanzamiento)) ap
             obtenerPestana: obtenerPestanaActiva,
             navegar
         });
-        const urlApp = extraerURLApp(process.argv);
+        const argv = process.argv || [];
+        const urlApp = extraerURLApp(argv);
         if (urlApp) abrirVentanaApp(urlApp);
-        else crearVentana();
+        else {
+            enlacesPendientes.push(...navegadorPredeterminado.extraerEnlaces(argv));
+            crearVentana();
+        }
+        if (process.platform === "win32" && app.isPackaged) {
+            // Mantiene el registro al día aunque cambie la carpeta de instalación.
+            void navegadorPredeterminado.ejecutarEnSegundoPlano(
+                navegadorPredeterminado.comandosRegistrar(ejecutableEstable(process.execPath))
+            );
+        }
         gestorProteccion.actualizarSiHaceFalta();
     })
     .catch((error) => {

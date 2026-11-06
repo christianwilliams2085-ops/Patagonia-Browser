@@ -36,6 +36,7 @@ contextBridge.exposeInMainWorld("patagonia", {
     eliminarFavorito: (id) => ipcRenderer.invoke("eliminar-favorito", id),
     abrirFavorito: (id) => ipcRenderer.invoke("abrir-favorito", id),
     crearAppPagina: () => ipcRenderer.invoke("crear-app-pagina"),
+    usarComoPredeterminado: () => ipcRenderer.invoke("usar-como-predeterminado"),
 
     navegar: (url) => ipcRenderer.send("navegar", url),
 

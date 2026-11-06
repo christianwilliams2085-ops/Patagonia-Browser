@@ -35,6 +35,21 @@
             ejecutar(() => window.patagonia.obtenerConfiguracion());
         }
     });
+    const predeterminado = document.getElementById("usarPredeterminado");
+    const estadoPredeterminado = document.getElementById("estadoPredeterminado");
+    predeterminado.addEventListener("click", async () => {
+        predeterminado.disabled = true;
+        estadoPredeterminado.textContent = "Abriendo la configuración de Windows…";
+        try {
+            const respuesta = await window.patagonia.usarComoPredeterminado();
+            if (!respuesta?.correcto) throw new Error(respuesta?.error);
+            estadoPredeterminado.textContent = "En la ventana de Windows, elegí Patagonia Browser para HTTP y HTTPS (o tocá \"Establecer como predeterminado\").";
+        } catch (error) {
+            estadoPredeterminado.textContent = error.message || "No se pudo abrir la configuración de Windows.";
+        } finally {
+            predeterminado.disabled = false;
+        }
+    });
     formulario.addEventListener("submit", evento => {
         evento.preventDefault();
         ejecutar(() => window.patagonia.guardarConfiguracion({ inicio: inicio.value.trim(), restaurar: restaurar.checked }), true);
